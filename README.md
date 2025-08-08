@@ -1,3 +1,5 @@
+[![Codespaces Prebuilds](https://github.com/mikaelkraft/Quicknote_Pro/actions/workflows/codespaces/create_codespaces_prebuilds/badge.svg)](https://github.com/mikaelkraft/Quicknote_Pro/actions/workflows/codespaces/create_codespaces_prebuilds)
+
 # Quicknote Pro
 
 A modern note-taking application that allows you to doodle, take screenshots, upload images, use voice note, sync to cloud and save to multiple servers.
