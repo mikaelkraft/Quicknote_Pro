@@ -1,8 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/local/note_repository.dart';
+import '../../services/local/hive_initializer.dart';
+import '../../services/premium/premium_service.dart';
+import '../../models/note.dart';
 import './widgets/drawing_canvas_widget.dart';
 import './widgets/formatting_toolbar_widget.dart';
 import './widgets/image_insertion_widget.dart';
@@ -30,33 +35,66 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   bool _showImageInsertion = false;
   bool _isSaving = false;
   bool _hasUnsavedChanges = false;
-  bool _isPremiumUser = false; // Mock premium status
   DateTime? _lastSaved;
+  
+  // Services
+  final NoteRepository _noteRepository = NoteRepository();
+  final PremiumService _premiumService = PremiumService();
 
-  // Mock note data
-  final Map<String, dynamic> _noteData = {
-    'id': '1',
-    'title': '',
-    'content': '',
-    'createdAt': DateTime.now(),
-    'updatedAt': DateTime.now(),
-    'folder': 'Personal',
-    'tags': <String>[],
-    'images': <String>[],
-    'voiceNotes': <String>[],
-  };
+  // Current note
+  Note? _currentNote;
+  String? _noteId;
 
   @override
   void initState() {
     super.initState();
     _setupKeyboardListener();
     _setupAutoSave();
-    _titleFocusNode.requestFocus();
 
     // Setup text change listeners
     _titleController.addListener(_onTextChanged);
     _contentController.addListener(_onTextChanged);
     _contentFocusNode.addListener(_onContentFocusChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get note ID from route arguments
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final noteId = args?['noteId'] as String?;
+    
+    if (noteId != null && _noteId != noteId) {
+      _noteId = noteId;
+      _loadNote(noteId);
+    } else if (noteId == null && _currentNote == null) {
+      // Create new note if no ID provided
+      _createNewNote();
+    }
+  }
+
+  Future<void> _loadNote(String noteId) async {
+    final note = _noteRepository.getNoteById(noteId);
+    if (note != null) {
+      setState(() {
+        _currentNote = note;
+        _titleController.text = note.title;
+        _contentController.text = note.content;
+        _hasUnsavedChanges = false;
+      });
+      _titleFocusNode.requestFocus();
+    }
+  }
+
+  Future<void> _createNewNote() async {
+    final note = await _noteRepository.createNote();
+    setState(() {
+      _currentNote = note;
+      _noteId = note.id;
+      _hasUnsavedChanges = false;
+    });
+    _titleFocusNode.requestFocus();
   }
 
   @override
@@ -107,32 +145,49 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   }
 
   Future<void> _saveNote({bool showConfirmation = true}) async {
+    if (_currentNote == null) return;
+    
     setState(() => _isSaving = true);
 
-    // Simulate save operation
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    _noteData['title'] = _titleController.text;
-    _noteData['content'] = _contentController.text;
-    _noteData['updatedAt'] = DateTime.now();
-
-    setState(() {
-      _isSaving = false;
-      _hasUnsavedChanges = false;
-      _lastSaved = DateTime.now();
-    });
-
-    if (showConfirmation) {
-      HapticFeedback.lightImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Note saved successfully'),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+    try {
+      // Update note with current content
+      final updatedNote = _currentNote!.copyWith(
+        title: _titleController.text,
+        content: _contentController.text,
       );
+      
+      await _noteRepository.updateNote(updatedNote);
+      
+      setState(() {
+        _currentNote = updatedNote;
+        _isSaving = false;
+        _hasUnsavedChanges = false;
+        _lastSaved = DateTime.now();
+      });
+
+      if (showConfirmation) {
+        HapticFeedback.lightImpact();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Note saved successfully'),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isSaving = false);
+      
+      if (showConfirmation) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
   }
 
@@ -274,27 +329,57 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     HapticFeedback.lightImpact();
   }
 
-  void _handleImageInsertion(String imagePath) {
-    setState(() {
-      _showImageInsertion = false;
-      _noteData['images'].add(imagePath);
-    });
+  void _handleImageInsertion(String imagePath) async {
+    if (_currentNote == null) return;
+    
+    try {
+      setState(() {
+        _showImageInsertion = false;
+      });
 
-    // Insert image reference in content
-    final currentText = _contentController.text;
-    final cursorPosition = _contentController.selection.baseOffset;
-    final imageRef = '\n![Image](${imagePath})\n';
+      // Copy file to app directory
+      final noteMediaPath = await HiveInitializer.getNoteMediaPath(_currentNote!.id);
+      final fileName = imagePath.split('/').last;
+      final destinationPath = '$noteMediaPath/$fileName';
+      
+      // Copy the file
+      final sourceFile = File(imagePath);
+      final destinationFile = await sourceFile.copy(destinationPath);
+      
+      // Update note with new image path
+      final updatedImages = List<String>.from(_currentNote!.images);
+      updatedImages.add(destinationFile.path);
+      
+      final updatedNote = _currentNote!.copyWith(images: updatedImages);
+      await _noteRepository.updateNote(updatedNote);
+      
+      setState(() {
+        _currentNote = updatedNote;
+      });
 
-    final newText = currentText.substring(0, cursorPosition) +
-        imageRef +
-        currentText.substring(cursorPosition);
+      // Insert image reference in content
+      final currentText = _contentController.text;
+      final cursorPosition = _contentController.selection.baseOffset;
+      final imageRef = '\n![Image]($destinationPath)\n';
 
-    _contentController.text = newText;
-    _contentController.selection = TextSelection.collapsed(
-      offset: cursorPosition + imageRef.length,
-    );
+      final newText = currentText.substring(0, cursorPosition) +
+          imageRef +
+          currentText.substring(cursorPosition);
 
-    HapticFeedback.lightImpact();
+      _contentController.text = newText;
+      _contentController.selection = TextSelection.collapsed(
+        offset: cursorPosition + imageRef.length,
+      );
+
+      HapticFeedback.lightImpact();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add image: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   @override
@@ -489,14 +574,14 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildVoiceInput() {
     return VoiceInputWidget(
       onTranscriptionComplete: _handleVoiceTranscription,
-      isPremiumUser: _isPremiumUser,
+      isPremiumUser: _premiumService.isPremium,
     );
   }
 
   Widget _buildDrawingCanvas() {
     return Positioned.fill(
       child: DrawingCanvasWidget(
-        isPremiumUser: _isPremiumUser,
+        isPremiumUser: _premiumService.isPremium,
         onClose: () => setState(() => _showDrawingCanvas = false),
       ),
     );
@@ -555,7 +640,13 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
       children: [
         FloatingActionButton(
           heroTag: 'drawing',
-          onPressed: () => setState(() => _showDrawingCanvas = true),
+          onPressed: () {
+            if (_premiumService.isFeatureAvailable(PremiumFeature.doodling)) {
+              setState(() => _showDrawingCanvas = true);
+            } else {
+              _showPremiumUpsell(PremiumFeature.doodling);
+            }
+          },
           backgroundColor: AppTheme.getAccentColor(
               Theme.of(context).brightness == Brightness.light),
           child: CustomIconWidget(
@@ -576,6 +667,35 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
           ),
         ),
       ],
+    );
+  }
+
+  void _showPremiumUpsell(PremiumFeature feature) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Premium Feature',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        content: Text(
+          _premiumService.getUpsellMessage(feature),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+            },
+            child: const Text('Upgrade'),
+          ),
+        ],
+      ),
     );
   }
 

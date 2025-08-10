@@ -42,10 +42,13 @@ class NoteRepository {
 
   /// Get note by ID
   Note? getNoteById(String id) {
-    return _box.values.firstWhere(
-      (note) => note.id == id && note.deletedAt == null,
-      orElse: () => null,
-    );
+    try {
+      return _box.values.firstWhere(
+        (note) => note.id == id && note.deletedAt == null,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Create a new note

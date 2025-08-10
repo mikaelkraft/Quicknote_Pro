@@ -29,7 +29,7 @@ dependencies:
   record: ^5.0.4
   
   # Local persistence dependencies
-  hive: ^4.0.0
+  hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.4
   

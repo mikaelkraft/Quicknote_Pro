@@ -2,7 +2,51 @@
 
 # Quicknote Pro
 
-A modern note-taking application that allows you to doodle, take screenshots, upload images, use voice note, sync to cloud and save to multiple servers.
+A modern note-taking application with real-time local persistence and optional cloud synchronization. Features include rich text editing, image insertion, drawing/doodling, voice notes, file attachments, and premium gating for advanced features.
+
+## ✨ Features
+
+### Core Features (Free)
+- **Rich Text Editing**: Full markdown support with formatting toolbar
+- **Image Insertion**: Camera capture and gallery selection with local file management
+- **Voice Notes**: Voice-to-text transcription
+- **Local Persistence**: Robust local storage using Hive database
+- **Search & Filtering**: Powerful search across note content, tags, and folders
+- **Organization**: Pin notes, add tags, and organize in folders
+
+### Premium Features
+- **Drawing & Doodling**: Digital canvas with various brushes and colors
+- **File Attachments**: Attach any file type to notes
+- **Cloud Synchronization**: 
+  - Google Drive integration (configurable)
+  - OneDrive integration (configurable)
+  - Automatic sync with conflict resolution
+- **Advanced Search**: AI-powered search suggestions
+
+### Cloud Sync Configuration (Optional)
+
+By default, the app runs in **local-only mode** and builds successfully without any cloud credentials. To enable cloud sync:
+
+#### Google Drive Setup
+1. Create a project in [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the Google Drive API
+3. Create OAuth 2.0 credentials for your app
+4. Update `lib/services/sync/providers/google_drive_sync_provider.dart`:
+   ```dart
+   static const bool _isEnabled = true; // Enable Google Drive
+   ```
+5. Configure OAuth credentials in your app's Info.plist (iOS) or AndroidManifest.xml
+
+#### OneDrive Setup
+1. Register your app in [Microsoft Azure Portal](https://portal.azure.com/)
+2. Configure Microsoft Graph API permissions
+3. Update `lib/services/sync/providers/onedrive_sync_provider.dart`:
+   ```dart
+   static const bool _isEnabled = true; // Enable OneDrive
+   ```
+4. Configure OAuth redirect URIs
+
+**Note**: The app builds and runs perfectly without cloud credentials. Cloud sync features will show "Not configured" in settings.
 
 ## 📋 Prerequisites
 
@@ -13,55 +57,90 @@ A modern note-taking application that allows you to doodle, take screenshots, up
 
 ## 🛠️ Installation
 
-1. Install dependencies:
+1. Clone the repository:
+```bash
+git clone https://github.com/mikaelkraft/Quicknote_Pro.git
+cd Quicknote_Pro
+```
+
+2. Install dependencies:
 ```bash
 flutter pub get
 ```
 
-2. Run the application:
+3. Generate Hive type adapters:
+```bash
+dart run build_runner build
+```
+
+4. Run the application:
 ```bash
 flutter run
+```
+
+### Development Setup
+
+For development with premium features enabled:
+```dart
+// Enable premium for testing
+final premiumService = PremiumService();
+await premiumService.grantPremium(); // Grants lifetime premium
 ```
 
 ## 📁 Project Structure
 
 ```
-flutter_app/
-├── android/            # Android-specific configuration
-├── ios/                # iOS-specific configuration
-├── lib/
-│   ├── core/           # Core utilities and services
-│   │   └── utils/      # Utility classes
-│   ├── presentation/   # UI screens and widgets
-│   │   └── splash_screen/ # Splash screen implementation
-│   ├── routes/         # Application routing
-│   ├── theme/          # Theme configuration
-│   ├── widgets/        # Reusable UI components
-│   └── main.dart       # Application entry point
-├── assets/             # Static assets (images, fonts, etc.)
-├── pubspec.yaml        # Project dependencies and configuration
-└── README.md           # Project documentation
+lib/
+├── core/                 # Core utilities and services
+├── models/               # Data models (Note, etc.)
+│   ├── note.dart        # Note model with Hive annotations
+│   └── note.g.dart      # Generated Hive adapters
+├── services/            # Business logic services
+│   ├── local/           # Local persistence services
+│   │   ├── hive_initializer.dart    # Database initialization
+│   │   └── note_repository.dart     # Note CRUD operations
+│   ├── premium/         # Premium feature management
+│   │   └── premium_service.dart     # Premium status and gating
+│   └── sync/            # Cloud synchronization
+│       ├── cloud_sync_service.dart  # Abstract sync interface
+│       ├── sync_manager.dart        # Sync orchestration
+│       └── providers/               # Cloud provider implementations
+│           ├── google_drive_sync_provider.dart
+│           └── onedrive_sync_provider.dart
+├── presentation/        # UI screens and widgets
+│   ├── notes_dashboard/             # Main notes interface
+│   ├── note_creation_editor/        # Note editing interface
+│   ├── settings_profile/
+│   │   └── cloud_connections.dart   # Cloud sync settings
+│   └── ...              # Other UI screens
+├── routes/              # Application routing
+├── theme/               # Theme configuration
+├── widgets/             # Reusable UI components
+└── main.dart            # Application entry point with service initialization
 ```
 
-## 🧩 Adding Routes
+## 🧩 Architecture
 
-To add new routes to the application, update the `lib/routes/app_routes.dart` file:
+### Local Persistence
+- **Hive Database**: NoSQL database for fast local storage
+- **Repository Pattern**: Clean separation between data access and business logic
+- **Reactive Streams**: Real-time UI updates via note repository streams
 
-```dart
-import 'package:flutter/material.dart';
-import 'package:package_name/presentation/home_screen/home_screen.dart';
+### Cloud Sync (Optional)
+- **Pluggable Providers**: Easy to add new cloud storage providers
+- **Offline-First**: Works seamlessly without internet connection
+- **Conflict Resolution**: Last-write-wins with basic merge safeguards
+- **Background Sync**: Automatic synchronization every 30 minutes when connected
 
-class AppRoutes {
-  static const String initial = '/';
-  static const String home = '/home';
+### Premium System
+- **Local Premium State**: Stored in Hive for offline access
+- **Feature Gating**: Centralized premium feature management
+- **Extensible**: Easy to integrate with real IAP systems later
 
-  static Map<String, WidgetBuilder> routes = {
-    initial: (context) => const SplashScreen(),
-    home: (context) => const HomeScreen(),
-    // Add more routes as needed
-  }
-}
-```
+### File Management
+- **Stable Storage**: Images and attachments copied to app documents directory
+- **Relative Paths**: Notes store relative paths for portability
+- **Auto-Cleanup**: Orphaned files removed during sync operations
 
 ## 🎨 Theming
 
