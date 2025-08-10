@@ -27,11 +27,20 @@ dependencies:
   image_picker: ^1.0.4
   permission_handler: ^11.1.0
   record: ^5.0.4
+  
+  # New dependencies for enhanced features
+  provider: ^6.1.1         # State management for theme service
+  share_plus: ^7.2.1      # Share functionality for notes
+  hive: ^2.2.3            # Local data persistence
+  hive_flutter: ^1.1.0    # Flutter integration for Hive
+  in_app_purchase: ^3.1.11 # IAP functionality (behind feature flag)
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
     sdk: flutter   # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
   flutter_lints: ^5.0.0 # 🚨 CRITICAL: Required for code quality - DO NOT REMOVE
+  hive_generator: ^2.0.1 # Code generation for Hive models
+  build_runner: ^2.4.7   # Code generation runner
 
 flutter:
   uses-material-design: true # 🚨 CRITICAL: Required for Material icon font - DO NOT REMOVE
