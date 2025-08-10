@@ -462,6 +462,12 @@ class _SettingsProfileState extends State<SettingsProfile>
                                   (value) =>
                                       setState(() => _autoBackup = value),
                                 ),
+                                _buildActionTile(
+                                  'Cloud Connections',
+                                  'Manage cloud storage providers',
+                                  'settings_applications',
+                                  () => Navigator.pushNamed(context, AppRoutes.cloudConnections),
+                                ),
                                 _buildManualBackupTile(),
                               ],
                             ),

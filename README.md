@@ -106,6 +106,110 @@ flutter build apk --release
 flutter build ios --release
 ```
 
+## ☁️ Cloud Sync
+
+QuickNote Pro supports multiple cloud storage providers for syncing your notes and media. All providers are optional - the app works perfectly in Local Only mode without any cloud configuration.
+
+### Supported Providers
+
+#### Google Drive & OneDrive
+*Coming soon - OAuth 2.0 integration*
+
+#### Dropbox
+OAuth 2.0 authentication with secure token storage.
+- **Requirements**: Client ID configuration in build settings
+- **Features**: File upload/download, automatic sync
+- **File size limit**: 150MB per file
+- **Setup**: Configure `DROPBOX_CLIENT_ID` in your build environment
+
+#### Box
+Enterprise-grade cloud storage with OAuth 2.0.
+- **Requirements**: Client ID configuration in build settings  
+- **Features**: File upload/download, folder organization
+- **File size limit**: 5GB per file
+- **Setup**: Configure `BOX_CLIENT_ID` in your build environment
+
+#### WebDAV (Nextcloud/ownCloud)
+Direct WebDAV integration with username/password authentication.
+- **Requirements**: Server URL, username, app password
+- **Features**: PROPFIND/PUT/GET operations, folder management
+- **File size limit**: Server dependent (usually unlimited)
+- **Setup**: Configure in Cloud Connections settings
+- **Security**: Uses app passwords (recommended) or main password
+
+#### S3-Compatible Storage (AWS S3/MinIO)
+Support for AWS S3 and S3-compatible services.
+- **Requirements**: Access key, secret key, region, bucket name
+- **Features**: putObject/getObject/list operations  
+- **File size limit**: 5GB per file
+- **Custom endpoints**: Supports MinIO and other S3-compatible services
+- **Setup**: Configure credentials in Cloud Connections settings
+
+#### Bitbucket (Repository-based)
+Store notes as JSON files in a Git repository.
+- **Requirements**: OAuth 2.0 client ID, workspace, repository
+- **Features**: Git-based versioning, structured note storage
+- **File organization**: Notes in `notes/` folder, media in `media/` folder
+- **File size limit**: 100MB (Git LFS recommended for larger files)
+- **Setup**: Configure `BITBUCKET_CLIENT_ID` and repository details
+
+### Configuration
+
+#### Build-time Configuration
+For OAuth-based providers (Dropbox, Box, Bitbucket), you need to configure client IDs:
+
+1. **Android**: Update `android/app/build.gradle`
+2. **iOS**: Update `ios/Runner/Info.plist`  
+3. **Redirect URIs**: 
+   - Dropbox: `com.quicknote.pro://oauth/dropbox`
+   - Box: `com.quicknote.pro://oauth/box`
+   - Bitbucket: `com.quicknote.pro://oauth/bitbucket`
+
+#### Runtime Configuration
+For credential-based providers (WebDAV, S3), configure through the app:
+
+1. Open Settings → Cloud Connections
+2. Select your provider
+3. Enter credentials and server details
+4. Test connection
+
+### Local Only Mode
+
+The app builds and runs perfectly without any provider configuration:
+- All cloud sync features are safely disabled
+- Settings show "Not Configured" status
+- Sync operations become no-ops
+- Full offline functionality maintained
+
+### Premium Features
+
+Premium subscription required for:
+- File uploads (images, voice recordings)
+- Drawing/doodling features
+- Multi-provider sync
+
+Free users can:
+- Create and sync text notes
+- Use all cloud providers for text content
+- Access all organizational features
+
+### Development Notes
+
+- All providers implement safe no-op fallbacks
+- Credentials stored in Flutter Secure Storage
+- Feature flags prevent crashes when unconfigured
+- Last-write-wins conflict resolution
+- Automatic retry with exponential backoff
+- Provider capability flags guide sync behavior
+
+### Security
+
+- OAuth tokens stored securely
+- App passwords recommended for WebDAV
+- S3 signature validation (when implemented)
+- No credentials stored in source code
+- Secure storage encryption on device
+
 ## 🙏 Acknowledgments
 - Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
 - Styled with Material Design
