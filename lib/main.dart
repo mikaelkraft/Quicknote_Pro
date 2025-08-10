@@ -10,9 +10,12 @@ import '../services/theme/theme_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize theme service
+  // Initialize services
   final themeService = ThemeService();
   await themeService.initialize();
+  
+  final syncManager = SyncManager();
+  await syncManager.initialize();
 
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -24,19 +27,30 @@ void main() async {
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
   ]).then((value) {
-    runApp(MyApp(themeService: themeService));
+    runApp(MyApp(
+      themeService: themeService,
+      syncManager: syncManager,
+    ));
   });
 }
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final SyncManager syncManager;
 
-  const MyApp({Key? key, required this.themeService}) : super(key: key);
+  const MyApp({
+    Key? key, 
+    required this.themeService,
+    required this.syncManager,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: themeService,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: syncManager),
+      ],
       child: Sizer(builder: (context, orientation, screenType) {
         return Consumer<ThemeService>(
           builder: (context, themeService, child) {
