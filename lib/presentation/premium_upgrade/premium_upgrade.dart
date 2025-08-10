@@ -23,7 +23,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   late Animation<double> _featuresAnimation;
 
   bool _isLoading = false;
-  String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  String _selectedPlan = ProductIds.premiumLifetime; // Default to lifetime
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -414,26 +414,25 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                   children: [
                                     Expanded(
                                       child: PricingOptionWidget(
-                                        title: 'Monthly',
-                                        price: '\$2.99',
+                                        title: ProductIds.productDisplayNames[ProductIds.premiumMonthly]!,
+                                        price: ProductIds.fallbackPrices[ProductIds.premiumMonthly]!,
                                         period: '/month',
                                         savings: null,
-                                        isSelected: _selectedPlan == 'monthly',
+                                        isSelected: _selectedPlan == ProductIds.premiumMonthly,
                                         isRecommended: false,
-                                        onTap: () => _onPlanSelected('monthly'),
+                                        onTap: () => _onPlanSelected(ProductIds.premiumMonthly),
                                       ),
                                     ),
                                     SizedBox(width: 3.w),
                                     Expanded(
                                       child: PricingOptionWidget(
-                                        title: 'Lifetime',
-                                        price: '\$14.99',
+                                        title: ProductIds.productDisplayNames[ProductIds.premiumLifetime]!,
+                                        price: ProductIds.fallbackPrices[ProductIds.premiumLifetime]!,
                                         period: 'one-time',
-                                        savings: 'Save 75%',
-                                        isSelected: _selectedPlan == 'lifetime',
+                                        savings: 'Save 80%',
+                                        isSelected: _selectedPlan == ProductIds.premiumLifetime,
                                         isRecommended: true,
-                                        onTap: () =>
-                                            _onPlanSelected('lifetime'),
+                                        onTap: () => _onPlanSelected(ProductIds.premiumLifetime),
                                       ),
                                     ),
                                   ],

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import './cloud_connections.dart';
 import './widgets/biometric_dialog_widget.dart';
 import './widgets/profile_header_widget.dart';
 import './widgets/settings_section_widget.dart';
@@ -446,11 +447,12 @@ class _SettingsProfileState extends State<SettingsProfile>
 
                             SizedBox(height: 2.h),
 
-                            // Backup & Sync
+                            // Cloud Sync & Backup
                             SettingsSectionWidget(
-                              title: 'Backup & Sync',
+                              title: 'Cloud Sync & Backup',
                               icon: 'cloud_sync',
                               children: [
+                                _buildCloudConnectionsTile(),
                                 _buildSyncStatus(),
                                 _buildSwitchTile(
                                   'Auto Backup',
@@ -781,6 +783,54 @@ class _SettingsProfileState extends State<SettingsProfile>
                   ),
                   Text(
                     'Backup now',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            CustomIconWidget(
+              iconName: 'arrow_forward_ios',
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCloudConnectionsTile() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CloudConnections(),
+          ),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+        child: Row(
+          children: [
+            CustomIconWidget(
+              iconName: 'cloud',
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            SizedBox(width: 3.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Cloud Storage',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  Text(
+                    'Connect Google Drive, OneDrive, and more',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
