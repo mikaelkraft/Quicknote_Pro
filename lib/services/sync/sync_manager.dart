@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'cloud_sync_service.dart';
 import 'provider_registry.dart';
+import '../premium_service.dart';
 
 /// Queue item for sync operations
 class SyncOperation {
@@ -165,6 +166,13 @@ class SyncManager {
     String? folder,
   }) async {
     final results = <SyncResult>[];
+    
+    // Check premium access for file uploads
+    final premiumService = PremiumService();
+    if (!premiumService.canUploadFiles()) {
+      results.add(SyncResult.error('File uploads require premium subscription'));
+      return results;
+    }
     
     for (String providerType in providerTypes) {
       queueOperation(SyncOperation(

@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import '../../core/app_export.dart';
 import '../../services/sync/sync_manager.dart';
 import '../../services/sync/cloud_sync_service.dart';
+import '../../services/premium_service.dart';
 
 class CloudConnectionsScreen extends StatefulWidget {
   const CloudConnectionsScreen({Key? key}) : super(key: key);
@@ -75,6 +76,11 @@ class _CloudConnectionsScreenState extends State<CloudConnectionsScreen> {
   }
 
   Future<void> _syncProvider(String providerType) async {
+    // Check premium access for cloud sync
+    if (!PremiumService.validatePremiumAction(context, 'cloud_sync')) {
+      return;
+    }
+
     try {
       final result = await _syncManager.syncProvider(providerType);
       if (result.success) {
