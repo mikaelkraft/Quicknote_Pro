@@ -4,9 +4,38 @@ import 'package:sizer/sizer.dart';
 
 import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
+import '../services/local/hive_initializer.dart';
+import '../services/local/note_repository.dart';
+import '../services/premium/premium_service.dart';
+import '../services/sync/sync_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive before running the app
+  try {
+    await HiveInitializer.init();
+    print('✅ Hive initialized successfully');
+  } catch (e) {
+    print('❌ Failed to initialize Hive: $e');
+    // Continue with app launch even if Hive fails (graceful degradation)
+  }
+
+  // Initialize services
+  try {
+    final noteRepository = NoteRepository();
+    noteRepository.init();
+    
+    final premiumService = PremiumService();
+    premiumService.init();
+    
+    final syncManager = SyncManager();
+    syncManager.init();
+    
+    print('✅ Services initialized successfully');
+  } catch (e) {
+    print('❌ Failed to initialize services: $e');
+  }
 
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
