@@ -167,26 +167,8 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   void _exportData() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Export Data'),
-        content: const Text('Export all your notes and settings to a file?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _performExport();
-            },
-            child: const Text('Export'),
-          ),
-        ],
-      ),
-    );
+    // Redirect to the new backup & import screen
+    Navigator.pushNamed(context, AppRoutes.backupImport);
   }
 
   void _performExport() async {
@@ -448,7 +430,7 @@ class _SettingsProfileState extends State<SettingsProfile>
 
                             // Backup & Sync
                             SettingsSectionWidget(
-                              title: 'Backup & Sync',
+                              title: 'Cloud & Data',
                               icon: 'cloud_sync',
                               children: [
                                 _buildSyncStatus(),
@@ -460,6 +442,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                                       setState(() => _autoBackup = value),
                                 ),
                                 _buildManualBackupTile(),
+                                _buildBackupImportTile(),
                               ],
                             ),
 
@@ -890,6 +873,47 @@ class _SettingsProfileState extends State<SettingsProfile>
                   ),
                   Text(
                     subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            CustomIconWidget(
+              iconName: 'arrow_forward_ios',
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackupImportTile() {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.backupImport),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+        child: Row(
+          children: [
+            CustomIconWidget(
+              iconName: 'folder_copy',
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            SizedBox(width: 3.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Backup & Import',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  Text(
+                    'Export notes or import from backup files',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
