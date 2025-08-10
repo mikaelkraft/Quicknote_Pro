@@ -1,0 +1,44 @@
+Per request from @mikaelkraft: I will keep pushing incremental commits to this PR and won’t cut test builds. Below is the working plan and tracking checklist; I’ll check items off as they land.
+
+Defaults in use
+- KDF: Argon2id (PBKDF2-HMAC-SHA256 fallback)
+- Export selected: templates excluded by default (toggle available)
+- Remember password: stored via OS Keystore/Keychain when enabled
+
+Encrypted backups
+- [ ] AES-GCM encryption for backup payloads with random nonce per archive
+- [ ] Password prompt UI with optional “remember on device”
+- [ ] Argon2id key derivation with salt; PBKDF2 fallback
+- [ ] Backward-compatible import for unencrypted ZIPs
+- [ ] Robust error handling and user-facing messages
+- [ ] Documentation updates (README)
+
+Export selected
+- [ ] Multi-select toolbar action to export selected notes
+- [ ] Note overflow menu action (single-note export)
+- [ ] Option to include templates (default off)
+- [ ] ZIP layout parity with full export (notes.json + media/)
+- [ ] Tests
+
+Import improvements
+- [ ] Dry-run validation with per-item details
+- [ ] Clearer conflict summary and resolution UX
+- [ ] Better missing-media handling (warnings, optional skip)
+- [ ] Merge strategy confirmation
+- [ ] Tests
+
+UI polish
+- [ ] Progress with cancel
+- [ ] Error states (banners/dialogs)
+- [ ] Post-import sync prompt
+
+Tests
+- [ ] Services unit tests (backup/import, crypto)
+- [ ] Basic UI flows
+- [ ] Crypto edge cases
+
+Misc
+- [ ] README updates for new options
+- [ ] Changelog entry (if applicable)
+
+I’ll continue committing in small slices and will update this comment as items complete. No test builds will be cut until you ask otherwise.
