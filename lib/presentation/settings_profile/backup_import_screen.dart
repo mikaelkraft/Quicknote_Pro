@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +29,6 @@ class _BackupImportScreenState extends State<BackupImportScreen>
   bool _syncAfterImport = true;
   
   ImportResult? _lastImportResult;
-  String? _lastExportPath;
 
   @override
   void initState() {
@@ -84,8 +82,6 @@ class _BackupImportScreenState extends State<BackupImportScreen>
         notes: notes,
         mediaPaths: mediaPaths,
       );
-
-      _lastExportPath = zipPath;
 
       // Share the backup file
       await _backupService.shareBackupFile(

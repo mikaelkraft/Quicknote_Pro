@@ -5,7 +5,6 @@ import 'package:sizer/sizer.dart';
 
 import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
-import '../services/theme/theme_service.dart';
 import '../services/sync/sync_manager.dart';
 
 void main() async {
