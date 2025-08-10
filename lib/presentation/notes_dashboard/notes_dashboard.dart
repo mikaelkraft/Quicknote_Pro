@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/app_export.dart';
 import './widgets/empty_state_widget.dart';
@@ -7,6 +8,7 @@ import './widgets/filter_chip_widget.dart';
 import './widgets/note_card_widget.dart';
 import './widgets/note_type_selector_widget.dart';
 import './widgets/search_bar_widget.dart';
+import './widgets/tag_filter_widget.dart';
 
 class NotesDashboard extends StatefulWidget {
   const NotesDashboard({Key? key}) : super(key: key);
@@ -19,74 +21,10 @@ class _NotesDashboardState extends State<NotesDashboard>
     with TickerProviderStateMixin {
   late TabController _tabController;
   bool _isGridView = false;
-  String _selectedFilter = 'All';
-  String _searchQuery = '';
   bool _isSearchExpanded = false;
 
   // Mock data for notes
-  final List<Map<String, dynamic>> _allNotes = [
-    {
-      "id": 1,
-      "title": "Meeting Notes - Q4 Planning",
-      "content":
-          "Discussed quarterly goals, budget allocation, and team expansion plans. Key decisions made regarding product roadmap and marketing strategy.",
-      "preview":
-          "Discussed quarterly goals, budget allocation, and team expansion plans...",
-      "type": "text",
-      "folder": "Work",
-      "createdAt": "2025-01-28T10:30:00Z",
-      "isPinned": true,
-      "hasReminder": true,
-    },
-    {
-      "id": 2,
-      "title": "Voice Memo - Grocery List",
-      "content":
-          "Milk, eggs, bread, apples, chicken breast, pasta, tomatoes, cheese",
-      "preview": "Milk, eggs, bread, apples, chicken breast, pasta...",
-      "type": "voice",
-      "folder": "Personal",
-      "createdAt": "2025-01-27T15:45:00Z",
-      "isPinned": false,
-      "hasReminder": false,
-    },
-    {
-      "id": 3,
-      "title": "App UI Wireframe",
-      "content": "Initial sketches for the new mobile app interface design",
-      "preview": "Initial sketches for the new mobile app interface design",
-      "type": "drawing",
-      "folder": "Work",
-      "createdAt": "2025-01-26T09:15:00Z",
-      "isPinned": false,
-      "hasReminder": false,
-    },
-    {
-      "id": 4,
-      "title": "Book Ideas",
-      "content":
-          "Collection of interesting plot concepts and character development notes for future writing projects.",
-      "preview":
-          "Collection of interesting plot concepts and character development...",
-      "type": "text",
-      "folder": "Personal",
-      "createdAt": "2025-01-25T20:30:00Z",
-      "isPinned": false,
-      "hasReminder": true,
-    },
-    {
-      "id": 5,
-      "title": "Travel Checklist",
-      "content":
-          "Passport, tickets, hotel confirmation, travel insurance, medications, chargers, camera",
-      "preview": "Passport, tickets, hotel confirmation, travel insurance...",
-      "type": "template",
-      "folder": null,
-      "createdAt": "2025-01-24T14:20:00Z",
-      "isPinned": true,
-      "hasReminder": false,
-    },
-  ];
+  final List<Map<String, dynamic>> _allNotes = [];
 
   List<Map<String, dynamic>> _filteredNotes = [];
   final List<String> _recentSearches = ['meeting notes', 'grocery', 'travel'];
@@ -100,7 +38,6 @@ class _NotesDashboardState extends State<NotesDashboard>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    _filteredNotes = List.from(_allNotes);
   }
 
   @override
@@ -109,39 +46,14 @@ class _NotesDashboardState extends State<NotesDashboard>
     super.dispose();
   }
 
-  void _filterNotes() {
-    setState(() {
-      _filteredNotes = _allNotes.where((note) {
-        bool matchesFilter = _selectedFilter == 'All' ||
-            note['folder'] == _selectedFilter ||
-            (_selectedFilter == 'Pinned' && note['isPinned'] == true) ||
-            (_selectedFilter == 'Reminders' && note['hasReminder'] == true);
-
-        bool matchesSearch = _searchQuery.isEmpty ||
-            (note['title'] as String)
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase()) ||
-            (note['content'] as String)
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase());
-
-        return matchesFilter && matchesSearch;
-      }).toList();
-    });
-  }
-
   void _onFilterSelected(String filter) {
-    setState(() {
-      _selectedFilter = filter;
-    });
-    _filterNotes();
+    final notesService = context.read<NotesService>();
+    notesService.setFilter(filter);
   }
 
   void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-    });
-    _filterNotes();
+    final notesService = context.read<NotesService>();
+    notesService.setSearchQuery(query);
   }
 
   void _showNoteTypeSelector() {
@@ -176,29 +88,55 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   void _onNoteAction(int noteId, String action) {
-    setState(() {
-      final noteIndex = _allNotes.indexWhere((note) => note['id'] == noteId);
-      if (noteIndex != -1) {
-        switch (action) {
-          case 'pin':
-            _allNotes[noteIndex]['isPinned'] =
-                !(_allNotes[noteIndex]['isPinned'] ?? false);
-            break;
-          case 'delete':
-            _allNotes.removeAt(noteIndex);
-            break;
-          case 'duplicate':
-            final originalNote = _allNotes[noteIndex];
-            final duplicatedNote = Map<String, dynamic>.from(originalNote);
-            duplicatedNote['id'] = DateTime.now().millisecondsSinceEpoch;
-            duplicatedNote['title'] = '${originalNote['title']} (Copy)';
-            duplicatedNote['createdAt'] = DateTime.now().toIso8601String();
-            _allNotes.insert(noteIndex + 1, duplicatedNote);
-            break;
-        }
+    final notesService = context.read<NotesService>();
+    
+    switch (action) {
+      case 'pin':
+        notesService.togglePin(noteId);
+        break;
+      case 'delete':
+        notesService.deleteNote(noteId);
+        break;
+      case 'duplicate':
+        notesService.duplicateNote(noteId);
+        break;
+      case 'share':
+        _shareNote(noteId);
+        break;
+    }
+  }
+  
+  Future<void> _shareNote(int noteId) async {
+    try {
+      final notesService = context.read<NotesService>();
+      await notesService.shareNote(noteId);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Share failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-    });
-    _filterNotes();
+    }
+  }
+  
+  void _showTagManagement() {
+    // TODO: Implement tag management dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Tag Management'),
+        content: const Text('Tag management feature coming soon!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -301,53 +239,40 @@ class _NotesDashboardState extends State<NotesDashboard>
 
             // Filter chips
             if (!_isSearchExpanded) ...[
-              Container(
-                height: 6.h,
-                padding: EdgeInsets.symmetric(vertical: 1.h),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  children: [
-                    FilterChipWidget(
-                      label: 'All',
-                      count: _allNotes.length,
-                      isSelected: _selectedFilter == 'All',
-                      onTap: () => _onFilterSelected('All'),
+              Consumer<NotesService>(
+                builder: (context, notesService, child) {
+                  final filterCounts = notesService.filterCounts;
+                  final selectedFilter = notesService.selectedFilter;
+                  
+                  return Container(
+                    height: 6.h,
+                    padding: EdgeInsets.symmetric(vertical: 1.h),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      children: filterCounts.entries.map((entry) {
+                        return FilterChipWidget(
+                          label: entry.key,
+                          count: entry.value,
+                          isSelected: selectedFilter == entry.key,
+                          onTap: () => _onFilterSelected(entry.key),
+                        );
+                      }).toList(),
                     ),
-                    FilterChipWidget(
-                      label: 'Work',
-                      count: _allNotes
-                          .where((note) => note['folder'] == 'Work')
-                          .length,
-                      isSelected: _selectedFilter == 'Work',
-                      onTap: () => _onFilterSelected('Work'),
-                    ),
-                    FilterChipWidget(
-                      label: 'Personal',
-                      count: _allNotes
-                          .where((note) => note['folder'] == 'Personal')
-                          .length,
-                      isSelected: _selectedFilter == 'Personal',
-                      onTap: () => _onFilterSelected('Personal'),
-                    ),
-                    FilterChipWidget(
-                      label: 'Pinned',
-                      count: _allNotes
-                          .where((note) => note['isPinned'] == true)
-                          .length,
-                      isSelected: _selectedFilter == 'Pinned',
-                      onTap: () => _onFilterSelected('Pinned'),
-                    ),
-                    FilterChipWidget(
-                      label: 'Reminders',
-                      count: _allNotes
-                          .where((note) => note['hasReminder'] == true)
-                          .length,
-                      isSelected: _selectedFilter == 'Reminders',
-                      onTap: () => _onFilterSelected('Reminders'),
-                    ),
-                  ],
-                ),
+                  );
+                },
+              ),
+              
+              // Tag filter row
+              Consumer<NotesService>(
+                builder: (context, notesService, child) {
+                  return TagFilterWidget(
+                    availableTags: notesService.availableTags,
+                    selectedTag: notesService.selectedTag,
+                    onTagSelected: (tag) => notesService.setTagFilter(tag),
+                    onManageTags: _showTagManagement,
+                  );
+                },
               ),
             ],
 
@@ -385,44 +310,48 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   Widget _buildNotesTab() {
-    if (_filteredNotes.isEmpty) {
-      return EmptyStateWidget(
-        onCreateNote: _showNoteTypeSelector,
-      );
-    }
+    return Consumer<NotesService>(
+      builder: (context, notesService, child) {
+        final filteredNotes = notesService.filteredNotes;
+        
+        if (filteredNotes.isEmpty) {
+          return EmptyStateWidget(
+            onCreateNote: _showNoteTypeSelector,
+          );
+        }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        // Simulate cloud sync
-        await Future.delayed(const Duration(seconds: 1));
-        setState(() {
-          // Refresh data
-        });
+        return RefreshIndicator(
+          onRefresh: () async {
+            // Simulate cloud sync
+            await Future.delayed(const Duration(seconds: 1));
+            // In a real app, you would trigger sync here
+          },
+          child: _isGridView 
+              ? _buildGridView(filteredNotes) 
+              : _buildListView(filteredNotes),
+        );
       },
-      child: _isGridView ? _buildGridView() : _buildListView(),
     );
   }
 
-  Widget _buildListView() {
+  Widget _buildListView(List<Note> notes) {
     return ListView.builder(
       padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
+      itemCount: notes.length,
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        final note = notes[index];
         return NoteCardWidget(
-          note: note,
+          note: note.toMap(), // Convert back to map for compatibility
           onTap: () {
             Navigator.pushNamed(context, '/note-creation-editor');
           },
-          onPin: () => _onNoteAction(note['id'], 'pin'),
-          onShare: () {
-            // Implement share functionality
-          },
+          onPin: () => _onNoteAction(note.id, 'pin'),
+          onShare: () => _onNoteAction(note.id, 'share'),
           onMove: () {
             Navigator.pushNamed(context, '/folder-organization');
           },
-          onDelete: () => _onNoteAction(note['id'], 'delete'),
-          onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
+          onDelete: () => _onNoteAction(note.id, 'delete'),
+          onDuplicate: () => _onNoteAction(note.id, 'duplicate'),
           onExport: () {
             // Implement export functionality
           },
@@ -434,7 +363,7 @@ class _NotesDashboardState extends State<NotesDashboard>
     );
   }
 
-  Widget _buildGridView() {
+  Widget _buildGridView(List<Note> notes) {
     return GridView.builder(
       padding: EdgeInsets.all(4.w).copyWith(bottom: 10.h),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -443,23 +372,21 @@ class _NotesDashboardState extends State<NotesDashboard>
         mainAxisSpacing: 2.w,
         childAspectRatio: 0.8,
       ),
-      itemCount: _filteredNotes.length,
+      itemCount: notes.length,
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        final note = notes[index];
         return NoteCardWidget(
-          note: note,
+          note: note.toMap(), // Convert back to map for compatibility
           onTap: () {
             Navigator.pushNamed(context, '/note-creation-editor');
           },
-          onPin: () => _onNoteAction(note['id'], 'pin'),
-          onShare: () {
-            // Implement share functionality
-          },
+          onPin: () => _onNoteAction(note.id, 'pin'),
+          onShare: () => _onNoteAction(note.id, 'share'),
           onMove: () {
             Navigator.pushNamed(context, '/folder-organization');
           },
-          onDelete: () => _onNoteAction(note['id'], 'delete'),
-          onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
+          onDelete: () => _onNoteAction(note.id, 'delete'),
+          onDuplicate: () => _onNoteAction(note.id, 'duplicate'),
           onExport: () {
             // Implement export functionality
           },
@@ -582,7 +509,7 @@ class _NotesDashboardState extends State<NotesDashboard>
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+                        Navigator.pushNamed(context, AppRoutes.upgradeScreen);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -597,7 +524,7 @@ class _NotesDashboardState extends State<NotesDashboard>
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+                        Navigator.pushNamed(context, AppRoutes.upgradeScreen);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

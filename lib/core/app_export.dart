@@ -7,3 +7,5 @@ export '../core/feature_flags.dart';
 export '../services/theme/theme_service.dart';
 export '../services/payments/iap_service.dart';
 export '../services/sync/provider_registry.dart';
+export '../services/notes/notes_service.dart';
+export '../models/note.dart';

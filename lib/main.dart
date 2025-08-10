@@ -19,6 +19,10 @@ void main() async {
   // Initialize sync provider registry
   final providerRegistry = ProviderRegistry();
   providerRegistry.initialize();
+  
+  // Initialize notes service
+  final notesService = NotesService();
+  notesService.initialize();
 
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -35,6 +39,7 @@ void main() async {
       themeService: themeService,
       iapService: iapService,
       providerRegistry: providerRegistry,
+      notesService: notesService,
     ));
   });
 }
@@ -43,12 +48,14 @@ class MyApp extends StatelessWidget {
   final ThemeService themeService;
   final IAPService iapService;
   final ProviderRegistry providerRegistry;
+  final NotesService notesService;
   
   const MyApp({
     Key? key,
     required this.themeService,
     required this.iapService,
     required this.providerRegistry,
+    required this.notesService,
   }) : super(key: key);
 
   @override
@@ -57,6 +64,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: iapService),
+        ChangeNotifierProvider.value(value: notesService),
         Provider.value(value: providerRegistry),
       ],
       child: Consumer<ThemeService>(

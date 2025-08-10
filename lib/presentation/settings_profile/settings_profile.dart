@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/app_export.dart';
 import './widgets/biometric_dialog_widget.dart';
@@ -468,6 +469,17 @@ class _SettingsProfileState extends State<SettingsProfile>
 
                             SizedBox(height: 2.h),
 
+                            // Cloud Sync Providers
+                            SettingsSectionWidget(
+                              title: 'Cloud Sync Providers',
+                              icon: 'cloud',
+                              children: [
+                                _buildSyncProvidersSection(),
+                              ],
+                            ),
+
+                            SizedBox(height: 2.h),
+
                             // Notifications
                             SettingsSectionWidget(
                               title: 'Notification Settings',
@@ -543,59 +555,130 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   Widget _buildThemeSelector() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Theme',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          SizedBox(height: 1.h),
-          Row(
-            children: ['Light', 'Dark', 'Auto'].map((theme) {
-              final isSelected = _themeMode == theme;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _themeMode = theme),
-                  child: Container(
-                    margin: EdgeInsets.only(right: theme != 'Auto' ? 2.w : 0),
-                    padding: EdgeInsets.symmetric(vertical: 1.h),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.1)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).dividerColor,
-                      ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Theme',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: Text(
-                      theme,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                children: ['Light', 'Dark', 'System'].map((theme) {
+                  final isSelected = themeService.themeModeString == theme;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => themeService.setThemeModeFromString(theme),
+                      child: Container(
+                        margin: EdgeInsets.only(right: theme != 'System' ? 2.w : 0),
+                        padding: EdgeInsets.symmetric(vertical: 1.h),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.1)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primary
-                                : null,
-                            fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w400,
+                                : Theme.of(context).dividerColor,
                           ),
+                        ),
+                        child: Text(
+                          theme,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
+                                fontWeight:
+                                    isSelected ? FontWeight.w600 : FontWeight.w400,
+                              ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 2.h),
+              
+              // Accent color picker
+              Text(
+                'Accent Color',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                children: [
+                  // Default (no custom accent)
+                  GestureDetector(
+                    onTap: () => themeService.setAccentColor(null),
+                    child: Container(
+                      width: 10.w,
+                      height: 10.w,
+                      margin: EdgeInsets.only(right: 2.w),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: themeService.accentColor == null
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).dividerColor,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.palette_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                  
+                  // Available accent colors
+                  ...ThemeService.availableAccentColors.map((color) {
+                    final isSelected = themeService.accentColor == color;
+                    return GestureDetector(
+                      onTap: () => themeService.setAccentColor(color),
+                      child: Container(
+                        width: 10.w,
+                        height: 10.w,
+                        margin: EdgeInsets.only(right: 2.w),
+                        decoration: BoxDecoration(
+                          color: color,
+                          border: Border.all(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.surface
+                                : Colors.transparent,
+                            width: 3,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: isSelected
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 20,
+                              )
+                            : null,
+                      ),
+                    );
+                  }).take(5), // Limit to 5 colors to fit in row
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -794,59 +877,68 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   Widget _buildSubscriptionStatus() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              color: (_userProfile['isPremium']
+    return Consumer<IAPService>(
+      builder: (context, iapService, child) {
+        final hasPremium = iapService.hasPremiumAccess;
+        final entitlementInfo = iapService.getEntitlementInfo();
+        
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: (hasPremium
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.secondary)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: CustomIconWidget(
+                  iconName: hasPremium ? 'star' : 'person',
+                  color: hasPremium
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.secondary)
-                  .withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: CustomIconWidget(
-              iconName: _userProfile['isPremium'] ? 'star' : 'person',
-              color: _userProfile['isPremium']
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
-              size: 20,
-            ),
-          ),
-          SizedBox(width: 3.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _userProfile['isPremium'] ? 'Premium Member' : 'Free Account',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      : Theme.of(context).colorScheme.secondary,
+                  size: 20,
                 ),
-                Text(
-                  _userProfile['isPremium']
-                      ? 'All features unlocked'
-                      : 'Upgrade to unlock premium features',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          if (!_userProfile['isPremium'])
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
               ),
-              child: const Text('Upgrade'),
-            ),
-        ],
-      ),
+              SizedBox(width: 3.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasPremium ? 'Premium Member' : 'Free Account',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    Text(
+                      hasPremium
+                          ? entitlementInfo['hasLocalEntitlement']
+                              ? 'Local entitlement (development)'
+                              : 'All features unlocked'
+                          : 'Upgrade to unlock premium features',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              if (!hasPremium)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.upgradeScreen);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+                  ),
+                  child: const Text('Upgrade'),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -899,6 +991,124 @@ class _SettingsProfileState extends State<SettingsProfile>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSyncProvidersSection() {
+    return Consumer<ProviderRegistry>(
+      builder: (context, registry, child) {
+        return Column(
+          children: registry.providers.map((provider) {
+            String statusText;
+            Color statusColor;
+            
+            switch (provider.status) {
+              case SyncStatus.notConfigured:
+                statusText = 'Not Configured';
+                statusColor = Theme.of(context).colorScheme.error;
+                break;
+              case SyncStatus.signedOut:
+                statusText = 'Sign In Required';
+                statusColor = Theme.of(context).colorScheme.secondary;
+                break;
+              case SyncStatus.signedIn:
+                statusText = 'Connected';
+                statusColor = Theme.of(context).colorScheme.primary;
+                break;
+              case SyncStatus.syncing:
+                statusText = 'Syncing...';
+                statusColor = Theme.of(context).colorScheme.primary;
+                break;
+              case SyncStatus.error:
+                statusText = 'Error';
+                statusColor = Theme.of(context).colorScheme.error;
+                break;
+            }
+            
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+              child: Row(
+                children: [
+                  CustomIconWidget(
+                    iconName: provider.displayName == 'iCloud Drive' ? 'cloud' : 'cloud_sync',
+                    color: statusColor,
+                    size: 24,
+                  ),
+                  SizedBox(width: 3.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          provider.displayName,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          statusText,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: statusColor,
+                              ),
+                        ),
+                        if (provider.status == SyncStatus.notConfigured) ...[
+                          SizedBox(height: 0.5.h),
+                          Text(
+                            'Requires setup - see README for configuration',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontSize: 10.sp,
+                                ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (provider.isConfigured) ...[
+                    ElevatedButton(
+                      onPressed: provider.status == SyncStatus.syncing 
+                          ? null 
+                          : () async {
+                              // Attempt sync
+                              final success = await provider.syncNotes();
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(success 
+                                        ? 'Sync completed successfully'
+                                        : 'Sync failed'
+                                    ),
+                                    backgroundColor: success ? Colors.green : Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
+                      ),
+                      child: Text(
+                        provider.status == SyncStatus.syncing ? 'Syncing...' : 'Sync Now',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Colors.white,
+                            ),
+                      ),
+                    ),
+                  ] else ...[
+                    Tooltip(
+                      message: 'Provider not configured',
+                      child: Icon(
+                        Icons.info_outline,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
