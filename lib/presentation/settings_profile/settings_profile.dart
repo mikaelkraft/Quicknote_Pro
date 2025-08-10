@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -21,8 +22,7 @@ class _SettingsProfileState extends State<SettingsProfile>
   late Animation<double> _backgroundAnimation;
   late Animation<double> _sectionsAnimation;
 
-  // Settings state
-  bool _isDarkMode = false;
+  // Settings state  
   bool _autoBackup = true;
   bool _syncEnabled = true;
   bool _reminderNotifications = true;
@@ -30,7 +30,6 @@ class _SettingsProfileState extends State<SettingsProfile>
   bool _marketingNotifications = false;
   double _fontSize = 16.0;
   String _defaultNoteType = 'Text';
-  String _themeMode = 'Auto';
 
   // User data
   final Map<String, dynamic> _userProfile = {
@@ -83,10 +82,8 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   void _loadSettings() {
-    // Load settings from SharedPreferences or similar
-    setState(() {
-      _isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    });
+    // Settings are now managed by ThemeService and loaded automatically
+    // Local settings like fontSize, notifications etc. can be loaded from SharedPreferences here
   }
 
   @override
@@ -543,59 +540,66 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   Widget _buildThemeSelector() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Theme',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          SizedBox(height: 1.h),
-          Row(
-            children: ['Light', 'Dark', 'Auto'].map((theme) {
-              final isSelected = _themeMode == theme;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => _themeMode = theme),
-                  child: Container(
-                    margin: EdgeInsets.only(right: theme != 'Auto' ? 2.w : 0),
-                    padding: EdgeInsets.symmetric(vertical: 1.h),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.1)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).dividerColor,
-                      ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Theme',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: Text(
-                      theme,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              ),
+              SizedBox(height: 1.h),
+              Row(
+                children: ThemeMode.values.map((mode) {
+                  final isSelected = themeService.themeMode == mode;
+                  final displayName = themeService.getThemeModeDisplayName(mode);
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => themeService.setThemeMode(mode),
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            right: mode != ThemeMode.dark ? 2.w : 0),
+                        padding: EdgeInsets.symmetric(vertical: 1.h),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.1)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primary
-                                : null,
-                            fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w400,
+                                : Theme.of(context).dividerColor,
                           ),
+                        ),
+                        child: Text(
+                          displayName,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
