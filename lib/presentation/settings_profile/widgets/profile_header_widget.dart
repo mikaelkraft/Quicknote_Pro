@@ -58,12 +58,12 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
         gradient: LinearGradient(
           colors: isDark
               ? [
-                  AppTheme.surfaceDark.withValues(alpha: 0.8),
-                  AppTheme.primaryDark.withValues(alpha: 0.1),
+                  AppTheme.surfaceDark.withOpacity(0.8),
+                  AppTheme.primaryDark.withOpacity(0.1),
                 ]
               : [
-                  AppTheme.surfaceLight.withValues(alpha: 0.8),
-                  AppTheme.primaryLight.withValues(alpha: 0.1),
+                  AppTheme.surfaceLight.withOpacity(0.8),
+                  AppTheme.primaryLight.withOpacity(0.1),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -71,7 +71,7 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-              .withValues(alpha: 0.2),
+              .withOpacity(0.2),
           width: 1,
         ),
         boxShadow: [
@@ -101,7 +101,7 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
                         colors: [
                           Colors.transparent,
                           (isDark ? Colors.white : Colors.black)
-                              .withValues(alpha: 0.05),
+                              .withOpacity(0.05),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.5, 1.0],
@@ -142,7 +142,7 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
                                   color: (isDark
                                           ? AppTheme.primaryDark
                                           : AppTheme.primaryLight)
-                                      .withValues(alpha: 0.3),
+                                      .withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -270,7 +270,7 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
                                         (isDark
                                                 ? AppTheme.warningDark
                                                 : AppTheme.warningLight)
-                                            .withValues(alpha: 0.8),
+                                            .withOpacity(0.8),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(12),
@@ -325,13 +325,13 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget>
                   decoration: BoxDecoration(
                     color:
                         (isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight)
-                            .withValues(alpha: 0.5),
+                            .withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: (isDark
                               ? AppTheme.dividerDark
                               : AppTheme.dividerLight)
-                          .withValues(alpha: 0.5),
+                          .withOpacity(0.5),
                     ),
                   ),
                   child: Row(

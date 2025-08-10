@@ -285,7 +285,7 @@ class _ImageInsertionWidgetState extends State<ImageInsertionWidget> {
               icon: Container(
                 padding: EdgeInsets.all(2.w),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
+                  color: Colors.black.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
                 child: CustomIconWidget(

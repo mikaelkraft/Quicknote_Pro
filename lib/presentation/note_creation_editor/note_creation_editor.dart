@@ -384,8 +384,16 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          final shouldPop = await _onWillPop();
+          if (shouldPop && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: _buildAppBar(),
@@ -590,7 +598,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildImageInsertion() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
             margin: EdgeInsets.all(4.w),

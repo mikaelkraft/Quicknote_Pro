@@ -357,7 +357,9 @@ class AppTheme {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
-    ), dialogTheme: DialogThemeData(backgroundColor: dialogLight),
+    ),
+
+    dialogTheme: DialogThemeData(backgroundColor: dialogLight),
   );
 
   /// Dark theme with Contemporary Productivity Minimalism
@@ -647,7 +649,9 @@ class AppTheme {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       clipBehavior: Clip.antiAliasWithSaveLayer,
-    ), dialogTheme: DialogThemeData(backgroundColor: dialogDark),
+    ),
+
+    dialogTheme: DialogThemeData(backgroundColor: dialogDark),
   );
 
   /// Helper method to build text theme with Inter font family

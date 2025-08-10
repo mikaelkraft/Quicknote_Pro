@@ -129,7 +129,7 @@ class NoteCardWidget extends StatelessWidget {
                         color: (isDark
                                 ? AppTheme.primaryDark
                                 : AppTheme.primaryLight)
-                            .withValues(alpha: 0.1),
+                            .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -190,9 +190,9 @@ class NoteCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: isLeft
             ? (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                .withValues(alpha: 0.2)
+                .withOpacity(0.2)
             : (isDark ? AppTheme.errorDark : AppTheme.errorLight)
-                .withValues(alpha: 0.2),
+                .withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Align(

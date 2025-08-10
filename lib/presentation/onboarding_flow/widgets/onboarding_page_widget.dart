@@ -83,7 +83,7 @@ class OnboardingPageWidget extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .outline
-                            .withValues(alpha: 0.2),
+                            .withOpacity(0.2),
                       ),
                     ),
                     child: Column(
@@ -152,13 +152,13 @@ class OnboardingPageWidget extends StatelessWidget {
       padding: EdgeInsets.all(3.w),
       decoration: BoxDecoration(
         color: isPremium
-            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
             : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isPremium
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              : Theme.of(context).colorScheme.outline.withOpacity(0.3),
         ),
       ),
       child: Column(

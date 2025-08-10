@@ -354,13 +354,13 @@ class _SettingsProfileState extends State<SettingsProfile>
                 colors: isDark
                     ? [
                         AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.7),
-                        AppTheme.accentDark.withValues(alpha: 0.05),
+                        AppTheme.surfaceDark.withOpacity(0.7),
+                        AppTheme.accentDark.withOpacity(0.05),
                       ]
                     : [
                         AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.7),
-                        AppTheme.accentLight.withValues(alpha: 0.05),
+                        AppTheme.surfaceLight.withOpacity(0.7),
+                        AppTheme.accentLight.withOpacity(0.05),
                       ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -390,7 +390,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                           color: (isDark
                                   ? AppTheme.textSecondaryDark
                                   : AppTheme.textSecondaryLight)
-                              .withValues(alpha: 0.1),
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: CustomIconWidget(
@@ -569,7 +569,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                           ? Theme.of(context)
                               .colorScheme
                               .primary
-                              .withValues(alpha: 0.1)
+                              .withOpacity(0.1)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -804,7 +804,7 @@ class _SettingsProfileState extends State<SettingsProfile>
               color: (_userProfile['isPremium']
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.secondary)
-                  .withValues(alpha: 0.1),
+                  .withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: CustomIconWidget(

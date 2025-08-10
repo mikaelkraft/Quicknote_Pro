@@ -19,7 +19,7 @@ class PremiumHeaderWidget extends StatelessWidget {
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: (isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight)
-            .withValues(alpha: 0.9),
+            .withOpacity(0.9),
         boxShadow: [
           BoxShadow(
             color: isDark ? AppTheme.shadowDark : AppTheme.shadowLight,
@@ -47,7 +47,7 @@ class PremiumHeaderWidget extends StatelessWidget {
                             (isDark
                                     ? AppTheme.warningDark
                                     : AppTheme.warningLight)
-                                .withValues(alpha: 0.8),
+                                .withOpacity(0.8),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(8),
@@ -86,7 +86,7 @@ class PremiumHeaderWidget extends StatelessWidget {
                             (isDark
                                     ? AppTheme.primaryDark
                                     : AppTheme.primaryLight)
-                                .withValues(alpha: 0.3),
+                                .withOpacity(0.3),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(2),
@@ -114,7 +114,7 @@ class PremiumHeaderWidget extends StatelessWidget {
                 color: (isDark
                         ? AppTheme.textSecondaryDark
                         : AppTheme.textSecondaryLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: CustomIconWidget(

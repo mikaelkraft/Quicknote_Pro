@@ -112,7 +112,7 @@ class _CloudConnectionsScreenState extends State<CloudConnectionsScreen> {
         color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: statusColor.withValues(alpha: 0.3),
+          color: statusColor.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -144,7 +144,7 @@ class _CloudConnectionsScreenState extends State<CloudConnectionsScreen> {
             SizedBox(height: 2.h),
             LinearProgressIndicator(
               value: _currentProgress!.progress,
-              backgroundColor: statusColor.withValues(alpha: 0.3),
+              backgroundColor: statusColor.withOpacity(0.3),
               valueColor: AlwaysStoppedAnimation<Color>(statusColor),
             ),
             SizedBox(height: 1.h),
@@ -225,7 +225,7 @@ class _CloudConnectionsScreenState extends State<CloudConnectionsScreen> {
           Container(
             padding: EdgeInsets.all(3.w),
             decoration: BoxDecoration(
-              color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight).withValues(alpha: 0.1),
+              color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: CustomIconWidget(
@@ -304,7 +304,7 @@ class _CloudConnectionsScreenState extends State<CloudConnectionsScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
           decoration: BoxDecoration(
-            color: (isDark ? AppTheme.successDark : AppTheme.successLight).withValues(alpha: 0.1),
+            color: (isDark ? AppTheme.successDark : AppTheme.successLight).withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
