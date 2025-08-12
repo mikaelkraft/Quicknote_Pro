@@ -158,6 +158,10 @@ class Note {
     final newAttachments = attachments
         .where((attachment) => attachment.id != attachmentId)
         .toList();
+    if (newAttachments.length == attachments.length) {
+      // No attachment was removed; return the current instance unchanged
+      return this;
+    }
     return copyWith(
       attachments: newAttachments,
       updatedAt: DateTime.now(),
