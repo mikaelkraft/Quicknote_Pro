@@ -8,6 +8,8 @@ import '../widgets/custom_error_widget.dart';
 import '../services/sync/sync_manager.dart';
 import '../services/notes/notes_service.dart';
 import '../services/widget/home_screen_widget_service.dart';
+import '../services/billing/billing_service.dart';
+import '../services/entitlement/entitlement_service.dart';
 import '../repositories/notes_repository.dart';
 
 void main() async {
@@ -16,6 +18,14 @@ void main() async {
   // Initialize theme service
   final themeService = ThemeService();
   await themeService.initialize();
+
+  // Initialize billing service
+  final billingService = BillingService();
+  await billingService.initialize();
+
+  // Initialize entitlement service
+  final entitlementService = EntitlementService(billingService);
+  await entitlementService.initialize();
 
   // Initialize sync manager
   final syncManager = SyncManager();
@@ -42,6 +52,8 @@ void main() async {
   ]).then((value) {
     runApp(MyApp(
       themeService: themeService,
+      billingService: billingService,
+      entitlementService: entitlementService,
       syncManager: syncManager,
       notesService: notesService,
       homeScreenWidgetService: homeScreenWidgetService,
@@ -51,6 +63,8 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final BillingService billingService;
+  final EntitlementService entitlementService;
   final SyncManager syncManager;
   final NotesService notesService;
   final HomeScreenWidgetService homeScreenWidgetService;
@@ -58,6 +72,8 @@ class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
     required this.themeService,
+    required this.billingService,
+    required this.entitlementService,
     required this.syncManager,
     required this.notesService,
     required this.homeScreenWidgetService,
@@ -68,6 +84,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: billingService),
+        ChangeNotifierProvider.value(value: entitlementService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
         Provider.value(value: homeScreenWidgetService),
