@@ -7,6 +7,7 @@ void main() {
     late Note testNote;
     late Attachment testImageAttachment;
     late Attachment testFileAttachment;
+    late Attachment testAudioAttachment;
     late DateTime testCreatedAt;
     late DateTime testUpdatedAt;
     
@@ -33,12 +34,23 @@ void main() {
         type: AttachmentType.file,
         createdAt: testCreatedAt,
       );
+
+      testAudioAttachment = Attachment(
+        id: 'audio_1',
+        name: 'voice_note.m4a',
+        relativePath: 'attachments/voice_note.m4a',
+        mimeType: 'audio/aac',
+        sizeBytes: 512000,
+        type: AttachmentType.audio,
+        createdAt: testCreatedAt,
+        durationSeconds: 120,
+      );
       
       testNote = Note(
         id: 'test_note_id',
         title: 'Test Note',
         content: 'This is test content for the note',
-        attachments: [testImageAttachment, testFileAttachment],
+        attachments: [testImageAttachment, testFileAttachment, testAudioAttachment],
         createdAt: testCreatedAt,
         updatedAt: testUpdatedAt,
       );
@@ -189,11 +201,19 @@ void main() {
 
     test('should calculate total attachment size', () {
       final totalSize = testNote.totalAttachmentSize;
-      expect(totalSize, 3072000); // 1024000 + 2048000
+      expect(totalSize, 3584000); // 1024000 + 2048000 + 512000
 
       final noSizeAttachment = testImageAttachment.copyWith(sizeBytes: null);
-      final noteWithNullSize = testNote.copyWith(attachments: [noSizeAttachment, testFileAttachment]);
-      expect(noteWithNullSize.totalAttachmentSize, 2048000); // Only counts non-null sizes
+      final noteWithNullSize = testNote.copyWith(attachments: [noSizeAttachment, testFileAttachment, testAudioAttachment]);
+      expect(noteWithNullSize.totalAttachmentSize, 2560000); // Only counts non-null sizes (2048000 + 512000)
+    });
+
+    test('should identify audio attachments', () {
+      expect(testNote.audioAttachments.length, 1);
+      expect(testNote.audioAttachments.first, testAudioAttachment);
+      expect(testNote.imageAttachments.length, 1);
+      expect(testNote.fileAttachments.length, 1);
+      expect(testNote.hasAttachments, isTrue);
     });
 
     test('should add attachment', () {
@@ -207,7 +227,7 @@ void main() {
 
       final updatedNote = testNote.addAttachment(newAttachment);
       
-      expect(updatedNote.attachments.length, 3);
+      expect(updatedNote.attachments.length, 4);
       expect(updatedNote.attachments.last, newAttachment);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
@@ -215,15 +235,15 @@ void main() {
     test('should remove attachment', () {
       final updatedNote = testNote.removeAttachment('img_1');
       
-      expect(updatedNote.attachments.length, 1);
-      expect(updatedNote.attachments[0], testFileAttachment);
+      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments, [testFileAttachment, testAudioAttachment]);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
 
     test('should not change note when removing non-existent attachment', () {
       final updatedNote = testNote.removeAttachment('non_existent');
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments, testNote.attachments);
     });
 
@@ -238,9 +258,10 @@ void main() {
 
       final updatedNote = testNote.replaceAttachment('img_1', newAttachment);
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments[0], newAttachment);
       expect(updatedNote.attachments[1], testFileAttachment);
+      expect(updatedNote.attachments[2], testAudioAttachment);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
 
@@ -255,7 +276,7 @@ void main() {
 
       final updatedNote = testNote.replaceAttachment('non_existent', newAttachment);
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments, testNote.attachments);
     });
 
@@ -277,7 +298,87 @@ void main() {
       expect(str, contains('test_note_id'));
       expect(str, contains('Test Note'));
       expect(str, contains('34 chars')); // content length
-      expect(str, contains('attachments: 2'));
+      expect(str, contains('attachments: 3'));
+    });
+  });
+
+  group('Audio Attachments in Note Tests', () {
+    late Note noteWithAudioOnly;
+    late Attachment audioAttachment1;
+    late Attachment audioAttachment2;
+    
+    setUp(() {
+      audioAttachment1 = Attachment(
+        id: 'audio_1',
+        name: 'voice_note_1.m4a',
+        relativePath: 'audio/voice_note_1.m4a',
+        mimeType: 'audio/aac',
+        sizeBytes: 300000,
+        type: AttachmentType.audio,
+        createdAt: DateTime.now(),
+        durationSeconds: 60,
+      );
+
+      audioAttachment2 = Attachment(
+        id: 'audio_2',
+        name: 'voice_note_2.m4a',
+        relativePath: 'audio/voice_note_2.m4a',
+        mimeType: 'audio/aac',
+        sizeBytes: 600000,
+        type: AttachmentType.audio,
+        createdAt: DateTime.now(),
+        durationSeconds: 180,
+      );
+
+      noteWithAudioOnly = Note(
+        id: 'audio_note',
+        title: 'Audio Note',
+        content: 'This note has audio attachments',
+        attachments: [audioAttachment1, audioAttachment2],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    });
+
+    test('should correctly identify multiple audio attachments', () {
+      expect(noteWithAudioOnly.audioAttachments.length, 2);
+      expect(noteWithAudioOnly.imageAttachments.length, 0);
+      expect(noteWithAudioOnly.fileAttachments.length, 0);
+      expect(noteWithAudioOnly.hasAttachments, isTrue);
+    });
+
+    test('should serialize and deserialize note with audio attachments', () {
+      final json = noteWithAudioOnly.toJson();
+      final fromJson = Note.fromJson(json);
+
+      expect(fromJson.audioAttachments.length, 2);
+      expect(fromJson.audioAttachments.first.durationSeconds, 60);
+      expect(fromJson.audioAttachments.last.durationSeconds, 180);
+      expect(fromJson.audioAttachments.first.isAudio, isTrue);
+    });
+
+    test('should add new audio attachment to existing note', () {
+      final newAudioAttachment = Attachment(
+        id: 'audio_3',
+        name: 'voice_note_3.m4a',
+        relativePath: 'audio/voice_note_3.m4a',
+        type: AttachmentType.audio,
+        createdAt: DateTime.now(),
+        durationSeconds: 90,
+      );
+
+      final updatedNote = noteWithAudioOnly.addAttachment(newAudioAttachment);
+      
+      expect(updatedNote.audioAttachments.length, 3);
+      expect(updatedNote.audioAttachments.last.durationSeconds, 90);
+    });
+
+    test('should remove specific audio attachment', () {
+      final updatedNote = noteWithAudioOnly.removeAttachment('audio_1');
+      
+      expect(updatedNote.audioAttachments.length, 1);
+      expect(updatedNote.audioAttachments.first.id, 'audio_2');
+      expect(updatedNote.audioAttachments.first.durationSeconds, 180);
     });
   });
 }

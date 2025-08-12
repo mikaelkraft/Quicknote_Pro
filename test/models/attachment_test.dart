@@ -6,11 +6,13 @@ void main() {
     test('should convert AttachmentType to string', () {
       expect(AttachmentType.image.value, 'image');
       expect(AttachmentType.file.value, 'file');
+      expect(AttachmentType.audio.value, 'audio');
     });
 
     test('should create AttachmentType from string', () {
       expect(AttachmentTypeExtension.fromString('image'), AttachmentType.image);
       expect(AttachmentTypeExtension.fromString('file'), AttachmentType.file);
+      expect(AttachmentTypeExtension.fromString('audio'), AttachmentType.audio);
     });
 
     test('should throw error for invalid AttachmentType string', () {
@@ -148,10 +150,17 @@ void main() {
     test('should identify attachment types correctly', () {
       expect(testAttachment.isImage, isTrue);
       expect(testAttachment.isFile, isFalse);
+      expect(testAttachment.isAudio, isFalse);
 
       final fileAttachment = testAttachment.copyWith(type: AttachmentType.file);
       expect(fileAttachment.isImage, isFalse);
       expect(fileAttachment.isFile, isTrue);
+      expect(fileAttachment.isAudio, isFalse);
+
+      final audioAttachment = testAttachment.copyWith(type: AttachmentType.audio);
+      expect(audioAttachment.isImage, isFalse);
+      expect(audioAttachment.isFile, isFalse);
+      expect(audioAttachment.isAudio, isTrue);
     });
 
     test('should extract file extension correctly', () {
@@ -176,6 +185,101 @@ void main() {
       expect(str, contains('test_image.jpg'));
       expect(str, contains('image/jpeg'));
       expect(str, contains('AttachmentType.image'));
+    });
+  });
+
+  group('Audio Attachment Tests', () {
+    late Attachment audioAttachment;
+    late DateTime testCreatedAt;
+    
+    setUp(() {
+      testCreatedAt = DateTime(2024, 1, 1, 12, 0, 0);
+      audioAttachment = Attachment(
+        id: 'audio_test_id',
+        name: 'voice_note_001.m4a',
+        relativePath: 'audio/voice_note_001.m4a',
+        mimeType: 'audio/aac',
+        sizeBytes: 1024000,
+        type: AttachmentType.audio,
+        createdAt: testCreatedAt,
+        durationSeconds: 120,
+      );
+    });
+
+    test('should create audio attachment with duration', () {
+      expect(audioAttachment.id, 'audio_test_id');
+      expect(audioAttachment.name, 'voice_note_001.m4a');
+      expect(audioAttachment.type, AttachmentType.audio);
+      expect(audioAttachment.durationSeconds, 120);
+      expect(audioAttachment.isAudio, isTrue);
+      expect(audioAttachment.isImage, isFalse);
+      expect(audioAttachment.isFile, isFalse);
+    });
+
+    test('should format duration correctly', () {
+      final testCases = [
+        {'seconds': 0, 'expected': '00:00'},
+        {'seconds': 30, 'expected': '00:30'},
+        {'seconds': 60, 'expected': '01:00'},
+        {'seconds': 90, 'expected': '01:30'},
+        {'seconds': 300, 'expected': '05:00'},
+        {'seconds': 3661, 'expected': '61:01'}, // Over an hour
+      ];
+
+      for (final testCase in testCases) {
+        final attachment = audioAttachment.copyWith(
+          durationSeconds: testCase['seconds'] as int,
+        );
+        expect(attachment.formattedDuration, testCase['expected']);
+      }
+    });
+
+    test('should handle null duration gracefully', () {
+      final attachment = audioAttachment.copyWith(durationSeconds: null);
+      expect(attachment.formattedDuration, '');
+    });
+
+    test('should serialize and deserialize audio attachment with duration', () {
+      final json = audioAttachment.toJson();
+      final fromJson = Attachment.fromJson(json);
+
+      expect(fromJson.id, audioAttachment.id);
+      expect(fromJson.name, audioAttachment.name);
+      expect(fromJson.type, AttachmentType.audio);
+      expect(fromJson.durationSeconds, 120);
+      expect(fromJson.mimeType, 'audio/aac');
+      expect(fromJson.formattedDuration, '02:00');
+    });
+
+    test('should copy audio attachment with updated duration', () {
+      final updated = audioAttachment.copyWith(
+        name: 'updated_voice.m4a',
+        durationSeconds: 180,
+      );
+
+      expect(updated.id, audioAttachment.id);
+      expect(updated.name, 'updated_voice.m4a');
+      expect(updated.durationSeconds, 180);
+      expect(updated.formattedDuration, '03:00');
+      expect(updated.type, AttachmentType.audio);
+    });
+
+    test('should get correct file extension for audio files', () {
+      expect(audioAttachment.fileExtension, 'm4a');
+
+      final mp3Attachment = audioAttachment.copyWith(name: 'audio.mp3');
+      expect(mp3Attachment.fileExtension, 'mp3');
+
+      final wavAttachment = audioAttachment.copyWith(name: 'recording.wav');
+      expect(wavAttachment.fileExtension, 'wav');
+    });
+
+    test('should include duration in string representation', () {
+      final str = audioAttachment.toString();
+      expect(str, contains('audio_test_id'));
+      expect(str, contains('voice_note_001.m4a'));
+      expect(str, contains('AttachmentType.audio'));
+      expect(str, contains('durationSeconds: 120'));
     });
   });
 }

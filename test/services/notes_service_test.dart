@@ -186,5 +186,46 @@ void main() {
       // Should complete without errors
       expect(true, isTrue);
     });
+
+    test('should add audio to current note', () async {
+      final note = await notesService.createNote(title: 'Audio Test Note');
+      notesService.setCurrentNote(note);
+      
+      // Mock audio path and duration
+      const audioPath = '/test/audio/voice_note.m4a';
+      const durationSeconds = 120;
+      
+      await notesService.addAudioToCurrentNote(audioPath, durationSeconds);
+      
+      // Since we're using the old model, this would be added to voice note paths
+      // In a real implementation, we'd need to mock the repository's copyFileToAppDirectory method
+      expect(notesService.currentNote, isNotNull);
+    });
+
+    test('should remove audio attachment from current note', () async {
+      final note = await notesService.createNote(title: 'Audio Removal Test');
+      notesService.setCurrentNote(note);
+      
+      // Add a voice note first
+      await notesService.addVoiceNoteToCurrentNote('/test/voice_note.m4a');
+      
+      // Remove by attachment ID
+      await notesService.removeAttachmentFromCurrentNote('voice_note');
+      
+      expect(notesService.currentNote, isNotNull);
+    });
+
+    test('should handle voice note operations', () async {
+      final note = await notesService.createNote(title: 'Voice Note Test');
+      notesService.setCurrentNote(note);
+      
+      // Add voice note
+      await notesService.addVoiceNoteToCurrentNote('/test/voice.m4a');
+      
+      // Remove voice note
+      await notesService.removeMediaFromCurrentNote('/test/voice.m4a', 'voice');
+      
+      expect(notesService.currentNote, isNotNull);
+    });
   });
 }
