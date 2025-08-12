@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -195,21 +196,33 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   Future<void> _startFreeTrial() async {
+    final billingService = context.read<BillingService>();
+    final entitlementService = context.read<EntitlementService>();
+    
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Simulate purchase process
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (kIsWeb) {
-        _showWebCheckout();
-      } else {
+      // Attempt to purchase the selected plan
+      final productId = _selectedPlan == 'monthly' 
+          ? ProductIds.premiumMonthly 
+          : ProductIds.premiumLifetime;
+      
+      final success = await billingService.purchaseProduct(productId);
+      
+      if (success) {
+        // Purchase successful, refresh entitlements
+        await entitlementService.refresh();
         _handleNativePurchase();
+      } else {
+        // Purchase failed or cancelled
+        if (billingService.error != null) {
+          _showErrorDialog('Purchase failed: ${billingService.error}');
+        }
       }
     } catch (e) {
-      _showErrorDialog('Purchase failed. Please try again.');
+      _showErrorDialog('Purchase failed: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -255,28 +268,58 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   void _restorePurchases() async {
+    final billingService = context.read<BillingService>();
+    final entitlementService = context.read<EntitlementService>();
+    
     setState(() {
       _isLoading = true;
     });
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+    try {
+      // Restore purchases from app stores
+      await billingService.refresh();
+      await entitlementService.refresh();
+      
+      if (entitlementService.isPremiumUser) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Complete'),
+            content: const Text('Purchases restored successfully! Welcome back to Premium! 🎉'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text('Get Started'),
+              ),
+            ],
           ),
-        ],
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Complete'),
+            content: const Text('No previous purchases found.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      _showErrorDialog('Failed to restore purchases: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
       ),
     );
   }
@@ -413,27 +456,34 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Monthly',
-                                        price: '\$2.99',
-                                        period: '/month',
-                                        savings: null,
-                                        isSelected: _selectedPlan == 'monthly',
-                                        isRecommended: false,
-                                        onTap: () => _onPlanSelected('monthly'),
+                                      child: Consumer<BillingService>(
+                                        builder: (context, billingService, _) {
+                                          return PricingOptionWidget(
+                                            title: 'Monthly',
+                                            price: billingService.getProductPrice(ProductIds.premiumMonthly),
+                                            period: '/month',
+                                            savings: null,
+                                            isSelected: _selectedPlan == 'monthly',
+                                            isRecommended: false,
+                                            onTap: () => _onPlanSelected('monthly'),
+                                          );
+                                        },
                                       ),
                                     ),
                                     SizedBox(width: 3.w),
                                     Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Lifetime',
-                                        price: '\$14.99',
-                                        period: 'one-time',
-                                        savings: 'Save 75%',
-                                        isSelected: _selectedPlan == 'lifetime',
-                                        isRecommended: true,
-                                        onTap: () =>
-                                            _onPlanSelected('lifetime'),
+                                      child: Consumer<BillingService>(
+                                        builder: (context, billingService, _) {
+                                          return PricingOptionWidget(
+                                            title: 'Lifetime',
+                                            price: billingService.getProductPrice(ProductIds.premiumLifetime),
+                                            period: 'one-time',
+                                            savings: 'Save 75%',
+                                            isSelected: _selectedPlan == 'lifetime',
+                                            isRecommended: true,
+                                            onTap: () => _onPlanSelected('lifetime'),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],
