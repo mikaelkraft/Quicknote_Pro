@@ -22,8 +22,6 @@ class UpsellDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(

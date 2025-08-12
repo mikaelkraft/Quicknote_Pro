@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import '../../services/entitlements/entitlement_service.dart';
 import '../../core/app_export.dart';
-import 'upsell_dialog.dart';
 
 /// Widget that gates premium features and shows upsell UI for non-premium users
 class FeatureGate extends StatelessWidget {
