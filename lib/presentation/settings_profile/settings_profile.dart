@@ -6,6 +6,7 @@ import '../../core/app_export.dart';
 import '../../services/theme/theme_entitlement_service.dart';
 import '../../services/theme/paywall_analytics_service.dart';
 import '../../widgets/theme_picker_widget.dart';
+import '../../widgets/dev_theme_tools_widget.dart';
 import './widgets/biometric_dialog_widget.dart';
 import './widgets/profile_header_widget.dart';
 import './widgets/settings_section_widget.dart';
@@ -465,6 +466,9 @@ class _SettingsProfileState extends State<SettingsProfile>
                                 ),
                               ],
                             ),
+
+                            // Developer tools (debug mode only)
+                            const DevThemeToolsWidget(),
 
                             SizedBox(height: 4.h),
                           ],
