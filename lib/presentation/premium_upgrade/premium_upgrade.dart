@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/app_export.dart';
+import '../../services/theme/theme_entitlement_service.dart';
+import '../../services/theme/paywall_analytics_service.dart';
 import './widgets/feature_card_widget.dart';
 import './widgets/premium_header_widget.dart';
 import './widgets/pricing_option_widget.dart';
@@ -24,8 +27,21 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
 
   bool _isLoading = false;
   String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  String _entryPoint = 'unknown';
+  String? _targetTheme;
+  String? _themeName;
+  DateTime? _paywallShownTime;
 
   final List<Map<String, dynamic>> _premiumFeatures = [
+    {
+      'title': 'Pro Themes',
+      'description': 'Exclusive Futuristic, Neon, and Floral themes',
+      'icon': 'palette',
+      'gradient': [Color(0xFF7C3AED), Color(0xFFA78BFA)],
+      'currentLimit': '2 basic themes',
+      'premiumLimit': '5+ stunning themes',
+      'hasDemo': true,
+    },
     {
       'title': 'Unlimited Voice Notes',
       'description': 'Record and transcribe unlimited voice memos with AI',
@@ -67,7 +83,30 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   @override
   void initState() {
     super.initState();
+    _paywallShownTime = DateTime.now();
     _initializeAnimations();
+    
+    // Handle route arguments to get entry point
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (arguments != null) {
+        _entryPoint = arguments['entry_point'] ?? 'unknown';
+        _targetTheme = arguments['target_theme'];
+        _themeName = arguments['theme_name'];
+        
+        // Log paywall shown if not already logged
+        if (_entryPoint != 'unknown') {
+          PaywallAnalyticsService.logPaywallShown(
+            entryPoint: _entryPoint,
+            featureType: _targetTheme != null ? 'theme' : 'general',
+            specificFeature: _targetTheme,
+            additionalData: {
+              if (_themeName != null) 'theme_name': _themeName,
+            },
+          );
+        }
+      }
+    });
   }
 
   void _initializeAnimations() {
@@ -103,6 +142,17 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
 
   @override
   void dispose() {
+    // Log paywall dismissal if user didn't purchase
+    final entitlementService = Provider.of<ThemeEntitlementService>(context, listen: false);
+    if (!entitlementService.isPremium && _paywallShownTime != null) {
+      final timeSpent = DateTime.now().difference(_paywallShownTime!).inSeconds;
+      PaywallAnalyticsService.logPaywallDismissed(
+        entryPoint: _entryPoint,
+        dismissReason: 'navigation_back',
+        timeSpentSeconds: timeSpent,
+      );
+    }
+    
     _backgroundController.dispose();
     _featuresController.dispose();
     super.dispose();
@@ -203,12 +253,33 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       // Simulate purchase process
       await Future.delayed(const Duration(seconds: 2));
 
+      final entitlementService = Provider.of<ThemeEntitlementService>(context, listen: false);
+
       if (kIsWeb) {
         _showWebCheckout();
       } else {
+        await entitlementService.grantPremiumAccess(purchaseType: _selectedPlan);
+        
+        // Log successful conversion
+        PaywallAnalyticsService.logPaywallConversion(
+          entryPoint: _entryPoint,
+          purchaseType: 'new_purchase',
+          planType: _selectedPlan,
+          price: _selectedPlan == 'monthly' ? 2.99 : 14.99,
+          additionalData: {
+            if (_targetTheme != null) 'target_theme': _targetTheme,
+          },
+        );
+        
         _handleNativePurchase();
       }
     } catch (e) {
+      PaywallAnalyticsService.logFailedPayment(
+        entryPoint: _entryPoint,
+        planType: _selectedPlan,
+        errorType: 'payment_failed',
+        errorMessage: e.toString(),
+      );
       _showErrorDialog('Purchase failed. Please try again.');
     } finally {
       setState(() {
@@ -240,12 +311,27 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Purchase Successful'),
-        content: const Text('Welcome to QuickNote Pro Premium!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Welcome to QuickNote Pro Premium!'),
+            if (_targetTheme != null && _themeName != null) ...[
+              SizedBox(height: 2.h),
+              Text(
+                'The $_themeName theme is now unlocked and applied.',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context, true); // Return to previous screen with success
             },
             child: const Text('Get Started'),
           ),
@@ -259,26 +345,65 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       _isLoading = true;
     });
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final entitlementService = Provider.of<ThemeEntitlementService>(context, listen: false);
+      final success = await entitlementService.restorePurchases();
+      
+      PaywallAnalyticsService.logPurchaseRestore(
+        success: success,
+        restoredItemsCount: success ? 1 : 0,
+      );
 
-    setState(() {
-      _isLoading = false;
-    });
+      if (success) {
+        PaywallAnalyticsService.logPaywallConversion(
+          entryPoint: _entryPoint,
+          purchaseType: 'restore',
+          planType: entitlementService.purchaseType ?? 'unknown',
+          price: 0.0, // No new charge for restore
+        );
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Successful'),
+            content: const Text('Your Pro features have been restored!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context, true); // Return with success
+                },
+                child: const Text('Continue'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Complete'),
+            content: const Text('No previous purchases found.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      PaywallAnalyticsService.logPurchaseRestore(
+        success: false,
+        errorMessage: e.toString(),
+      );
+      _showErrorDialog('Failed to restore purchases. Please try again.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _showErrorDialog(String message) {
@@ -438,6 +563,68 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                     ),
                                   ],
                                 ),
+                                SizedBox(height: 2.h),
+                                // One-time purchase messaging
+                                if (_selectedPlan == 'lifetime')
+                                  Container(
+                                    padding: EdgeInsets.all(3.w),
+                                    decoration: BoxDecoration(
+                                      color: (isDark
+                                              ? AppTheme.successDark
+                                              : AppTheme.successLight)
+                                          .withAlpha(26),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isDark
+                                            ? AppTheme.successDark
+                                            : AppTheme.successLight,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.star,
+                                          color: isDark
+                                              ? AppTheme.successDark
+                                              : AppTheme.successLight,
+                                          size: 5.w,
+                                        ),
+                                        SizedBox(width: 3.w),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'One-time purchase, no subscription',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleSmall
+                                                    ?.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: isDark
+                                                          ? AppTheme.successDark
+                                                          : AppTheme.successLight,
+                                                    ),
+                                              ),
+                                              Text(
+                                                'Pay once, own forever. No recurring charges.',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: isDark
+                                                          ? AppTheme.successDark
+                                                          : AppTheme.successLight,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

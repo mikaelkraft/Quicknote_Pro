@@ -1,10 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Definition of a theme with metadata for the theme picker
+class ThemeDefinition {
+  final String id;
+  final String name;
+  final String description;
+  final bool isPro;
+  final List<Color> previewColors;
+
+  const ThemeDefinition({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.isPro,
+    required this.previewColors,
+  });
+}
+
 /// A class that contains all theme configurations for the note-taking application.
 /// Implements Contemporary Productivity Minimalism with Adaptive Professional Palette.
+/// Includes Pro-only themes for premium users.
 class AppTheme {
   AppTheme._();
+
+  /// Available theme types including Pro themes
+  static const Map<String, ThemeDefinition> availableThemes = {
+    'default_light': ThemeDefinition(
+      id: 'default_light',
+      name: 'Classic Light',
+      description: 'Clean and minimal light theme for productivity',
+      isPro: false,
+      previewColors: [primaryLight, surfaceLight, backgroundLight],
+    ),
+    'default_dark': ThemeDefinition(
+      id: 'default_dark', 
+      name: 'Classic Dark',
+      description: 'Comfortable dark theme for low-light environments',
+      isPro: false,
+      previewColors: [primaryDark, surfaceDark, backgroundDark],
+    ),
+    'futuristic': ThemeDefinition(
+      id: 'futuristic',
+      name: 'Futuristic Pro',
+      description: 'Sleek cyberpunk-inspired theme with neon accents',
+      isPro: true,
+      previewColors: [Color(0xFF00FFFF), Color(0xFF1A1A2E), Color(0xFF16213E)],
+    ),
+    'neon': ThemeDefinition(
+      id: 'neon',
+      name: 'Neon Pro', 
+      description: 'Vibrant neon colors for creative inspiration',
+      isPro: true,
+      previewColors: [Color(0xFFFF006E), Color(0xFF8338EC), Color(0xFF3A86FF)],
+    ),
+    'floral': ThemeDefinition(
+      id: 'floral',
+      name: 'Floral Pro',
+      description: 'Nature-inspired theme with soft botanical colors',
+      isPro: true,
+      previewColors: [Color(0xFF7209B7), Color(0xFFF72585), Color(0xFF4CC9F0)],
+    ),
+  };
 
   // Adaptive Professional Palette - Color Specifications
   static const Color primaryLight =
@@ -69,6 +126,33 @@ class AppTheme {
       Color(0x3364748B); // Secondary color at 0.2 opacity
   static const Color dividerDark =
       Color(0x3394A3B8); // Secondary color at 0.2 opacity
+
+  // Pro Theme Colors - Futuristic
+  static const Color futuristicPrimary = Color(0xFF00FFFF); // Bright cyan
+  static const Color futuristicSecondary = Color(0xFF7C3AED); // Electric purple
+  static const Color futuristicAccent = Color(0xFFFF0080); // Hot pink
+  static const Color futuristicSurface = Color(0xFF1A1A2E); // Dark navy
+  static const Color futuristicBackground = Color(0xFF16213E); // Darker navy
+  static const Color futuristicTextPrimary = Color(0xFFE0E6ED); // Light gray
+  static const Color futuristicTextSecondary = Color(0xFF94A9C9); // Muted blue-gray
+
+  // Pro Theme Colors - Neon  
+  static const Color neonPrimary = Color(0xFFFF006E); // Hot pink
+  static const Color neonSecondary = Color(0xFF8338EC); // Purple
+  static const Color neonAccent = Color(0xFF3A86FF); // Bright blue
+  static const Color neonSurface = Color(0xFF0F0F23); // Very dark purple
+  static const Color neonBackground = Color(0xFF06061B); // Almost black purple
+  static const Color neonTextPrimary = Color(0xFFF7F7FF); // Almost white
+  static const Color neonTextSecondary = Color(0xFFB8B8CC); // Light purple-gray
+
+  // Pro Theme Colors - Floral
+  static const Color floralPrimary = Color(0xFF7209B7); // Deep purple
+  static const Color floralSecondary = Color(0xFFF72585); // Bright pink  
+  static const Color floralAccent = Color(0xFF4CC9F0); // Sky blue
+  static const Color floralSurface = Color(0xFFFDF2F8); // Very light pink
+  static const Color floralBackground = Color(0xFFFEF7FF); // Very light purple
+  static const Color floralTextPrimary = Color(0xFF1F1019); // Dark purple
+  static const Color floralTextSecondary = Color(0xFF6B4C7B); // Medium purple
 
   /// Light theme with Contemporary Productivity Minimalism
   static ThemeData lightTheme = ThemeData(
@@ -784,5 +868,180 @@ class AppTheme {
   /// Helper method to get warning color for premium prompts
   static Color getWarningColor(bool isLight) {
     return isLight ? warningLight : warningDark;
+  }
+
+  /// Get theme data for a specific theme ID
+  static ThemeData getThemeById(String themeId) {
+    switch (themeId) {
+      case 'default_light':
+        return lightTheme;
+      case 'default_dark':
+        return darkTheme;
+      case 'futuristic':
+        return _buildFuturisticTheme();
+      case 'neon':
+        return _buildNeonTheme();
+      case 'floral':
+        return _buildFloralTheme();
+      default:
+        return lightTheme; // Fallback to light theme
+    }
+  }
+
+  /// Build Futuristic Pro theme
+  static ThemeData _buildFuturisticTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme(
+        brightness: Brightness.dark,
+        primary: futuristicPrimary,
+        onPrimary: Colors.black,
+        primaryContainer: futuristicPrimary.withAlpha(51),
+        onPrimaryContainer: futuristicPrimary,
+        secondary: futuristicSecondary,
+        onSecondary: Colors.white,
+        secondaryContainer: futuristicSecondary.withAlpha(51),
+        onSecondaryContainer: futuristicSecondary,
+        tertiary: futuristicAccent,
+        onTertiary: Colors.white,
+        tertiaryContainer: futuristicAccent.withAlpha(51),
+        onTertiaryContainer: futuristicAccent,
+        error: errorDark,
+        onError: Colors.black,
+        surface: futuristicSurface,
+        onSurface: futuristicTextPrimary,
+        onSurfaceVariant: futuristicTextSecondary,
+        outline: futuristicTextSecondary.withAlpha(128),
+        outlineVariant: futuristicTextSecondary.withAlpha(64),
+        shadow: shadowDark,
+        scrim: Colors.black87,
+        inverseSurface: surfaceLight,
+        onInverseSurface: textPrimaryLight,
+        inversePrimary: primaryLight,
+      ),
+      scaffoldBackgroundColor: futuristicBackground,
+      cardColor: futuristicSurface,
+      dividerColor: futuristicTextSecondary.withAlpha(128),
+      textTheme: _buildTextTheme(isLight: false),
+      // Use similar theme configurations as dark theme but with futuristic colors
+      appBarTheme: AppBarTheme(
+        backgroundColor: futuristicSurface,
+        foregroundColor: futuristicTextPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 2,
+        shadowColor: shadowDark,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: futuristicTextPrimary,
+        ),
+      ),
+      // Add other theme properties as needed...
+    );
+  }
+
+  /// Build Neon Pro theme  
+  static ThemeData _buildNeonTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme(
+        brightness: Brightness.dark,
+        primary: neonPrimary,
+        onPrimary: Colors.white,
+        primaryContainer: neonPrimary.withAlpha(51),
+        onPrimaryContainer: neonPrimary,
+        secondary: neonSecondary,
+        onSecondary: Colors.white,
+        secondaryContainer: neonSecondary.withAlpha(51),
+        onSecondaryContainer: neonSecondary,
+        tertiary: neonAccent,
+        onTertiary: Colors.white,
+        tertiaryContainer: neonAccent.withAlpha(51),
+        onTertiaryContainer: neonAccent,
+        error: errorDark,
+        onError: Colors.black,
+        surface: neonSurface,
+        onSurface: neonTextPrimary,
+        onSurfaceVariant: neonTextSecondary,
+        outline: neonTextSecondary.withAlpha(128),
+        outlineVariant: neonTextSecondary.withAlpha(64),
+        shadow: shadowDark,
+        scrim: Colors.black87,
+        inverseSurface: surfaceLight,
+        onInverseSurface: textPrimaryLight,
+        inversePrimary: primaryLight,
+      ),
+      scaffoldBackgroundColor: neonBackground,
+      cardColor: neonSurface,
+      dividerColor: neonTextSecondary.withAlpha(128),
+      textTheme: _buildTextTheme(isLight: false),
+      appBarTheme: AppBarTheme(
+        backgroundColor: neonSurface,
+        foregroundColor: neonTextPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 2,
+        shadowColor: shadowDark,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: neonTextPrimary,
+        ),
+      ),
+      // Add other theme properties as needed...
+    );
+  }
+
+  /// Build Floral Pro theme
+  static ThemeData _buildFloralTheme() {
+    return ThemeData(
+      brightness: Brightness.light,
+      colorScheme: ColorScheme(
+        brightness: Brightness.light,
+        primary: floralPrimary,
+        onPrimary: Colors.white,
+        primaryContainer: floralPrimary.withAlpha(26),
+        onPrimaryContainer: floralPrimary,
+        secondary: floralSecondary,
+        onSecondary: Colors.white,
+        secondaryContainer: floralSecondary.withAlpha(26),
+        onSecondaryContainer: floralSecondary,
+        tertiary: floralAccent,
+        onTertiary: Colors.white,
+        tertiaryContainer: floralAccent.withAlpha(26),
+        onTertiaryContainer: floralAccent,
+        error: errorLight,
+        onError: Colors.white,
+        surface: floralSurface,
+        onSurface: floralTextPrimary,
+        onSurfaceVariant: floralTextSecondary,
+        outline: floralTextSecondary.withAlpha(128),
+        outlineVariant: floralTextSecondary.withAlpha(64),
+        shadow: shadowLight,
+        scrim: Colors.black54,
+        inverseSurface: surfaceDark,
+        onInverseSurface: textPrimaryDark,
+        inversePrimary: primaryDark,
+      ),
+      scaffoldBackgroundColor: floralBackground,
+      cardColor: floralSurface,
+      dividerColor: floralTextSecondary.withAlpha(128),
+      textTheme: _buildTextTheme(isLight: true),
+      appBarTheme: AppBarTheme(
+        backgroundColor: floralSurface,
+        foregroundColor: floralTextPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 2,
+        shadowColor: shadowLight,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: floralTextPrimary,
+        ),
+      ),
+      // Add other theme properties as needed...
+    );
   }
 }
