@@ -17,6 +17,10 @@ void main() async {
   final themeService = ThemeService();
   await themeService.initialize();
 
+  // Initialize monetization manager
+  final monetizationManager = MonetizationManager();
+  await monetizationManager.initialize();
+
   // Initialize sync manager
   final syncManager = SyncManager();
   await syncManager.initialize();
@@ -42,6 +46,7 @@ void main() async {
   ]).then((value) {
     runApp(MyApp(
       themeService: themeService,
+      monetizationManager: monetizationManager,
       syncManager: syncManager,
       notesService: notesService,
       homeScreenWidgetService: homeScreenWidgetService,
@@ -51,6 +56,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final MonetizationManager monetizationManager;
   final SyncManager syncManager;
   final NotesService notesService;
   final HomeScreenWidgetService homeScreenWidgetService;
@@ -58,6 +64,7 @@ class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
     required this.themeService,
+    required this.monetizationManager,
     required this.syncManager,
     required this.notesService,
     required this.homeScreenWidgetService,
@@ -68,6 +75,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: monetizationManager),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
         Provider.value(value: homeScreenWidgetService),

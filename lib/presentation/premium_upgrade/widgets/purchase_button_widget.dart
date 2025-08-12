@@ -6,6 +6,8 @@ import '../../../core/app_export.dart';
 class PurchaseButtonWidget extends StatefulWidget {
   final bool isLoading;
   final String selectedPlan;
+  final String? buttonText;
+  final bool hasPromo;
   final VoidCallback onStartTrial;
   final VoidCallback onRestore;
 
@@ -13,6 +15,8 @@ class PurchaseButtonWidget extends StatefulWidget {
     Key? key,
     required this.isLoading,
     required this.selectedPlan,
+    this.buttonText,
+    this.hasPromo = false,
     required this.onStartTrial,
     required this.onRestore,
   }) : super(key: key);
@@ -144,23 +148,47 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              if (widget.hasPromo) ...[
+                                Icon(
+                                  Icons.local_offer,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 1.w),
+                              ],
                               CustomIconWidget(
                                 iconName: 'rocket_launch',
                                 color: Colors.white,
                                 size: 24,
                               ),
                               SizedBox(width: 2.w),
-                              Text(
-                                widget.selectedPlan == 'lifetime'
-                                    ? 'Get Lifetime Access'
-                                    : 'Start Free Trial',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.buttonText ?? (widget.selectedPlan == 'lifetime'
+                                        ? 'Get Lifetime Access'
+                                        : 'Start Free Trial'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  if (widget.hasPromo)
+                                    Text(
+                                      'Promo Applied!',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.9),
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                     ),
+                                ],
                               ),
                             ],
                           ),
