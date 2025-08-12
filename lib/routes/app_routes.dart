@@ -7,6 +7,7 @@ import '../presentation/note_creation_editor/note_creation_editor.dart';
 import '../presentation/search_discovery/search_discovery.dart';
 import '../presentation/premium_upgrade/premium_upgrade.dart';
 import '../presentation/settings_profile/settings_profile.dart';
+import '../presentation/settings_profile/backup_import_screen.dart';
 
 class AppRoutes {
   // TODO: Add your routes here
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String searchDiscovery = '/search-discovery';
   static const String premiumUpgrade = '/premium-upgrade';
   static const String settingsProfile = '/settings-profile';
+  static const String backupImport = '/backup-import';
 
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
@@ -30,6 +32,7 @@ class AppRoutes {
     searchDiscovery: (context) => const SearchDiscovery(),
     premiumUpgrade: (context) => const PremiumUpgrade(),
     settingsProfile: (context) => const SettingsProfile(),
+    backupImport: (context) => const BackupImportScreen(),
     // TODO: Add your other routes here
   };
 }

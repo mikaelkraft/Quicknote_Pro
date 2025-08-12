@@ -94,6 +94,93 @@ Container(
   child: Text('Responsive Container'),
 )
 ```
+## 💾 Backup & Import
+
+QuickNote Pro includes comprehensive backup and import capabilities that work without requiring cloud storage credentials:
+
+### Features
+
+- **Export All Notes**: Create a ZIP backup containing all your notes and media files
+- **Import from Backup**: Restore notes from ZIP or JSON backup files
+- **Safe Merge Strategy**: Smart conflict resolution using last-write-wins based on timestamps
+- **Import as Copies**: Option to create new IDs for imported notes to avoid conflicts
+- **Cloud Sync Integration**: Optional automatic sync after import when cloud provider is connected
+
+### Usage
+
+#### Creating a Backup
+
+1. Go to **Settings > Cloud & Data > Backup & Import**
+2. Tap **Export All Notes**
+3. Review the export summary showing note count, media files, and estimated size
+4. Confirm the export
+5. Use the system share dialog to save the backup file anywhere
+
+#### Importing a Backup
+
+1. Go to **Settings > Cloud & Data > Backup & Import**
+2. Tap **Import from File**
+3. Select a ZIP or JSON backup file
+4. Configure import options:
+   - **Import as copies**: Creates new IDs to avoid conflicts
+   - **Sync after import**: Automatically sync to cloud if connected
+5. Review the import preview and confirm
+6. View the import summary showing created/updated/skipped notes
+
+### File Formats
+
+#### ZIP Backup Structure
+```
+quicknote_backup_YYYYMMDD_HHMM.zip
+├── notes.json          # Array of note objects with metadata
+└── media/              # Binary assets referenced by notes
+    ├── image1.jpg
+    ├── image2.png
+    └── voice1.m4a
+```
+
+#### Note Object Schema
+```json
+{
+  "id": "unique_note_id",
+  "title": "Note Title",
+  "content": "Note content text",
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-16T14:45:00.000Z",
+  "folder": "Personal",
+  "tags": ["tag1", "tag2"],
+  "images": ["image1.jpg"],
+  "voiceNotes": ["voice1.m4a"],
+  "pinned": false
+}
+```
+
+#### JSON Import
+- Single note: JSON object with note data
+- Multiple notes: JSON array of note objects
+- Media files are not included (graceful warnings provided)
+
+### Privacy & Security
+
+- **No Storage Permissions Required**: Uses system share dialogs and app documents directory
+- **Local Processing**: All backup/import operations happen locally on your device
+- **No Cloud Dependencies**: Works completely offline
+- **User Control**: You choose where to save and store backup files
+
+### Platform Support
+
+- **Android**: Full support with SAF (Storage Access Framework)
+- **iOS**: Full support with system share sheets
+- **Desktop**: Supported with platform-specific file dialogs
+- **Web**: Download support (media extraction limitations may apply)
+
+### Limitations
+
+- Large media collections may create substantial backup file sizes
+- Web platform has limited media file handling capabilities
+- Import validation requires well-formed JSON/ZIP structures
+- Sync integration only available when cloud provider is configured
+
 ## 📦 Deployment
 
 Build the application for production:

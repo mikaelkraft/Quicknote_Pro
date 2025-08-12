@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -167,69 +166,8 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   void _exportData() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Export Data'),
-        content: const Text('Export all your notes and settings to a file?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _performExport();
-            },
-            child: const Text('Export'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _performExport() async {
-    // Simulate export process
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(),
-            SizedBox(width: 4.w),
-            const Text('Exporting data...'),
-          ],
-        ),
-      ),
-    );
-
-    await Future.delayed(const Duration(seconds: 2));
-    Navigator.pop(context);
-
-    if (kIsWeb) {
-      // Web download
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data exported successfully!')),
-      );
-    } else {
-      // Mobile file save
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Export Complete'),
-          content:
-              const Text('Your data has been exported to Downloads folder.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
+    // Redirect to the new backup & import screen
+    Navigator.pushNamed(context, AppRoutes.backupImport);
   }
 
   void _deleteAccount() {
@@ -351,13 +289,13 @@ class _SettingsProfileState extends State<SettingsProfile>
                 colors: isDark
                     ? [
                         AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.7),
-                        AppTheme.accentDark.withValues(alpha: 0.05),
+                        AppTheme.surfaceDark.withOpacity(0.7),
+                        AppTheme.accentDark.withOpacity(0.05),
                       ]
                     : [
                         AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.7),
-                        AppTheme.accentLight.withValues(alpha: 0.05),
+                        AppTheme.surfaceLight.withOpacity(0.7),
+                        AppTheme.accentLight.withOpacity(0.05),
                       ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -387,7 +325,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                           color: (isDark
                                   ? AppTheme.textSecondaryDark
                                   : AppTheme.textSecondaryLight)
-                              .withValues(alpha: 0.1),
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: CustomIconWidget(
@@ -448,7 +386,7 @@ class _SettingsProfileState extends State<SettingsProfile>
 
                             // Backup & Sync
                             SettingsSectionWidget(
-                              title: 'Backup & Sync',
+                              title: 'Cloud & Data',
                               icon: 'cloud_sync',
                               children: [
                                 _buildSyncStatus(),
@@ -460,6 +398,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                                       setState(() => _autoBackup = value),
                                 ),
                                 _buildManualBackupTile(),
+                                _buildBackupImportTile(),
                               ],
                             ),
 
@@ -570,7 +509,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                               ? Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withValues(alpha: 0.1)
+                                  .withOpacity(0.1)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
@@ -808,7 +747,7 @@ class _SettingsProfileState extends State<SettingsProfile>
               color: (_userProfile['isPremium']
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.secondary)
-                  .withValues(alpha: 0.1),
+                  .withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: CustomIconWidget(
@@ -890,6 +829,47 @@ class _SettingsProfileState extends State<SettingsProfile>
                   ),
                   Text(
                     subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            CustomIconWidget(
+              iconName: 'arrow_forward_ios',
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackupImportTile() {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.backupImport),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+        child: Row(
+          children: [
+            CustomIconWidget(
+              iconName: 'folder_copy',
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            SizedBox(width: 3.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Backup & Import',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  Text(
+                    'Export notes or import from backup files',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
