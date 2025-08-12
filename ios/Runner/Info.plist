@@ -47,7 +47,15 @@
     <dict>
         <key>NSAllowsArbitraryLoads</key>
         <true />
+    
     </dict>
+    <!-- Add these keys to your existing <dict> -->
+<key>NSCameraUsageDescription</key>
+<string>Allow Quicknote Pro to use the camera to capture photos for notes.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Allow Quicknote Pro to access your photo library to attach images to notes.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Allow Quicknote Pro to save captured photos to your library.</string>
     <!-- Camera and Photos permissions for note attachments -->
     <key>NSCameraUsageDescription</key>
     <string>This app needs camera access to capture photos for your notes.</string>
