@@ -1,11 +1,10 @@
 name: quicknote_pro
-description: A comprehensive and advanced note-taking app
-with cloud sync, doodling, voice note and many more.
+description: A comprehensive and advanced note-taking app with cloud sync, doodling, voice note and many more.
 publish_to: none
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.0
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:       # 🚨 CRITICAL: Required for every Flutter project - DO NOT REMOVE
