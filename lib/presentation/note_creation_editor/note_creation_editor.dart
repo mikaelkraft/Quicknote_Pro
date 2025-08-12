@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../models/note_model.dart';
+import '../../services/notes/notes_service.dart';
 import './widgets/drawing_canvas_widget.dart';
 import './widgets/formatting_toolbar_widget.dart';
 import './widgets/image_insertion_widget.dart';
+import './widgets/file_attachment_widget.dart';
 import './widgets/save_status_indicator_widget.dart';
 import './widgets/voice_input_widget.dart';
 
 class NoteCreationEditor extends StatefulWidget {
-  const NoteCreationEditor({Key? key}) : super(key: key);
+  final String? noteId; // If provided, edit existing note
+  
+  const NoteCreationEditor({Key? key, this.noteId}) : super(key: key);
 
   @override
   State<NoteCreationEditor> createState() => _NoteCreationEditorState();
@@ -28,27 +34,19 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   bool _showFormattingToolbar = false;
   bool _showDrawingCanvas = false;
   bool _showImageInsertion = false;
+  bool _showFileAttachment = false;
   bool _isSaving = false;
   bool _hasUnsavedChanges = false;
   bool _isPremiumUser = false; // Mock premium status
   DateTime? _lastSaved;
-
-  // Mock note data
-  final Map<String, dynamic> _noteData = {
-    'id': '1',
-    'title': '',
-    'content': '',
-    'createdAt': DateTime.now(),
-    'updatedAt': DateTime.now(),
-    'folder': 'Personal',
-    'tags': <String>[],
-    'images': <String>[],
-    'voiceNotes': <String>[],
-  };
+  
+  Note? _currentNote;
+  NotesService? _notesService;
 
   @override
   void initState() {
     super.initState();
+    _notesService = Provider.of<NotesService>(context, listen: false);
     _setupKeyboardListener();
     _setupAutoSave();
     _titleFocusNode.requestFocus();
@@ -57,16 +55,41 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     _titleController.addListener(_onTextChanged);
     _contentController.addListener(_onTextChanged);
     _contentFocusNode.addListener(_onContentFocusChanged);
+    
+    // Load existing note or create new one
+    _initializeNote();
   }
 
   @override
   void dispose() {
+    _notesService?.stopAutoSave();
     _titleController.dispose();
     _contentController.dispose();
     _titleFocusNode.dispose();
     _contentFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Initialize note - load existing or create new
+  Future<void> _initializeNote() async {
+    if (widget.noteId != null) {
+      // Load existing note
+      _currentNote = await _notesService!.getNoteById(widget.noteId!);
+      if (_currentNote != null) {
+        _titleController.text = _currentNote!.title;
+        _contentController.text = _currentNote!.content;
+        _notesService!.setCurrentNote(_currentNote);
+      }
+    } else {
+      // Create new note
+      _currentNote = await _notesService!.createNote();
+      _notesService!.setCurrentNote(_currentNote);
+    }
+    
+    if (_currentNote != null) {
+      _notesService!.startAutoSave(_currentNote!);
+    }
   }
 
   void _setupKeyboardListener() {
@@ -107,32 +130,50 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   }
 
   Future<void> _saveNote({bool showConfirmation = true}) async {
+    if (_currentNote == null || _notesService == null) return;
+    
     setState(() => _isSaving = true);
 
-    // Simulate save operation
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    _noteData['title'] = _titleController.text;
-    _noteData['content'] = _contentController.text;
-    _noteData['updatedAt'] = DateTime.now();
-
-    setState(() {
-      _isSaving = false;
-      _hasUnsavedChanges = false;
-      _lastSaved = DateTime.now();
-    });
-
-    if (showConfirmation) {
-      HapticFeedback.lightImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Note saved successfully'),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+    try {
+      // Update note with current content
+      final updatedNote = _currentNote!.copyWith(
+        title: _titleController.text,
+        content: _contentController.text,
       );
+
+      await _notesService!.saveNote(updatedNote);
+      _currentNote = updatedNote;
+
+      setState(() {
+        _isSaving = false;
+        _hasUnsavedChanges = false;
+        _lastSaved = DateTime.now();
+      });
+
+      if (showConfirmation) {
+        HapticFeedback.lightImpact();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Note saved successfully'),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() => _isSaving = false);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
   }
 
@@ -274,27 +315,86 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     HapticFeedback.lightImpact();
   }
 
-  void _handleImageInsertion(String imagePath) {
-    setState(() {
-      _showImageInsertion = false;
-      _noteData['images'].add(imagePath);
-    });
+  void _handleImageInsertion(String imagePath) async {
+    if (_notesService == null) return;
+    
+    setState(() => _showImageInsertion = false);
 
-    // Insert image reference in content
-    final currentText = _contentController.text;
-    final cursorPosition = _contentController.selection.baseOffset;
-    final imageRef = '\n![Image](${imagePath})\n';
+    try {
+      await _notesService!.addImageToCurrentNote(imagePath);
+      
+      // Insert image reference in content
+      final currentText = _contentController.text;
+      final cursorPosition = _contentController.selection.baseOffset;
+      final imageRef = '\n![Image](${imagePath})\n';
 
-    final newText = currentText.substring(0, cursorPosition) +
-        imageRef +
-        currentText.substring(cursorPosition);
+      final newText = currentText.substring(0, cursorPosition) +
+          imageRef +
+          currentText.substring(cursorPosition);
 
-    _contentController.text = newText;
-    _contentController.selection = TextSelection.collapsed(
-      offset: cursorPosition + imageRef.length,
-    );
+      _contentController.text = newText;
+      _contentController.selection = TextSelection.collapsed(
+        offset: cursorPosition + imageRef.length,
+      );
 
-    HapticFeedback.lightImpact();
+      HapticFeedback.lightImpact();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image added to note')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add image: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+  void _handleFileAttachment(String filePath) async {
+    if (_notesService == null) return;
+    
+    setState(() => _showFileAttachment = false);
+
+    try {
+      await _notesService!.addAttachmentToCurrentNote(filePath);
+      
+      // Insert file reference in content
+      final currentText = _contentController.text;
+      final cursorPosition = _contentController.selection.baseOffset;
+      final fileName = filePath.split('/').last;
+      final fileRef = '\n[📎 $fileName]($filePath)\n';
+
+      final newText = currentText.substring(0, cursorPosition) +
+          fileRef +
+          currentText.substring(cursorPosition);
+
+      _contentController.text = newText;
+      _contentController.selection = TextSelection.collapsed(
+        offset: cursorPosition + fileRef.length,
+      );
+
+      HapticFeedback.lightImpact();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File attached to note')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to attach file: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -311,6 +411,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
             if (!_showDrawingCanvas) _buildVoiceInput(),
             if (_showDrawingCanvas) _buildDrawingCanvas(),
             if (_showImageInsertion) _buildImageInsertion(),
+            if (_showFileAttachment) _buildFileAttachment(),
           ],
         ),
         floatingActionButton: _buildFloatingActionButtons(),
@@ -548,6 +649,52 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
       ),
     );
   }
+  Widget _buildFileAttachment() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.5),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(4.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Attach File',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        onPressed: () =>
+                            setState(() => _showFileAttachment = false),
+                        icon: CustomIconWidget(
+                          iconName: 'close',
+                          size: 6.w,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                FileAttachmentWidget(
+                  onFileSelected: _handleFileAttachment,
+                ),
+                SizedBox(height: 2.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildFloatingActionButtons() {
     return Column(
@@ -571,6 +718,17 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
           backgroundColor: Theme.of(context).colorScheme.secondary,
           child: CustomIconWidget(
             iconName: 'image',
+            size: 6.w,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        FloatingActionButton(
+          heroTag: 'file',
+          onPressed: () => setState(() => _showFileAttachment = true),
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          child: CustomIconWidget(
+            iconName: 'attach_file',
             size: 6.w,
             color: Colors.white,
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/app_export.dart';
@@ -104,6 +105,7 @@ class _ImageInsertionWidgetState extends State<ImageInsertionWidget> {
         _showCameraPreview = false;
       });
 
+      // Use the photo path directly - the note editor will handle copying to app directory
       widget.onImageSelected(photo.path);
     } catch (e) {
       _showErrorSnackBar('Failed to capture photo');
@@ -111,6 +113,15 @@ class _ImageInsertionWidgetState extends State<ImageInsertionWidget> {
   }
 
   Future<void> _pickFromGallery() async {
+    // Request storage permission for gallery access
+    if (!kIsWeb) {
+      final status = await Permission.photos.request();
+      if (!status.isGranted) {
+        _showPermissionDialog();
+        return;
+      }
+    }
+
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -120,6 +131,7 @@ class _ImageInsertionWidgetState extends State<ImageInsertionWidget> {
       );
 
       if (image != null) {
+        // Use the image path directly - the note editor will handle copying to app directory
         widget.onImageSelected(image.path);
       }
     } catch (e) {
@@ -150,11 +162,11 @@ class _ImageInsertionWidgetState extends State<ImageInsertionWidget> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Camera Permission Required',
+          'Permission Required',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         content: Text(
-          'Please grant camera permission to capture photos.',
+          'Please grant camera and storage permissions to capture and select photos.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [

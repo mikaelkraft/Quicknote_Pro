@@ -6,6 +6,8 @@ import 'package:sizer/sizer.dart';
 import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
 import '../services/sync/sync_manager.dart';
+import '../services/notes/notes_service.dart';
+import '../repositories/notes_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,11 @@ void main() async {
   final syncManager = SyncManager();
   await syncManager.initialize();
 
+  // Initialize notes service
+  final notesRepository = NotesRepository();
+  final notesService = NotesService(notesRepository);
+  await notesService.initialize();
+
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return CustomErrorWidget(
@@ -28,15 +35,25 @@ void main() async {
   Future.wait([
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
   ]).then((value) {
-    runApp(MyApp(themeService: themeService, syncManager: syncManager));
+    runApp(MyApp(
+      themeService: themeService,
+      syncManager: syncManager,
+      notesService: notesService,
+    ));
   });
 }
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
   final SyncManager syncManager;
+  final NotesService notesService;
 
-  const MyApp({Key? key, required this.themeService, required this.syncManager}) : super(key: key);
+  const MyApp({
+    Key? key,
+    required this.themeService,
+    required this.syncManager,
+    required this.notesService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +61,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: syncManager),
+        ChangeNotifierProvider.value(value: notesService),
       ],
       child: Sizer(builder: (context, orientation, screenType) {
         return Consumer<ThemeService>(
