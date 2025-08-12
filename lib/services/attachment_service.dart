@@ -111,7 +111,7 @@ class AttachmentService {
           deletedPaths.add(relativePath);
         } catch (e) {
           // Log error but continue cleanup
-          print('Error deleting orphaned file $relativePath: $e');
+          debugPrint('Error deleting orphaned file $relativePath: $e');
         }
       }
     }
