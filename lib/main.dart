@@ -7,6 +7,7 @@ import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
 import '../services/sync/sync_manager.dart';
 import '../services/notes/notes_service.dart';
+import '../services/ads/ads_service.dart';
 import '../services/widget/home_screen_widget_service.dart';
 import '../services/note_persistence_service.dart';
 import '../services/attachment_service.dart';
@@ -19,6 +20,10 @@ void main() async {
   // Initialize theme service
   final themeService = ThemeService();
   await themeService.initialize();
+
+  // Initialize ads service
+  final adsService = AdsService();
+  await adsService.initialize();
 
   // Initialize sync manager
   final syncManager = SyncManager();
@@ -55,6 +60,7 @@ void main() async {
     runApp(MyApp(
       themeService: themeService,
       syncManager: syncManager,
+      adsService: adsService,
       notesService: notesService,
       noteController: noteController,
       homeScreenWidgetService: homeScreenWidgetService,
@@ -65,6 +71,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
   final SyncManager syncManager;
+  final AdsService adsService;
   final NotesService notesService;
   final NoteController noteController;
   final HomeScreenWidgetService homeScreenWidgetService;
@@ -73,6 +80,7 @@ class MyApp extends StatelessWidget {
     Key? key,
     required this.themeService,
     required this.syncManager,
+    required this.adsService,
     required this.notesService,
     required this.noteController,
     required this.homeScreenWidgetService,
@@ -84,6 +92,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: syncManager),
+        ChangeNotifierProvider.value(value: adsService),
         ChangeNotifierProvider.value(value: notesService),
         ChangeNotifierProvider.value(value: noteController),
         Provider.value(value: homeScreenWidgetService),

@@ -410,9 +410,21 @@ class _NotesDashboardState extends State<NotesDashboard>
   Widget _buildListView() {
     return ListView.builder(
       padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
+      itemCount: _filteredNotes.length + (_filteredNotes.length ~/ 5), // Add ads every 5 notes
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        // Insert banner ad every 5 notes
+        if (index != 0 && (index + 1) % 6 == 0) {
+          return const SimpleBannerAd(
+            placementId: AdsConfig.placementNoteList,
+            margin: EdgeInsets.symmetric(vertical: 8),
+          );
+        }
+        
+        // Calculate the actual note index (accounting for ads)
+        final noteIndex = index - (index ~/ 6);
+        if (noteIndex >= _filteredNotes.length) return const SizedBox.shrink();
+        
+        final note = _filteredNotes[noteIndex];
         return NoteCardWidget(
           note: note,
           onTap: () {
@@ -616,6 +628,13 @@ class _NotesDashboardState extends State<NotesDashboard>
               ),
             ],
           ),
+        ),
+        SizedBox(height: 3.h),
+
+        // Native ad placement in settings
+        const SimpleNativeAd(
+          placementId: AdsConfig.placementSettings,
+          template: NativeAdTemplate.medium,
         ),
         SizedBox(height: 3.h),
 

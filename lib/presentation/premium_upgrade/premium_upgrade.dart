@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -235,12 +236,25 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   void _handleNativePurchase() {
+    // Update ads service to disable ads for premium user
+    final adsService = context.read<AdsService>();
+    adsService.setPremiumUser(true);
+    
+    // Track conversion analytics
+    if (adsService.loadedAds.isNotEmpty) {
+      final adId = adsService.loadedAds.values.first.id;
+      adsService.onAdConversion(adId, conversionData: {
+        'type': 'premium_upgrade',
+        'value': _selectedPlan == 'monthly' ? 2.99 : 14.99,
+      });
+    }
+    
     // Native purchase simulation
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Purchase Successful'),
-        content: const Text('Welcome to QuickNote Pro Premium!'),
+        content: const Text('Welcome to QuickNote Pro Premium!\n\nYou now have access to all premium features and an ad-free experience.'),
         actions: [
           TextButton(
             onPressed: () {
