@@ -66,7 +66,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
                 colors: [
                   isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
                   (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                      .withValues(alpha: 0.8),
+                      .withOpacity(0.8),
                   isDark ? AppTheme.accentDark : AppTheme.accentLight,
                 ],
                 begin: Alignment.topLeft,
@@ -76,7 +76,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
               boxShadow: [
                 BoxShadow(
                   color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                      .withValues(alpha: 0.4),
+                      .withOpacity(0.4),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -101,7 +101,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.transparent,
-                                  Colors.white.withValues(alpha: 0.2),
+                                  Colors.white.withOpacity(0.2),
                                   Colors.transparent,
                                 ],
                                 stops: const [0.0, 0.5, 1.0],
@@ -211,8 +211,8 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
           'Terms of Service • Privacy Policy',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: isDark
-                    ? AppTheme.textSecondaryDark.withValues(alpha: 0.7)
-                    : AppTheme.textSecondaryLight.withValues(alpha: 0.7),
+                    ? AppTheme.textSecondaryDark.withOpacity(0.7)
+                    : AppTheme.textSecondaryLight.withOpacity(0.7),
               ),
           textAlign: TextAlign.center,
         ),

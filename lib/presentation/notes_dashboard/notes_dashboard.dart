@@ -252,7 +252,7 @@ class _NotesDashboardState extends State<NotesDashboard>
                             color: (isDark
                                     ? AppTheme.primaryDark
                                     : AppTheme.primaryLight)
-                                .withValues(alpha: 0.1),
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: CustomIconWidget(
@@ -549,7 +549,7 @@ class _NotesDashboardState extends State<NotesDashboard>
               colors: [
                 isDark ? AppTheme.warningDark : AppTheme.warningLight,
                 (isDark ? AppTheme.warningDark : AppTheme.warningLight)
-                    .withValues(alpha: 0.8),
+                    .withOpacity(0.8),
               ],
             ),
             borderRadius: BorderRadius.circular(12),
@@ -573,7 +573,7 @@ class _NotesDashboardState extends State<NotesDashboard>
               Text(
                 'Unlock unlimited features',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: Colors.white.withOpacity(0.9),
                     ),
               ),
               SizedBox(height: 2.h),

@@ -75,7 +75,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurfaceVariant
-                            .withValues(alpha: 0.6),
+                            .withOpacity(0.6),
                       ),
                   border: InputBorder.none,
                   contentPadding:
@@ -93,7 +93,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 color: Theme.of(context)
                     .colorScheme
                     .primary
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: SizedBox(
