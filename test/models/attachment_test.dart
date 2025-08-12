@@ -6,11 +6,13 @@ void main() {
     test('should convert AttachmentType to string', () {
       expect(AttachmentType.image.value, 'image');
       expect(AttachmentType.file.value, 'file');
+      expect(AttachmentType.voice.value, 'voice');
     });
 
     test('should create AttachmentType from string', () {
       expect(AttachmentTypeExtension.fromString('image'), AttachmentType.image);
       expect(AttachmentTypeExtension.fromString('file'), AttachmentType.file);
+      expect(AttachmentTypeExtension.fromString('voice'), AttachmentType.voice);
     });
 
     test('should throw error for invalid AttachmentType string', () {
@@ -23,6 +25,7 @@ void main() {
 
   group('Attachment Model Tests', () {
     late Attachment testAttachment;
+    late Attachment testVoiceAttachment;
     late DateTime testCreatedAt;
     
     setUp(() {
@@ -35,6 +38,18 @@ void main() {
         sizeBytes: 1024000,
         type: AttachmentType.image,
         createdAt: testCreatedAt,
+      );
+      
+      testVoiceAttachment = Attachment(
+        id: 'voice_test_id',
+        name: 'voice_note.m4a',
+        relativePath: 'attachments/voice_note.m4a',
+        mimeType: 'audio/mp4',
+        sizeBytes: 512000,
+        type: AttachmentType.voice,
+        createdAt: testCreatedAt,
+        duration: Duration(minutes: 2, seconds: 30),
+        metadata: {'quality': 'high', 'bitrate': 128},
       );
     });
 
@@ -148,6 +163,62 @@ void main() {
     test('should identify attachment types correctly', () {
       expect(testAttachment.isImage, isTrue);
       expect(testAttachment.isFile, isFalse);
+      expect(testAttachment.isVoice, isFalse);
+      
+      expect(testVoiceAttachment.isImage, isFalse);
+      expect(testVoiceAttachment.isFile, isFalse);
+      expect(testVoiceAttachment.isVoice, isTrue);
+    });
+
+    test('should format duration correctly for voice attachments', () {
+      expect(testVoiceAttachment.durationFormatted, '02:30');
+      
+      final shortVoice = testVoiceAttachment.copyWith(duration: Duration(seconds: 45));
+      expect(shortVoice.durationFormatted, '00:45');
+      
+      final longVoice = testVoiceAttachment.copyWith(duration: Duration(minutes: 15, seconds: 5));
+      expect(longVoice.durationFormatted, '15:05');
+      
+      final noDurationAttachment = testAttachment.copyWith(duration: null);
+      expect(noDurationAttachment.durationFormatted, 'Unknown duration');
+    });
+
+    test('should handle voice attachment metadata', () {
+      expect(testVoiceAttachment.metadata, isNotNull);
+      expect(testVoiceAttachment.metadata!['quality'], 'high');
+      expect(testVoiceAttachment.metadata!['bitrate'], 128);
+    });
+
+    test('should create voice attachment with all properties', () {
+      expect(testVoiceAttachment.id, 'voice_test_id');
+      expect(testVoiceAttachment.name, 'voice_note.m4a');
+      expect(testVoiceAttachment.type, AttachmentType.voice);
+      expect(testVoiceAttachment.duration, Duration(minutes: 2, seconds: 30));
+      expect(testVoiceAttachment.metadata, isNotNull);
+    });
+
+    test('should handle JSON serialization with voice attachments', () {
+      final json = testVoiceAttachment.toJson();
+      expect(json['type'], 'voice');
+      expect(json['duration'], 150000); // 2:30 in milliseconds
+      expect(json['metadata'], isNotNull);
+      
+      final fromJson = Attachment.fromJson(json);
+      expect(fromJson.type, AttachmentType.voice);
+      expect(fromJson.duration, Duration(minutes: 2, seconds: 30));
+      expect(fromJson.metadata, testVoiceAttachment.metadata);
+    });
+
+    test('should handle copyWith with new fields', () {
+      final updated = testAttachment.copyWith(
+        duration: Duration(minutes: 1),
+        metadata: {'test': 'value'},
+      );
+      
+      expect(updated.duration, Duration(minutes: 1));
+      expect(updated.metadata!['test'], 'value');
+      expect(updated.id, testAttachment.id); // Other fields unchanged
+    });
 
       final fileAttachment = testAttachment.copyWith(type: AttachmentType.file);
       expect(fileAttachment.isImage, isFalse);

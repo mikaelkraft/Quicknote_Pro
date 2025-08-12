@@ -41,6 +41,8 @@ void main() {
         attachments: [testImageAttachment, testFileAttachment],
         createdAt: testCreatedAt,
         updatedAt: testUpdatedAt,
+        folder: 'Work',
+        tags: ['important', 'project'],
       );
     });
 
@@ -278,6 +280,132 @@ void main() {
       expect(str, contains('Test Note'));
       expect(str, contains('34 chars')); // content length
       expect(str, contains('attachments: 2'));
+      expect(str, contains('folder: Work'));
+      expect(str, contains('tags: [important, project]'));
+    });
+
+    // Tests for new features
+    test('should create note with folder and tags', () {
+      expect(testNote.folder, 'Work');
+      expect(testNote.tags, ['important', 'project']);
+    });
+
+    test('should handle default values', () {
+      final defaultNote = Note(
+        id: 'default_id',
+        title: 'Default Note',
+        content: 'Content',
+        createdAt: testCreatedAt,
+        updatedAt: testUpdatedAt,
+      );
+      
+      expect(defaultNote.folder, 'General');
+      expect(defaultNote.tags, isEmpty);
+      expect(defaultNote.attachments, isEmpty);
+    });
+
+    test('should add tags correctly', () {
+      final noteWithNewTag = testNote.addTag('urgent');
+      expect(noteWithNewTag.tags, contains('urgent'));
+      expect(noteWithNewTag.tags.length, 3);
+      
+      // Should not add duplicate tags
+      final duplicateTag = testNote.addTag('important');
+      expect(duplicateTag.tags.length, 2);
+    });
+
+    test('should remove tags correctly', () {
+      final noteWithoutTag = testNote.removeTag('important');
+      expect(noteWithoutTag.tags, ['project']);
+      expect(noteWithoutTag.tags.length, 1);
+    });
+
+    test('should update folder correctly', () {
+      final noteWithNewFolder = testNote.updateFolder('Personal');
+      expect(noteWithNewFolder.folder, 'Personal');
+      expect(noteWithNewFolder.updatedAt, isNot(testNote.updatedAt));
+    });
+
+    test('should check for tags', () {
+      expect(testNote.hasTag('important'), isTrue);
+      expect(testNote.hasTag('urgent'), isFalse);
+    });
+
+    test('should handle voice attachments', () {
+      final voiceAttachment = Attachment(
+        id: 'voice_1',
+        name: 'note.m4a',
+        relativePath: 'attachments/note.m4a',
+        mimeType: 'audio/mp4',
+        type: AttachmentType.voice,
+        createdAt: testCreatedAt,
+        duration: Duration(minutes: 3, seconds: 45),
+      );
+      
+      final noteWithVoice = testNote.addAttachment(voiceAttachment);
+      expect(noteWithVoice.hasVoiceNotes, isTrue);
+      expect(noteWithVoice.voiceAttachments.length, 1);
+      expect(noteWithVoice.totalVoiceDuration, Duration(minutes: 3, seconds: 45));
+    });
+
+    test('should get attachments by type', () {
+      final voiceAttachment = Attachment(
+        id: 'voice_1',
+        name: 'note.m4a',
+        relativePath: 'attachments/note.m4a',
+        type: AttachmentType.voice,
+        createdAt: testCreatedAt,
+      );
+      
+      final noteWithVoice = testNote.addAttachment(voiceAttachment);
+      
+      expect(noteWithVoice.getAttachmentsByType(AttachmentType.image).length, 1);
+      expect(noteWithVoice.getAttachmentsByType(AttachmentType.file).length, 1);
+      expect(noteWithVoice.getAttachmentsByType(AttachmentType.voice).length, 1);
+    });
+
+    test('should detect changes including new fields', () {
+      final changedNote = testNote.copyWith(folder: 'Personal');
+      expect(testNote.hasChangesFrom(changedNote), isTrue);
+      
+      final changedTags = testNote.copyWith(tags: ['different']);
+      expect(testNote.hasChangesFrom(changedTags), isTrue);
+    });
+
+    test('should handle JSON serialization with new fields', () {
+      final json = testNote.toJson();
+      expect(json['folder'], 'Work');
+      expect(json['tags'], ['important', 'project']);
+      
+      final fromJson = Note.fromJson(json);
+      expect(fromJson.folder, 'Work');
+      expect(fromJson.tags, ['important', 'project']);
+    });
+
+    test('should handle JSON deserialization with missing optional fields', () {
+      final jsonWithoutOptionalFields = {
+        'id': 'test_id',
+        'title': 'Test',
+        'content': 'Content',
+        'attachments': [],
+        'createdAt': testCreatedAt.toIso8601String(),
+        'updatedAt': testUpdatedAt.toIso8601String(),
+      };
+      
+      final note = Note.fromJson(jsonWithoutOptionalFields);
+      expect(note.folder, 'General');
+      expect(note.tags, isEmpty);
+    });
+
+    test('should handle copyWith with new fields', () {
+      final updated = testNote.copyWith(
+        folder: 'Personal',
+        tags: ['new', 'tags'],
+      );
+      
+      expect(updated.folder, 'Personal');
+      expect(updated.tags, ['new', 'tags']);
+      expect(updated.id, testNote.id); // Other fields unchanged
     });
   });
 }

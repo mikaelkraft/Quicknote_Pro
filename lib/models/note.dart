@@ -9,6 +9,8 @@ class Note {
   final List<Attachment> attachments;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String folder;
+  final List<String> tags;
 
   const Note({
     required this.id,
@@ -17,6 +19,8 @@ class Note {
     this.attachments = const [],
     required this.createdAt,
     required this.updatedAt,
+    this.folder = 'General',
+    this.tags = const [],
   });
 
   /// Create a copy of the note with updated fields
@@ -27,6 +31,8 @@ class Note {
     List<Attachment>? attachments,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? folder,
+    List<String>? tags,
   }) {
     return Note(
       id: id ?? this.id,
@@ -35,6 +41,8 @@ class Note {
       attachments: attachments ?? List.from(this.attachments),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      folder: folder ?? this.folder,
+      tags: tags ?? List.from(this.tags),
     );
   }
 
@@ -47,6 +55,8 @@ class Note {
       'attachments': attachments.map((attachment) => attachment.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'folder': folder,
+      'tags': tags,
     };
   }
 
@@ -61,6 +71,8 @@ class Note {
           .toList() ?? [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      folder: json['folder'] as String? ?? 'General',
+      tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
 
@@ -89,7 +101,7 @@ class Note {
   String toString() {
     return 'Note{id: $id, title: $title, content: ${content.length} chars, '
            'attachments: ${attachments.length}, createdAt: $createdAt, '
-           'updatedAt: $updatedAt}';
+           'updatedAt: $updatedAt, folder: $folder, tags: $tags}';
   }
 
   /// Check if note has any content
@@ -99,7 +111,18 @@ class Note {
   bool hasChangesFrom(Note other) {
     return title != other.title ||
            content != other.content ||
+           folder != other.folder ||
+           !_listEquals(tags, other.tags) ||
            !_attachmentListEquals(attachments, other.attachments);
+  }
+
+  /// Helper method to compare string lists
+  bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   /// Helper method to compare attachment lists
@@ -136,6 +159,20 @@ class Note {
   /// Get all file attachments
   List<Attachment> get fileAttachments => 
       attachments.where((attachment) => attachment.isFile).toList();
+
+  /// Get all voice note attachments
+  List<Attachment> get voiceAttachments => 
+      attachments.where((attachment) => attachment.isVoice).toList();
+
+  /// Check if note has any voice notes
+  bool get hasVoiceNotes => voiceAttachments.isNotEmpty;
+
+  /// Get total duration of all voice attachments
+  Duration get totalVoiceDuration {
+    return voiceAttachments
+        .where((attachment) => attachment.duration != null)
+        .fold(Duration.zero, (total, attachment) => total + attachment.duration!);
+  }
 
   /// Get total size of all attachments
   int get totalAttachmentSize {
@@ -178,4 +215,38 @@ class Note {
       updatedAt: DateTime.now(),
     );
   }
+
+  /// Add a tag to the note
+  Note addTag(String tag) {
+    if (tags.contains(tag)) return this;
+    final newTags = List<String>.from(tags)..add(tag);
+    return copyWith(
+      tags: newTags,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Remove a tag from the note
+  Note removeTag(String tag) {
+    final newTags = tags.where((t) => t != tag).toList();
+    return copyWith(
+      tags: newTags,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Update the folder of the note
+  Note updateFolder(String newFolder) {
+    return copyWith(
+      folder: newFolder,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Check if note has a specific tag
+  bool hasTag(String tag) => tags.contains(tag);
+
+  /// Get attachments by type
+  List<Attachment> getAttachmentsByType(AttachmentType type) =>
+      attachments.where((attachment) => attachment.type == type).toList();
 }
