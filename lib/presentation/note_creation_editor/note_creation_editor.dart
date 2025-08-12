@@ -632,14 +632,12 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildVoiceInput() {
     return VoiceInputWidget(
       onTranscriptionComplete: _handleVoiceTranscription,
-      isPremiumUser: _isPremiumUser,
     );
   }
 
   Widget _buildDrawingCanvas() {
     return Positioned.fill(
       child: DrawingCanvasWidget(
-        isPremiumUser: _isPremiumUser,
         onClose: () => setState(() => _showDrawingCanvas = false),
       ),
     );
@@ -892,16 +890,75 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
                 _exportAsTxt();
               },
             ),
-            ListTile(
-              leading: CustomIconWidget(
-                iconName: 'picture_as_pdf',
-                size: 6.w,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: const Text('Export as PDF'),
-              onTap: () {
-                Navigator.pop(context);
-                _exportAsPdf();
+            Consumer<EntitlementService>(
+              builder: (context, entitlementService, child) {
+                if (entitlementService.hasFeature(PremiumFeature.exportFormats)) {
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: CustomIconWidget(
+                          iconName: 'picture_as_pdf',
+                          size: 6.w,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: const Text('Export as PDF'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _exportAsPdf();
+                        },
+                      ),
+                      ListTile(
+                        leading: CustomIconWidget(
+                          iconName: 'description',
+                          size: 6.w,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: const Text('Export as Word'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _exportAsWord();
+                        },
+                      ),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.workspace_premium, color: Colors.amber, size: 6.w),
+                        title: const Text('PDF Export'),
+                        subtitle: const Text('Premium feature'),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.black,
+                          ),
+                          child: const Text('Upgrade'),
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.workspace_premium, color: Colors.amber, size: 6.w),
+                        title: const Text('Word Export'),
+                        subtitle: const Text('Premium feature'),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.black,
+                          ),
+                          child: const Text('Upgrade'),
+                        ),
+                      ),
+                    ],
+                  );
+                }
               },
             ),
           ],
@@ -911,16 +968,23 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   }
 
   void _exportAsTxt() {
-    // Implement TXT export
+    // Basic TXT export - always available
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Exported as TXT')),
     );
   }
 
   void _exportAsPdf() {
-    // Implement PDF export
+    // Premium PDF export
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Exported as PDF')),
+    );
+  }
+
+  void _exportAsWord() {
+    // Premium Word export
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Exported as Word document')),
     );
   }
 

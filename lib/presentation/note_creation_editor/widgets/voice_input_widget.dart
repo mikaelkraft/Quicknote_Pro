@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:sizer/sizer.dart';
 
@@ -8,12 +9,10 @@ import '../../../../core/app_export.dart';
 
 class VoiceInputWidget extends StatefulWidget {
   final Function(String) onTranscriptionComplete;
-  final bool isPremiumUser;
 
   const VoiceInputWidget({
     Key? key,
     required this.onTranscriptionComplete,
-    required this.isPremiumUser,
   }) : super(key: key);
 
   @override
@@ -124,8 +123,9 @@ class _VoiceInputWidgetState extends State<VoiceInputWidget>
       if (mounted && _isRecording) {
         setState(() => _recordingDuration++);
 
-        // Free tier limit check
-        if (!widget.isPremiumUser && _recordingDuration >= 60) {
+        // Check entitlement for longer recordings
+        final entitlementService = context.read<EntitlementService>();
+        if (entitlementService.hasReachedLimit(PremiumFeature.longerRecordings, _recordingDuration)) {
           await _stopRecording();
           _showUpgradeDialog();
           return false;
@@ -136,6 +136,14 @@ class _VoiceInputWidgetState extends State<VoiceInputWidget>
   }
 
   void _simulateTranscription() {
+    final entitlementService = context.read<EntitlementService>();
+    
+    // Check if transcription feature is available
+    if (!entitlementService.hasFeature(PremiumFeature.voiceNoteTranscription)) {
+      _showTranscriptionUpgradeDialog();
+      return;
+    }
+    
     // Simulate real transcription with realistic delay
     Future.delayed(const Duration(milliseconds: 1500), () {
       final transcriptions = [
@@ -181,25 +189,27 @@ class _VoiceInputWidgetState extends State<VoiceInputWidget>
   }
 
   void _showUpgradeDialog() {
+    final entitlementService = context.read<EntitlementService>();
+    final limit = entitlementService.getFeatureLimit(PremiumFeature.longerRecordings);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          'Upgrade to Premium',
+          'Recording Limit Reached',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomIconWidget(
-              iconName: 'star',
+              iconName: 'workspace_premium',
               size: 12.w,
-              color: AppTheme.getWarningColor(
-                  Theme.of(context).brightness == Brightness.light),
+              color: Colors.amber,
             ),
             SizedBox(height: 2.h),
             Text(
-              'Free users are limited to 1-minute voice recordings. Upgrade to Premium for unlimited voice-to-text conversion.',
+              'Free users are limited to ${limit ?? 60}-second voice recordings. Upgrade to Premium for unlimited recording time.',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -213,9 +223,52 @@ class _VoiceInputWidgetState extends State<VoiceInputWidget>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // Navigate to premium upgrade screen
+              Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
             },
-            child: const Text('Upgrade Now'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('Upgrade Now', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTranscriptionUpgradeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Premium Feature',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomIconWidget(
+              iconName: 'workspace_premium',
+              size: 12.w,
+              color: Colors.amber,
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              'Voice-to-text transcription is a premium feature. Upgrade to automatically convert your voice recordings to text.',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Maybe Later'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('Upgrade Now', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),

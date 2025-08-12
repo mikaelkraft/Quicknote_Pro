@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../core/app_export.dart';
 
 class DrawingCanvasWidget extends StatefulWidget {
-  final bool isPremiumUser;
   final Function() onClose;
 
   const DrawingCanvasWidget({
     Key? key,
-    required this.isPremiumUser,
     required this.onClose,
   }) : super(key: key);
 
@@ -140,11 +139,19 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
                         _buildSizeOption(1.0),
                         _buildSizeOption(2.0),
                         _buildSizeOption(4.0),
-                        if (widget.isPremiumUser) ...[
-                          _buildSizeOption(6.0),
-                          _buildSizeOption(8.0),
-                          _buildSizeOption(12.0),
-                        ],
+                        ...Consumer<EntitlementService>(
+                          builder: (context, entitlementService, child) {
+                            if (entitlementService.hasFeature(PremiumFeature.advancedDrawingTools)) {
+                              return [
+                                _buildSizeOption(6.0),
+                                _buildSizeOption(8.0),
+                                _buildSizeOption(12.0),
+                              ];
+                            } else {
+                              return [_buildPremiumSizeLockIndicator()];
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -175,12 +182,17 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
                       children: [
                         ..._basicColors
                             .map((color) => _buildColorOption(color)),
-                        if (widget.isPremiumUser) ...[
-                          ..._premiumColors
-                              .map((color) => _buildColorOption(color)),
-                        ] else ...[
-                          _buildPremiumLockIndicator(),
-                        ],
+                        ...Consumer<EntitlementService>(
+                          builder: (context, entitlementService, child) {
+                            if (entitlementService.hasFeature(PremiumFeature.advancedDrawingTools)) {
+                              return _premiumColors
+                                  .map((color) => _buildColorOption(color))
+                                  .toList();
+                            } else {
+                              return [_buildPremiumColorLockIndicator()];
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -279,9 +291,9 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
     );
   }
 
-  Widget _buildPremiumLockIndicator() {
+  Widget _buildPremiumColorLockIndicator() {
     return GestureDetector(
-      onTap: _showPremiumDialog,
+      onTap: () => _showPremiumDialog(PremiumFeature.advancedDrawingTools),
       child: Container(
         width: 8.w,
         height: 4.h,
@@ -293,37 +305,87 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
         ),
         child: Center(
           child: CustomIconWidget(
-            iconName: 'lock',
+            iconName: 'workspace_premium',
             size: 3.w,
-            color: Colors.grey[600]!,
+            color: Colors.amber,
           ),
         ),
       ),
     );
   }
 
-  void _showPremiumDialog() {
+  Widget _buildPremiumSizeLockIndicator() {
+    return GestureDetector(
+      onTap: () => _showPremiumDialog(PremiumFeature.advancedDrawingTools),
+      child: Container(
+        width: 10.w,
+        height: 5.h,
+        margin: EdgeInsets.only(right: 2.w),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[300]!, width: 1),
+        ),
+        child: Center(
+          child: CustomIconWidget(
+            iconName: 'workspace_premium',
+            size: 4.w,
+            color: Colors.amber,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumLockIndicator() {
+    return _buildPremiumColorLockIndicator();
+  }
+
+  void _showPremiumDialog(PremiumFeature feature) {
+    final entitlementService = context.read<EntitlementService>();
+    final featureName = entitlementService.getFeatureName(feature);
+    final featureDescription = entitlementService.getFeatureDescription(feature);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          'Premium Feature',
-          style: Theme.of(context).textTheme.titleLarge,
+        title: Row(
+          children: [
+            Icon(Icons.workspace_premium, color: Colors.amber),
+            SizedBox(width: 2.w),
+            Expanded(
+              child: Text(
+                featureName,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CustomIconWidget(
-              iconName: 'palette',
-              size: 12.w,
-              color: AppTheme.getWarningColor(true),
-            ),
-            SizedBox(height: 2.h),
             Text(
-              'Unlock advanced drawing tools including multiple brush sizes, extended color palette, and premium brushes.',
+              featureDescription,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
+            SizedBox(height: 2.h),
+            Text(
+              'Premium drawing tools include:',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 1.h),
+            ...['Multiple brush sizes', 'Extended color palette', 'Advanced stroke effects', 'Drawing layers support']
+                .map((benefit) => Padding(
+                  padding: EdgeInsets.only(bottom: 0.5.h),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check, color: Colors.green, size: 16.sp),
+                      SizedBox(width: 2.w),
+                      Expanded(child: Text(benefit, style: TextStyle(fontSize: 11.sp))),
+                    ],
+                  ),
+                )),
           ],
         ),
         actions: [
@@ -334,8 +396,15 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // Navigate to premium upgrade
+              Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
             },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('Upgrade Now', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
             child: const Text('Upgrade Now'),
           ),
         ],
