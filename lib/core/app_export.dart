@@ -8,3 +8,7 @@ export '../services/notes/notes_service.dart';
 export '../repositories/notes_repository.dart';
 export '../models/note_model.dart';
 export '../constants/product_ids.dart';
+export '../services/entitlements/entitlement_service.dart';
+export '../services/billing/billing_service.dart';
+export '../widgets/premium/feature_gate.dart';
+export '../widgets/premium/upsell_dialog.dart';

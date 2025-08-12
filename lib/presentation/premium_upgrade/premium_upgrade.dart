@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -200,16 +201,30 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     });
 
     try {
-      // Simulate purchase process
-      await Future.delayed(const Duration(seconds: 2));
+      final billingService = Provider.of<BillingService>(context, listen: false);
+      final entitlementService = Provider.of<EntitlementService>(context, listen: false);
 
       if (kIsWeb) {
         _showWebCheckout();
+        return;
+      }
+
+      // Use the selected plan to determine product ID
+      final productId = _selectedPlan == 'monthly' 
+          ? ProductIds.premiumMonthly 
+          : ProductIds.premiumLifetime;
+
+      final success = await billingService.purchaseProduct(productId);
+      
+      if (success) {
+        // Purchase initiated successfully
+        _showPurchaseInitiated();
       } else {
-        _handleNativePurchase();
+        final error = billingService.lastError ?? 'Purchase failed. Please try again.';
+        _showErrorDialog(error);
       }
     } catch (e) {
-      _showErrorDialog('Purchase failed. Please try again.');
+      _showErrorDialog('Purchase failed: ${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -224,6 +239,22 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       builder: (context) => AlertDialog(
         title: const Text('Web Checkout'),
         content: const Text('Redirecting to secure payment page...'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPurchaseInitiated() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Purchase Initiated'),
+        content: const Text('Your purchase is being processed. You will receive a confirmation shortly.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -259,21 +290,41 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       _isLoading = true;
     });
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final billingService = Provider.of<BillingService>(context, listen: false);
+      final entitlementService = Provider.of<EntitlementService>(context, listen: false);
 
-    setState(() {
-      _isLoading = false;
-    });
+      await billingService.restorePurchases();
+      await entitlementService.refreshEntitlements();
 
+      if (entitlementService.isPremium) {
+        _showRestoreSuccess('Premium access restored successfully!');
+      } else {
+        _showRestoreSuccess('No previous purchases found.');
+      }
+    } catch (e) {
+      _showErrorDialog('Failed to restore purchases: ${e.toString()}');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showRestoreSuccess(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
+        content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context);
+              if (Provider.of<EntitlementService>(context, listen: false).isPremium) {
+                Navigator.pop(context); // Close premium upgrade screen
+              }
+            },
             child: const Text('OK'),
           ),
         ],

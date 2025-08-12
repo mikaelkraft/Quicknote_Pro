@@ -17,6 +17,11 @@ void main() async {
   final themeService = ThemeService();
   await themeService.initialize();
 
+  // Initialize billing and entitlement services
+  final billingService = BillingService();
+  final entitlementService = EntitlementService(billingService);
+  await entitlementService.initialize();
+
   // Initialize sync manager
   final syncManager = SyncManager();
   await syncManager.initialize();
@@ -45,6 +50,8 @@ void main() async {
       syncManager: syncManager,
       notesService: notesService,
       homeScreenWidgetService: homeScreenWidgetService,
+      entitlementService: entitlementService,
+      billingService: billingService,
     ));
   });
 }
@@ -54,6 +61,8 @@ class MyApp extends StatelessWidget {
   final SyncManager syncManager;
   final NotesService notesService;
   final HomeScreenWidgetService homeScreenWidgetService;
+  final EntitlementService entitlementService;
+  final BillingService billingService;
 
   const MyApp({
     Key? key,
@@ -61,6 +70,8 @@ class MyApp extends StatelessWidget {
     required this.syncManager,
     required this.notesService,
     required this.homeScreenWidgetService,
+    required this.entitlementService,
+    required this.billingService,
   }) : super(key: key);
 
   @override
@@ -70,6 +81,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
+        ChangeNotifierProvider.value(value: entitlementService),
+        ChangeNotifierProvider.value(value: billingService),
         Provider.value(value: homeScreenWidgetService),
       ],
       child: Sizer(builder: (context, orientation, screenType) {
