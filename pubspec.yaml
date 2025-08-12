@@ -39,14 +39,23 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   http: ^1.1.0
   
+  # OCR and text recognition
+  google_mlkit_text_recognition: ^0.13.0
+  google_mlkit_commons: ^0.7.1
+  
   # State management and sharing
   provider: ^6.1.1
   share_plus: ^7.2.1
+  
+  # Home screen widgets
+  home_widget: ^0.6.0
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
     sdk: flutter   # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
   flutter_lints: ^5.0.0 # 🚨 CRITICAL: Required for code quality - DO NOT REMOVE
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true # 🚨 CRITICAL: Required for Material icon font - DO NOT REMOVE

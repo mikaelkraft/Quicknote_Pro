@@ -48,5 +48,18 @@
         <key>NSAllowsArbitraryLoads</key>
         <true />
     </dict>
+    <!-- Camera and Photos permissions for note attachments -->
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs camera access to capture photos for your notes.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs photo library access to attach images to your notes.</string>
+    <!-- Microphone permission for voice notes -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs microphone access to record voice notes.</string>
+    <!-- File access for attachments -->
+    <key>NSDocumentDirectory</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
 </dict>
 </plist>

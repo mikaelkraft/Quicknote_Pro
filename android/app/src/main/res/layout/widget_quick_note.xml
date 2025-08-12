@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Widget Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="QuickNote Pro"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="QuickNote Pro"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"/>
+
+        <TextView
+            android:id="@+id/widget_notes_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 notes"
+            android:textSize="12sp"
+            android:textColor="@color/widget_text_secondary"/>
+    </LinearLayout>
+
+    <!-- Recent Note Content -->
+    <LinearLayout
+        android:id="@+id/widget_main_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="@drawable/widget_content_background"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No recent notes"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/widget_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create your first note"
+            android:textSize="12sp"
+            android:textColor="@color/widget_text_secondary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:paddingTop="4dp"/>
+
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/widget_create_note_btn"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:layout_marginRight="4dp"
+            android:src="@drawable/ic_add"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="Create Note"
+            android:scaleType="center"/>
+
+        <ImageButton
+            android:id="@+id/widget_voice_note_btn"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:src="@drawable/ic_mic"
+            android:background="@drawable/widget_button_background"
+            android:contentDescription="Voice Note"
+            android:scaleType="center"/>
+
+    </LinearLayout>
+
+</LinearLayout>
