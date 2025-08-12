@@ -10,6 +10,8 @@ import '../services/notes/notes_service.dart';
 import '../services/widget/home_screen_widget_service.dart';
 import '../services/note_persistence_service.dart';
 import '../services/attachment_service.dart';
+import '../services/pricing_tier_service.dart';
+import '../services/monetization_analytics_service.dart';
 import '../controllers/note_controller.dart';
 import '../repositories/notes_repository.dart';
 
@@ -19,6 +21,15 @@ void main() async {
   // Initialize theme service
   final themeService = ThemeService();
   await themeService.initialize();
+
+  // Initialize pricing and analytics services
+  final pricingTierService = PricingTierService();
+  final analyticsService = MonetizationAnalyticsService();
+  await pricingTierService.initialize();
+  await analyticsService.initialize();
+
+  // Connect analytics to pricing service
+  pricingTierService.setAnalyticsCallback(analyticsService.trackEvent);
 
   // Initialize sync manager
   final syncManager = SyncManager();
@@ -54,6 +65,8 @@ void main() async {
   ]).then((value) {
     runApp(MyApp(
       themeService: themeService,
+      pricingTierService: pricingTierService,
+      analyticsService: analyticsService,
       syncManager: syncManager,
       notesService: notesService,
       noteController: noteController,
@@ -64,6 +77,8 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final PricingTierService pricingTierService;
+  final MonetizationAnalyticsService analyticsService;
   final SyncManager syncManager;
   final NotesService notesService;
   final NoteController noteController;
@@ -72,6 +87,8 @@ class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
     required this.themeService,
+    required this.pricingTierService,
+    required this.analyticsService,
     required this.syncManager,
     required this.notesService,
     required this.noteController,
@@ -83,6 +100,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: pricingTierService),
+        Provider.value(value: analyticsService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
         ChangeNotifierProvider.value(value: noteController),
