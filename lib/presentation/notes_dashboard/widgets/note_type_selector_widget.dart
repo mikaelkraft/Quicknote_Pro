@@ -82,6 +82,16 @@ class NoteTypeSelectorWidget extends StatelessWidget {
             onTap: () => _selectNoteType(context, 'template'),
           ),
           SizedBox(height: 2.h),
+
+          _buildNoteTypeOption(
+            context,
+            icon: 'attach_file',
+            title: 'Note with Attachments',
+            subtitle: 'Add photos, files, and camera images',
+            onTap: () => _selectNoteType(context, 'attachments'),
+            isPremium: false,
+          ),
+          SizedBox(height: 2.h),
         ],
       ),
     );
