@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/app_export.dart';
 import './widgets/empty_state_widget.dart';
@@ -7,6 +8,7 @@ import './widgets/filter_chip_widget.dart';
 import './widgets/note_card_widget.dart';
 import './widgets/note_type_selector_widget.dart';
 import './widgets/search_bar_widget.dart';
+import '../premium_upgrade/widgets/banner_ad_widget.dart';
 
 class NotesDashboard extends StatefulWidget {
   const NotesDashboard({Key? key}) : super(key: key);
@@ -240,6 +242,79 @@ class _NotesDashboardState extends State<NotesDashboard>
                                 ),
                       ),
                       const Spacer(),
+                      
+                      // Premium status indicator
+                      Consumer<MonetizationManager>(
+                        builder: (context, monetization, child) {
+                          if (monetization.premium.isPremium) {
+                            return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.amber, Colors.orange],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.star, color: Colors.white, size: 16),
+                                  SizedBox(width: 1.w),
+                                  Text(
+                                    'PRO',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return GestureDetector(
+                              onTap: () {
+                                monetization.analytics.trackFunnelStep(
+                                  'upgrade_funnel', 
+                                  'header_upgrade_tapped'
+                                );
+                                Navigator.pushNamed(context, '/premium-upgrade');
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.upgrade,
+                                      color: isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 1.w),
+                                    Text(
+                                      'Upgrade',
+                                      style: TextStyle(
+                                        color: isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      
+                      SizedBox(width: 2.w),
+                      
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -404,30 +479,60 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   Widget _buildListView() {
-    return ListView.builder(
-      padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
-      itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
-        return NoteCardWidget(
-          note: note,
-          onTap: () {
-            Navigator.pushNamed(context, '/note-creation-editor');
-          },
-          onPin: () => _onNoteAction(note['id'], 'pin'),
-          onShare: () {
-            // Implement share functionality
-          },
-          onMove: () {
-            Navigator.pushNamed(context, '/folder-organization');
-          },
-          onDelete: () => _onNoteAction(note['id'], 'delete'),
-          onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
-          onExport: () {
-            // Implement export functionality
-          },
-          onSetReminder: () {
-            // Implement reminder functionality
+    return Consumer<MonetizationManager>(
+      builder: (context, monetization, child) {
+        return ListView.builder(
+          padding: EdgeInsets.only(bottom: 10.h),
+          itemCount: _getListItemCount(monetization),
+          itemBuilder: (context, index) {
+            // Show banner ad every 4 notes for free users
+            if (!monetization.premium.adFree && 
+                monetization.ads.shouldShowAds && 
+                index > 0 && 
+                (index + 1) % 5 == 0) {
+              return Column(
+                children: [
+                  SizedBox(height: 2.h),
+                  const BannerAdWidget(placement: 'notes_list'),
+                  SizedBox(height: 2.h),
+                ],
+              );
+            }
+
+            // Calculate actual note index (accounting for ads)
+            final noteIndex = _getNoteIndex(index, monetization);
+            if (noteIndex >= _filteredNotes.length) return SizedBox.shrink();
+
+            final note = _filteredNotes[noteIndex];
+            return NoteCardWidget(
+              note: note,
+              onTap: () {
+                // Track note view and maybe show interstitial
+                monetization.analytics.trackFeatureUsage('note_view', context: {
+                  'note_type': note['type'],
+                  'from': 'dashboard',
+                });
+                monetization.ads.maybeShowInterstitialAd();
+                Navigator.pushNamed(context, '/note-creation-editor');
+              },
+              onPin: () => _onNoteAction(note['id'], 'pin'),
+              onShare: () {
+                // Track share action
+                monetization.analytics.trackFeatureUsage('note_share');
+                // Implement share functionality
+              },
+              onMove: () {
+                Navigator.pushNamed(context, '/folder-organization');
+              },
+              onDelete: () => _onNoteAction(note['id'], 'delete'),
+              onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
+              onExport: () {
+                // Implement export functionality
+              },
+              onSetReminder: () {
+                // Implement reminder functionality
+              },
+            );
           },
         );
       },
@@ -446,29 +551,62 @@ class _NotesDashboardState extends State<NotesDashboard>
       itemCount: _filteredNotes.length,
       itemBuilder: (context, index) {
         final note = _filteredNotes[index];
-        return NoteCardWidget(
-          note: note,
-          onTap: () {
-            Navigator.pushNamed(context, '/note-creation-editor');
-          },
-          onPin: () => _onNoteAction(note['id'], 'pin'),
-          onShare: () {
-            // Implement share functionality
-          },
-          onMove: () {
-            Navigator.pushNamed(context, '/folder-organization');
-          },
-          onDelete: () => _onNoteAction(note['id'], 'delete'),
-          onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
-          onExport: () {
-            // Implement export functionality
-          },
-          onSetReminder: () {
-            // Implement reminder functionality
+        return Consumer<MonetizationManager>(
+          builder: (context, monetization, child) {
+            return NoteCardWidget(
+              note: note,
+              onTap: () {
+                // Track note view
+                monetization.analytics.trackFeatureUsage('note_view', context: {
+                  'note_type': note['type'],
+                  'from': 'dashboard_grid',
+                });
+                monetization.ads.maybeShowInterstitialAd();
+                Navigator.pushNamed(context, '/note-creation-editor');
+              },
+              onPin: () => _onNoteAction(note['id'], 'pin'),
+              onShare: () {
+                // Track share action
+                monetization.analytics.trackFeatureUsage('note_share');
+                // Implement share functionality
+              },
+              onMove: () {
+                Navigator.pushNamed(context, '/folder-organization');
+              },
+              onDelete: () => _onNoteAction(note['id'], 'delete'),
+              onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
+              onExport: () {
+                // Implement export functionality
+              },
+              onSetReminder: () {
+                // Implement reminder functionality
+              },
+            );
           },
         );
       },
     );
+  }
+
+  // Helper methods for ad integration
+  int _getListItemCount(MonetizationManager monetization) {
+    if (monetization.premium.adFree || !monetization.ads.shouldShowAds) {
+      return _filteredNotes.length;
+    }
+    
+    // Add extra items for ads (every 5th position)
+    final adCount = (_filteredNotes.length / 4).floor();
+    return _filteredNotes.length + adCount;
+  }
+
+  int _getNoteIndex(int listIndex, MonetizationManager monetization) {
+    if (monetization.premium.adFree || !monetization.ads.shouldShowAds) {
+      return listIndex;
+    }
+    
+    // Calculate note index accounting for ads
+    final adsBeforeIndex = (listIndex / 5).floor();
+    return listIndex - adsBeforeIndex;
   }
 
   Widget _buildFoldersTab() {
@@ -652,7 +790,9 @@ class _NotesDashboardState extends State<NotesDashboard>
           icon: 'share',
           title: 'Refer Friends',
           subtitle: 'Get 1 month free premium',
-          onTap: () {},
+          onTap: () {
+            _shareReferralCode();
+          },
         ),
       ],
     );

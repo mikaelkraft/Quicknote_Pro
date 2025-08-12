@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/app_export.dart';
 import './widgets/feature_card_widget.dart';
 import './widgets/premium_header_widget.dart';
 import './widgets/pricing_option_widget.dart';
 import './widgets/purchase_button_widget.dart';
+import './widgets/promo_code_widget.dart';
+import './widgets/banner_ad_widget.dart';
 
 class PremiumUpgrade extends StatefulWidget {
   const PremiumUpgrade({Key? key}) : super(key: key);
@@ -24,6 +27,8 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
 
   bool _isLoading = false;
   String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  String? _promoCode;
+  final TextEditingController _promoController = TextEditingController();
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -68,6 +73,12 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   void initState() {
     super.initState();
     _initializeAnimations();
+    
+    // Track funnel step
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final monetization = Provider.of<MonetizationManager>(context, listen: false);
+      monetization.analytics.trackFunnelStep('upgrade_funnel', 'premium_screen_viewed');
+    });
   }
 
   void _initializeAnimations() {
@@ -105,6 +116,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   void dispose() {
     _backgroundController.dispose();
     _featuresController.dispose();
+    _promoController.dispose();
     super.dispose();
   }
 
@@ -195,21 +207,32 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   Future<void> _startFreeTrial() async {
+    final monetization = Provider.of<MonetizationManager>(context, listen: false);
+    
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Simulate purchase process
-      await Future.delayed(const Duration(seconds: 2));
+      // Track purchase attempt
+      monetization.analytics.trackFunnelStep('upgrade_funnel', 'purchase_attempted', extra: {
+        'plan': _selectedPlan,
+        'has_promo': _promoCode != null,
+      });
 
-      if (kIsWeb) {
-        _showWebCheckout();
+      final productId = _selectedPlan == 'monthly' 
+          ? ProductIds.premiumMonthly 
+          : ProductIds.premiumLifetime;
+
+      final success = await monetization.purchaseProduct(productId, promoCode: _promoCode);
+
+      if (success) {
+        _showSuccessDialog();
       } else {
-        _handleNativePurchase();
+        _showErrorDialog('Purchase failed. Please try again.');
       }
     } catch (e) {
-      _showErrorDialog('Purchase failed. Please try again.');
+      _showErrorDialog('Purchase failed: ${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -217,30 +240,19 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     }
   }
 
-  void _showWebCheckout() {
-    // Web checkout redirect simulation
+  void _showSuccessDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Web Checkout'),
-        content: const Text('Redirecting to secure payment page...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleNativePurchase() {
-    // Native purchase simulation
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Purchase Successful'),
-        content: const Text('Welcome to QuickNote Pro Premium!'),
+        title: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 32),
+            SizedBox(width: 2.w),
+            Text('Welcome to Premium!'),
+          ],
+        ),
+        content: Text('Thank you for upgrading to QuickNote Pro Premium! All features are now unlocked.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -255,30 +267,42 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   void _restorePurchases() async {
+    final monetization = Provider.of<MonetizationManager>(context, listen: false);
+    
     setState(() {
       _isLoading = true;
     });
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await monetization.restorePurchases();
+      
+      setState(() {
+        _isLoading = false;
+      });
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Restore Complete'),
+          content: Text(
+            monetization.premium.isPremium 
+                ? 'Your premium features have been restored!'
+                : 'No previous purchases found.'
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('Failed to restore purchases: ${e.toString()}');
+    }
   }
 
   void _showErrorDialog(String message) {
@@ -297,172 +321,210 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     );
   }
 
+  void _onPromoCodeApplied(String code) {
+    setState(() {
+      _promoCode = code;
+    });
+  }
+
+  void _onPromoCodeCleared() {
+    setState(() {
+      _promoCode = null;
+    });
+    _promoController.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      body: AnimatedBuilder(
-        animation: _backgroundAnimation,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [
-                        AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.8),
-                        AppTheme.primaryDark.withValues(alpha: 0.1),
-                      ]
-                    : [
-                        AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.8),
-                        AppTheme.primaryLight.withValues(alpha: 0.1),
-                      ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: [
-                  0.0,
-                  0.5 + (_backgroundAnimation.value * 0.3),
-                  1.0,
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Header
-                  PremiumHeaderWidget(
-                    onClose: () => Navigator.pop(context),
+    return Consumer<MonetizationManager>(
+      builder: (context, monetization, child) {
+        // Get dynamic pricing from A/B tests
+        final monthlyPrice = monetization.getTestPrice(ProductIds.premiumMonthly);
+        final lifetimePrice = monetization.getTestPrice(ProductIds.premiumLifetime);
+        final buttonText = monetization.getUpgradeButtonText();
+
+        return Scaffold(
+          backgroundColor:
+              isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
+          body: AnimatedBuilder(
+            animation: _backgroundAnimation,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [
+                            AppTheme.backgroundDark,
+                            AppTheme.surfaceDark.withValues(alpha: 0.8),
+                            AppTheme.primaryDark.withValues(alpha: 0.1),
+                          ]
+                        : [
+                            AppTheme.backgroundLight,
+                            AppTheme.surfaceLight.withValues(alpha: 0.8),
+                            AppTheme.primaryLight.withValues(alpha: 0.1),
+                          ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: [
+                      0.0,
+                      0.5 + (_backgroundAnimation.value * 0.3),
+                      1.0,
+                    ],
                   ),
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Header
+                      PremiumHeaderWidget(
+                        onClose: () => Navigator.pop(context),
+                      ),
 
-                  // Content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 2.h),
+                      // Show banner ad for free users
+                      if (!monetization.premium.adFree && monetization.ads.shouldShowAds)
+                        const BannerAdWidget(),
 
-                          // Features section
-                          AnimatedBuilder(
-                            animation: _featuresAnimation,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: _featuresAnimation.value,
-                                child: Column(
-                                  children: _premiumFeatures
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                    final index = entry.key;
-                                    final feature = entry.value;
-                                    return AnimatedContainer(
-                                      duration: Duration(
-                                          milliseconds: 300 + (index * 100)),
-                                      curve: Curves.easeOutBack,
-                                      margin: EdgeInsets.only(bottom: 2.h),
-                                      child: FeatureCardWidget(
-                                        feature: feature,
-                                        onTap: () => _onFeatureTapped(feature),
-                                        animationDelay: index * 200,
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              );
-                            },
-                          ),
+                      // Content
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 2.h),
 
-                          SizedBox(height: 3.h),
-
-                          // Pricing section
-                          Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: BoxDecoration(
-                              color: (isDark
-                                      ? AppTheme.surfaceDark
-                                      : AppTheme.surfaceLight)
-                                  .withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: (isDark
-                                        ? AppTheme.primaryDark
-                                        : AppTheme.primaryLight)
-                                    .withValues(alpha: 0.2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Choose Your Plan',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: isDark
-                                            ? AppTheme.primaryDark
-                                            : AppTheme.primaryLight,
-                                      ),
-                                ),
-                                SizedBox(height: 2.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Monthly',
-                                        price: '\$2.99',
-                                        period: '/month',
-                                        savings: null,
-                                        isSelected: _selectedPlan == 'monthly',
-                                        isRecommended: false,
-                                        onTap: () => _onPlanSelected('monthly'),
-                                      ),
+                              // Features section
+                              AnimatedBuilder(
+                                animation: _featuresAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _featuresAnimation.value,
+                                    child: Column(
+                                      children: _premiumFeatures
+                                          .asMap()
+                                          .entries
+                                          .map((entry) {
+                                        final index = entry.key;
+                                        final feature = entry.value;
+                                        return AnimatedContainer(
+                                          duration: Duration(
+                                              milliseconds: 300 + (index * 100)),
+                                          curve: Curves.easeOutBack,
+                                          margin: EdgeInsets.only(bottom: 2.h),
+                                          child: FeatureCardWidget(
+                                            feature: feature,
+                                            onTap: () => _onFeatureTapped(feature),
+                                            animationDelay: index * 200,
+                                          ),
+                                        );
+                                      }).toList(),
                                     ),
-                                    SizedBox(width: 3.w),
-                                    Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Lifetime',
-                                        price: '\$14.99',
-                                        period: 'one-time',
-                                        savings: 'Save 75%',
-                                        isSelected: _selectedPlan == 'lifetime',
-                                        isRecommended: true,
-                                        onTap: () =>
-                                            _onPlanSelected('lifetime'),
-                                      ),
+                                  );
+                                },
+                              ),
+
+                              SizedBox(height: 3.h),
+
+                              // Promo code section
+                              PromoCodeWidget(
+                                controller: _promoController,
+                                onApplied: _onPromoCodeApplied,
+                                onCleared: _onPromoCodeCleared,
+                                appliedCode: _promoCode,
+                              ),
+
+                              SizedBox(height: 2.h),
+
+                              // Pricing section
+                              Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: BoxDecoration(
+                                  color: (isDark
+                                          ? AppTheme.surfaceDark
+                                          : AppTheme.surfaceLight)
+                                      .withValues(alpha: 0.8),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: (isDark
+                                            ? AppTheme.primaryDark
+                                            : AppTheme.primaryLight)
+                                        .withValues(alpha: 0.2),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Choose Your Plan',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? AppTheme.primaryDark
+                                                : AppTheme.primaryLight,
+                                          ),
+                                    ),
+                                    SizedBox(height: 2.h),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: PricingOptionWidget(
+                                            title: 'Monthly',
+                                            price: monthlyPrice,
+                                            period: '/month',
+                                            savings: _promoCode != null ? 'Promo Applied!' : null,
+                                            isSelected: _selectedPlan == 'monthly',
+                                            isRecommended: false,
+                                            onTap: () => _onPlanSelected('monthly'),
+                                          ),
+                                        ),
+                                        SizedBox(width: 3.w),
+                                        Expanded(
+                                          child: PricingOptionWidget(
+                                            title: 'Lifetime',
+                                            price: lifetimePrice,
+                                            period: 'one-time',
+                                            savings: _promoCode != null ? 'Promo Applied!' : 'Save 75%',
+                                            isSelected: _selectedPlan == 'lifetime',
+                                            isRecommended: true,
+                                            onTap: () =>
+                                                _onPlanSelected('lifetime'),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+
+                              SizedBox(height: 4.h),
+
+                              // Purchase buttons
+                              PurchaseButtonWidget(
+                                isLoading: _isLoading,
+                                selectedPlan: _selectedPlan,
+                                buttonText: buttonText,
+                                hasPromo: _promoCode != null,
+                                onStartTrial: _startFreeTrial,
+                                onRestore: _restorePurchases,
+                              ),
+
+                              SizedBox(height: 2.h),
+                            ],
                           ),
-
-                          SizedBox(height: 4.h),
-
-                          // Purchase buttons
-                          PurchaseButtonWidget(
-                            isLoading: _isLoading,
-                            selectedPlan: _selectedPlan,
-                            onStartTrial: _startFreeTrial,
-                            onRestore: _restorePurchases,
-                          ),
-
-                          SizedBox(height: 2.h),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
