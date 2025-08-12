@@ -1,0 +1,12 @@
+Acknowledged prefs and proceeding:
+- Pickers: image_picker for camera/gallery, file_picker for arbitrary files.
+- State wiring: Local controller within a StatefulWidget (no provider/riverpod). Can refactor to an InheritedWidget later if needed.
+- Android permissions: gate at runtime by SDK level — SDK >= 33 request READ_MEDIA_IMAGES for gallery access; below 33 request READ_EXTERNAL_STORAGE. Request CAMERA as needed for capture. Manifest remains minimal and aligned with minSdk/target.
+
+Implementation notes:
+- Debounced autosave (~700ms) on title/content.
+- Attachment thumbnails for images; file name + size for others; delete affordance.
+- Graceful handling for permission denial with retry snackbars.
+- Tests: controller autosave + attachment ops; widget autosave persistence with SharedPreferences mock.
+
+I’ll push commits to this PR accordingly and update the description to close #1 when ready. If you want a different debounce window or UI affordances, let me know here.
