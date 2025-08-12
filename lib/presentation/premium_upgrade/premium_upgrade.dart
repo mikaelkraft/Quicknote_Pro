@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -22,8 +23,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   late Animation<double> _backgroundAnimation;
   late Animation<double> _featuresAnimation;
 
-  bool _isLoading = false;
-  String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  String _selectedPlan = ProductIds.premiumLifetime; // Default to lifetime
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -133,7 +133,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -195,52 +195,37 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   Future<void> _startFreeTrial() async {
-    setState(() {
-      _isLoading = true;
-    });
-
+    final premiumService = context.read<PremiumService>();
+    
     try {
-      // Simulate purchase process
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (kIsWeb) {
-        _showWebCheckout();
-      } else {
-        _handleNativePurchase();
+      final success = await premiumService.purchaseProduct(_selectedPlan);
+      if (success) {
+        _showSuccessDialog();
+      } else if (premiumService.lastError != null) {
+        _showErrorDialog(premiumService.lastError!);
       }
     } catch (e) {
       _showErrorDialog('Purchase failed. Please try again.');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
-  void _showWebCheckout() {
-    // Web checkout redirect simulation
+  void _showSuccessDialog() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Web Checkout'),
-        content: const Text('Redirecting to secure payment page...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleNativePurchase() {
-    // Native purchase simulation
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Purchase Successful'),
-        content: const Text('Welcome to QuickNote Pro Premium!'),
+        title: Row(
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 28,
+            ),
+            SizedBox(width: 2.w),
+            Text('Welcome to Premium!'),
+          ],
+        ),
+        content: Text('Your purchase was successful. Enjoy all premium features!'),
         actions: [
           TextButton(
             onPressed: () {
@@ -255,22 +240,59 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   }
 
   void _restorePurchases() async {
-    setState(() {
-      _isLoading = true;
-    });
+    final premiumService = context.read<PremiumService>();
+    
+    try {
+      await premiumService.restorePurchases();
+      
+      // Show result after a brief delay to allow processing
+      await Future.delayed(const Duration(seconds: 1));
+      
+      if (premiumService.isPremium) {
+        _showRestoreSuccessDialog();
+      } else {
+        _showRestoreNoFoundDialog();
+      }
+    } catch (e) {
+      _showErrorDialog('Restore failed. Please try again.');
+    }
+  }
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
-      _isLoading = false;
-    });
-
+  void _showRestoreSuccessDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
+        title: Row(
+          children: [
+            Icon(
+              Icons.refresh,
+              color: Colors.green,
+              size: 28,
+            ),
+            SizedBox(width: 2.w),
+            Text('Restore Successful'),
+          ],
+        ),
+        content: const Text('Your premium subscription has been restored!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRestoreNoFoundDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('No Purchases Found'),
+        content: const Text('No previous purchases were found to restore.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -301,168 +323,246 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
+    return Consumer<PremiumService>(
+      builder: (context, premiumService, child) {
+        // If user is already premium, show success message
+        if (premiumService.isPremium) {
+          return _buildPremiumAlreadyActiveScreen(isDark);
+        }
+
+        return Scaffold(
+          backgroundColor:
+              isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
+          body: AnimatedBuilder(
+            animation: _backgroundAnimation,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [
+                            AppTheme.backgroundDark,
+                            AppTheme.surfaceDark.withOpacity(0.8),
+                            AppTheme.primaryDark.withOpacity(0.1),
+                          ]
+                        : [
+                            AppTheme.backgroundLight,
+                            AppTheme.surfaceLight.withOpacity(0.8),
+                            AppTheme.primaryLight.withOpacity(0.1),
+                          ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: [
+                      0.0,
+                      0.5 + (_backgroundAnimation.value * 0.3),
+                      1.0,
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Header
+                      PremiumHeaderWidget(
+                        onClose: () => Navigator.pop(context),
+                      ),
+
+                      // Content
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 2.h),
+
+                              // Features section
+                              AnimatedBuilder(
+                                animation: _featuresAnimation,
+                                builder: (context, child) {
+                                  return Transform.scale(
+                                    scale: _featuresAnimation.value,
+                                    child: Column(
+                                      children: _premiumFeatures
+                                          .asMap()
+                                          .entries
+                                          .map((entry) {
+                                        final index = entry.key;
+                                        final feature = entry.value;
+                                        return AnimatedContainer(
+                                          duration: Duration(
+                                              milliseconds: 300 + (index * 100)),
+                                          curve: Curves.easeOutBack,
+                                          margin: EdgeInsets.only(bottom: 2.h),
+                                          child: FeatureCardWidget(
+                                            feature: feature,
+                                            onTap: () => _onFeatureTapped(feature),
+                                            animationDelay: index * 200,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              SizedBox(height: 3.h),
+
+                              // Pricing section
+                              _buildPricingSection(isDark, premiumService),
+
+                              SizedBox(height: 4.h),
+
+                              // Purchase buttons
+                              PurchaseButtonWidget(
+                                isLoading: premiumService.isLoading,
+                                selectedPlan: _selectedPlan,
+                                onStartTrial: _startFreeTrial,
+                                onRestore: _restorePurchases,
+                              ),
+
+                              SizedBox(height: 2.h),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPremiumAlreadyActiveScreen(bool isDark) {
     return Scaffold(
       backgroundColor:
           isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      body: AnimatedBuilder(
-        animation: _backgroundAnimation,
-        builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [
-                        AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.8),
-                        AppTheme.primaryDark.withValues(alpha: 0.1),
-                      ]
-                    : [
-                        AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.8),
-                        AppTheme.primaryLight.withValues(alpha: 0.1),
-                      ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: [
-                  0.0,
-                  0.5 + (_backgroundAnimation.value * 0.3),
-                  1.0,
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Header
-                  PremiumHeaderWidget(
-                    onClose: () => Navigator.pop(context),
-                  ),
-
-                  // Content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 2.h),
-
-                          // Features section
-                          AnimatedBuilder(
-                            animation: _featuresAnimation,
-                            builder: (context, child) {
-                              return Transform.scale(
-                                scale: _featuresAnimation.value,
-                                child: Column(
-                                  children: _premiumFeatures
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                    final index = entry.key;
-                                    final feature = entry.value;
-                                    return AnimatedContainer(
-                                      duration: Duration(
-                                          milliseconds: 300 + (index * 100)),
-                                      curve: Curves.easeOutBack,
-                                      margin: EdgeInsets.only(bottom: 2.h),
-                                      child: FeatureCardWidget(
-                                        feature: feature,
-                                        onTap: () => _onFeatureTapped(feature),
-                                        animationDelay: index * 200,
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              );
-                            },
-                          ),
-
-                          SizedBox(height: 3.h),
-
-                          // Pricing section
-                          Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: BoxDecoration(
-                              color: (isDark
-                                      ? AppTheme.surfaceDark
-                                      : AppTheme.surfaceLight)
-                                  .withValues(alpha: 0.8),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: (isDark
-                                        ? AppTheme.primaryDark
-                                        : AppTheme.primaryLight)
-                                    .withValues(alpha: 0.2),
-                                width: 1,
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'Choose Your Plan',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: isDark
-                                            ? AppTheme.primaryDark
-                                            : AppTheme.primaryLight,
-                                      ),
-                                ),
-                                SizedBox(height: 2.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Monthly',
-                                        price: '\$2.99',
-                                        period: '/month',
-                                        savings: null,
-                                        isSelected: _selectedPlan == 'monthly',
-                                        isRecommended: false,
-                                        onTap: () => _onPlanSelected('monthly'),
-                                      ),
-                                    ),
-                                    SizedBox(width: 3.w),
-                                    Expanded(
-                                      child: PricingOptionWidget(
-                                        title: 'Lifetime',
-                                        price: '\$14.99',
-                                        period: 'one-time',
-                                        savings: 'Save 75%',
-                                        isSelected: _selectedPlan == 'lifetime',
-                                        isRecommended: true,
-                                        onTap: () =>
-                                            _onPlanSelected('lifetime'),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: 4.h),
-
-                          // Purchase buttons
-                          PurchaseButtonWidget(
-                            isLoading: _isLoading,
-                            selectedPlan: _selectedPlan,
-                            onStartTrial: _startFreeTrial,
-                            onRestore: _restorePurchases,
-                          ),
-
-                          SizedBox(height: 2.h),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: Text('Premium Status'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(6.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.star,
+                size: 80,
+                color: isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                'You\'re Premium!',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
+                    ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                'Thank you for supporting QuickNote Pro. You have access to all premium features.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              SizedBox(height: 4.h),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Continue'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPricingSection(bool isDark, PremiumService premiumService) {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: (isDark
+                ? AppTheme.surfaceDark
+                : AppTheme.surfaceLight)
+            .withOpacity(0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: (isDark
+                  ? AppTheme.primaryDark
+                  : AppTheme.primaryLight)
+              .withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Choose Your Plan',
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppTheme.primaryDark
+                      : AppTheme.primaryLight,
+                ),
+          ),
+          SizedBox(height: 2.h),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPricingOption(
+                  premiumService,
+                  ProductIds.premiumMonthly,
+                  'Monthly',
+                  '/month',
+                  null,
+                  false,
+                ),
+              ),
+              SizedBox(width: 3.w),
+              Expanded(
+                child: _buildPricingOption(
+                  premiumService,
+                  ProductIds.premiumLifetime,
+                  'Lifetime',
+                  'one-time',
+                  'Best Value',
+                  true,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPricingOption(
+    PremiumService premiumService,
+    String productId,
+    String title,
+    String period,
+    String? savings,
+    bool isRecommended,
+  ) {
+    final product = premiumService.getProductDetails(productId);
+    final price = product?.price ?? ProductIds.fallbackPrices[productId] ?? 'N/A';
+    
+    return PricingOptionWidget(
+      title: title,
+      price: price,
+      period: period,
+      savings: savings,
+      isSelected: _selectedPlan == productId,
+      isRecommended: isRecommended,
+      onTap: () => _onPlanSelected(productId),
     );
   }
 }

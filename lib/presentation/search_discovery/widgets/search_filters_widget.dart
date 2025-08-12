@@ -158,7 +158,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                         ? Theme.of(context)
                             .colorScheme
                             .primary
-                            .withValues(alpha: 0.1)
+                            .withOpacity(0.1)
                         : Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -167,7 +167,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                           : Theme.of(context)
                               .colorScheme
                               .outline
-                              .withValues(alpha: 0.3),
+                              .withOpacity(0.3),
                     ),
                   ),
                   child: Row(
@@ -220,12 +220,12 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
               decoration: BoxDecoration(
                 color: AppTheme.getWarningColor(
                         Theme.of(context).brightness == Brightness.light)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: AppTheme.getWarningColor(
                           Theme.of(context).brightness == Brightness.light)
-                      .withValues(alpha: 0.3),
+                      .withOpacity(0.3),
                 ),
               ),
               child: Row(
@@ -304,13 +304,13 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
         padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
         decoration: BoxDecoration(
           color: isSelected
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
               : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
           ),
         ),
         child: Row(

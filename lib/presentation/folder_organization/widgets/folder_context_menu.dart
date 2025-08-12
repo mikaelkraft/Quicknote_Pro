@@ -62,7 +62,7 @@ class FolderContextMenu extends StatelessWidget {
                   padding: EdgeInsets.all(2.w),
                   decoration: BoxDecoration(
                     color: _getFolderColor(folder['color'] as String, isDark)
-                        .withValues(alpha: 0.2),
+                        .withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: CustomIconWidget(
@@ -178,7 +178,7 @@ class FolderContextMenu extends StatelessWidget {
             ? (isDark
                     ? AppTheme.textSecondaryDark
                     : AppTheme.textSecondaryLight)
-                .withValues(alpha: 0.5)
+                .withOpacity(0.5)
             : isDestructive
                 ? (isDark ? AppTheme.errorDark : AppTheme.errorLight)
                 : (isDark
@@ -193,7 +193,7 @@ class FolderContextMenu extends StatelessWidget {
                   ? (isDark
                           ? AppTheme.textSecondaryDark
                           : AppTheme.textSecondaryLight)
-                      .withValues(alpha: 0.5)
+                      .withOpacity(0.5)
                   : isDestructive
                       ? (isDark ? AppTheme.errorDark : AppTheme.errorLight)
                       : (isDark
