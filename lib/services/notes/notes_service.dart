@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../models/note_model.dart';
 import '../../repositories/notes_repository.dart';
+import '../widget/home_screen_widget_service.dart';
 
 /// Service for managing notes with business logic and caching
 class NotesService extends ChangeNotifier {
@@ -35,6 +36,7 @@ class NotesService extends ChangeNotifier {
     
     try {
       _notes = await _repository.getAllNotes();
+      await _updateHomeScreenWidget();
       notifyListeners();
     } catch (e) {
       _setError('Failed to load notes: $e');
@@ -90,6 +92,9 @@ class NotesService extends ChangeNotifier {
       
       // Sort notes by updated date
       _notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      
+      // Update home screen widget
+      await _updateHomeScreenWidget();
       
       notifyListeners();
     } catch (e) {
@@ -351,6 +356,32 @@ class NotesService extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to get storage stats: $e');
       return {};
+    }
+  }
+  
+  /// Update home screen widget with latest note data
+  Future<void> _updateHomeScreenWidget() async {
+    try {
+      if (_notes.isNotEmpty) {
+        final recentNote = _notes.first;
+        final truncatedContent = recentNote.content.length > 100 
+            ? '${recentNote.content.substring(0, 97)}...' 
+            : recentNote.content;
+            
+        await HomeScreenWidgetService().updateWidget(
+          recentNoteTitle: recentNote.title.isEmpty ? 'Untitled Note' : recentNote.title,
+          recentNoteContent: truncatedContent.isEmpty ? 'Empty note' : truncatedContent,
+          totalNotesCount: _notes.length,
+        );
+      } else {
+        await HomeScreenWidgetService().updateWidget(
+          recentNoteTitle: 'No notes yet',
+          recentNoteContent: 'Create your first note to get started',
+          totalNotesCount: 0,
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to update home screen widget: $e');
     }
   }
   

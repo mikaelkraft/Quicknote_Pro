@@ -46,6 +46,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        
+        <!-- Home Screen Widget Provider -->
+        <receiver android:name=".QuickNoteWidgetProvider"
+            android:exported="true"
+            android:label="QuickNote Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.quicknote_pro.app.CREATE_NOTE" />
+                <action android:name="com.quicknote_pro.app.VOICE_NOTE" />
+                <action android:name="com.quicknote_pro.app.OPEN_APP" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_quick_note_info" />
+        </receiver>
+        
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

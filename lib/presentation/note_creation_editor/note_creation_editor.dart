@@ -12,6 +12,7 @@ import './widgets/image_insertion_widget.dart';
 import './widgets/file_attachment_widget.dart';
 import './widgets/save_status_indicator_widget.dart';
 import './widgets/voice_input_widget.dart';
+import './widgets/ocr_text_extraction_widget.dart';
 
 class NoteCreationEditor extends StatefulWidget {
   final String? noteId; // If provided, edit existing note
@@ -35,6 +36,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   bool _showDrawingCanvas = false;
   bool _showImageInsertion = false;
   bool _showFileAttachment = false;
+  bool _showOcrExtraction = false;
   bool _isSaving = false;
   bool _hasUnsavedChanges = false;
   bool _isPremiumUser = false; // Mock premium status
@@ -396,6 +398,45 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
       }
     }
   }
+  void _handleOcrTextExtraction(String extractedText) async {
+    setState(() => _showOcrExtraction = false);
+
+    try {
+      // Insert extracted text at cursor position
+      final currentText = _contentController.text;
+      final cursorPosition = _contentController.selection.baseOffset;
+      
+      // Add a separator if there's existing content
+      final separator = currentText.isNotEmpty && !currentText.endsWith('\n') ? '\n\n' : '';
+      final textToInsert = '$separator--- Extracted Text ---\n$extractedText\n\n';
+
+      final newText = currentText.substring(0, cursorPosition) +
+          textToInsert +
+          currentText.substring(cursorPosition);
+
+      _contentController.text = newText;
+      _contentController.selection = TextSelection.collapsed(
+        offset: cursorPosition + textToInsert.length,
+      );
+
+      HapticFeedback.lightImpact();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Text extracted and added to note')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add extracted text: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -412,6 +453,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
             if (_showDrawingCanvas) _buildDrawingCanvas(),
             if (_showImageInsertion) _buildImageInsertion(),
             if (_showFileAttachment) _buildFileAttachment(),
+            if (_showOcrExtraction) _buildOcrExtraction(),
           ],
         ),
         floatingActionButton: _buildFloatingActionButtons(),
@@ -696,6 +738,54 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     );
   }
 
+  Widget _buildOcrExtraction() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.5),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(4.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Extract Text from Image',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        onPressed: () =>
+                            setState(() => _showOcrExtraction = false),
+                        icon: CustomIconWidget(
+                          iconName: 'close',
+                          size: 6.w,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                OcrTextExtractionWidget(
+                  onTextExtracted: _handleOcrTextExtraction,
+                  isPremiumUser: _isPremiumUser,
+                ),
+                SizedBox(height: 2.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFloatingActionButtons() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -720,6 +810,46 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
             iconName: 'image',
             size: 6.w,
             color: Colors.white,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        FloatingActionButton(
+          heroTag: 'ocr',
+          onPressed: () => setState(() => _showOcrExtraction = true),
+          backgroundColor: _isPremiumUser 
+              ? const Color(0xFF4CAF50) 
+              : Colors.grey[400],
+          child: Stack(
+            children: [
+              Center(
+                child: CustomIconWidget(
+                  iconName: 'text_fields',
+                  size: 6.w,
+                  color: Colors.white,
+                ),
+              ),
+              if (!_isPremiumUser)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 4.w,
+                    height: 4.w,
+                    decoration: BoxDecoration(
+                      color: AppTheme.getWarningColor(true),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    child: Center(
+                      child: CustomIconWidget(
+                        iconName: 'lock',
+                        size: 2.w,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         SizedBox(height: 2.h),

@@ -7,6 +7,7 @@ import '../core/app_export.dart';
 import '../widgets/custom_error_widget.dart';
 import '../services/sync/sync_manager.dart';
 import '../services/notes/notes_service.dart';
+import '../services/widget/home_screen_widget_service.dart';
 import '../repositories/notes_repository.dart';
 
 void main() async {
@@ -25,6 +26,10 @@ void main() async {
   final notesService = NotesService(notesRepository);
   await notesService.initialize();
 
+  // Initialize home screen widget service
+  final homeScreenWidgetService = HomeScreenWidgetService();
+  await homeScreenWidgetService.initializeWidgets();
+
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return CustomErrorWidget(
@@ -39,6 +44,7 @@ void main() async {
       themeService: themeService,
       syncManager: syncManager,
       notesService: notesService,
+      homeScreenWidgetService: homeScreenWidgetService,
     ));
   });
 }
@@ -47,12 +53,14 @@ class MyApp extends StatelessWidget {
   final ThemeService themeService;
   final SyncManager syncManager;
   final NotesService notesService;
+  final HomeScreenWidgetService homeScreenWidgetService;
 
   const MyApp({
     Key? key,
     required this.themeService,
     required this.syncManager,
     required this.notesService,
+    required this.homeScreenWidgetService,
   }) : super(key: key);
 
   @override
@@ -62,6 +70,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
+        Provider.value(value: homeScreenWidgetService),
       ],
       child: Sizer(builder: (context, orientation, screenType) {
         return Consumer<ThemeService>(
