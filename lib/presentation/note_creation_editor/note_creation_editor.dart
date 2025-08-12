@@ -39,7 +39,6 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   bool _showOcrExtraction = false;
   bool _isSaving = false;
   bool _hasUnsavedChanges = false;
-  bool _isPremiumUser = false; // Mock premium status
   DateTime? _lastSaved;
   
   Note? _currentNote;
@@ -438,6 +437,19 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     }
   }
 
+  void _showPremiumDialog(PremiumFeature feature) {
+    showDialog(
+      context: context,
+      builder: (context) => UpsellDialog(
+        feature: feature,
+        onUpgrade: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pushNamed(AppRoutes.premiumUpgrade);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -630,18 +642,26 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   }
 
   Widget _buildVoiceInput() {
-    return VoiceInputWidget(
-      onTranscriptionComplete: _handleVoiceTranscription,
-      isPremiumUser: _isPremiumUser,
+    return Consumer<EntitlementService>(
+      builder: (context, entitlementService, _) {
+        return VoiceInputWidget(
+          onTranscriptionComplete: _handleVoiceTranscription,
+          isPremiumUser: entitlementService.hasFeature(PremiumFeature.unlimitedVoiceNotes),
+        );
+      },
     );
   }
 
   Widget _buildDrawingCanvas() {
-    return Positioned.fill(
-      child: DrawingCanvasWidget(
-        isPremiumUser: _isPremiumUser,
-        onClose: () => setState(() => _showDrawingCanvas = false),
-      ),
+    return Consumer<EntitlementService>(
+      builder: (context, entitlementService, _) {
+        return Positioned.fill(
+          child: DrawingCanvasWidget(
+            isPremiumUser: entitlementService.hasFeature(PremiumFeature.advancedDrawingTools),
+            onClose: () => setState(() => _showDrawingCanvas = false),
+          ),
+        );
+      },
     );
   }
 
@@ -773,9 +793,13 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
                     ],
                   ),
                 ),
-                OcrTextExtractionWidget(
-                  onTextExtracted: _handleOcrTextExtraction,
-                  isPremiumUser: _isPremiumUser,
+                Consumer<EntitlementService>(
+                  builder: (context, entitlementService, _) {
+                    return OcrTextExtractionWidget(
+                      onTextExtracted: _handleOcrTextExtraction,
+                      isPremiumUser: entitlementService.hasFeature(PremiumFeature.voiceTranscription),
+                    );
+                  },
                 ),
                 SizedBox(height: 2.h),
               ],
@@ -813,44 +837,51 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
           ),
         ),
         SizedBox(height: 2.h),
-        FloatingActionButton(
-          heroTag: 'ocr',
-          onPressed: () => setState(() => _showOcrExtraction = true),
-          backgroundColor: _isPremiumUser 
-              ? const Color(0xFF4CAF50) 
-              : Colors.grey[400],
-          child: Stack(
-            children: [
-              Center(
-                child: CustomIconWidget(
-                  iconName: 'text_fields',
-                  size: 6.w,
-                  color: Colors.white,
-                ),
-              ),
-              if (!_isPremiumUser)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 4.w,
-                    height: 4.w,
-                    decoration: BoxDecoration(
-                      color: AppTheme.getWarningColor(true),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1),
-                    ),
-                    child: Center(
-                      child: CustomIconWidget(
-                        iconName: 'lock',
-                        size: 2.w,
-                        color: Colors.white,
-                      ),
+        Consumer<EntitlementService>(
+          builder: (context, entitlementService, _) {
+            final hasOcrAccess = entitlementService.hasFeature(PremiumFeature.voiceTranscription);
+            return FloatingActionButton(
+              heroTag: 'ocr',
+              onPressed: hasOcrAccess 
+                ? () => setState(() => _showOcrExtraction = true)
+                : () => _showPremiumDialog(PremiumFeature.voiceTranscription),
+              backgroundColor: hasOcrAccess 
+                  ? const Color(0xFF4CAF50) 
+                  : Colors.grey[400],
+              child: Stack(
+                children: [
+                  Center(
+                    child: CustomIconWidget(
+                      iconName: 'text_fields',
+                      size: 6.w,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-            ],
-          ),
+                  if (!hasOcrAccess)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 4.w,
+                        height: 4.w,
+                        decoration: BoxDecoration(
+                          color: AppTheme.getWarningColor(true),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1),
+                        ),
+                        child: Center(
+                          child: CustomIconWidget(
+                            iconName: 'lock',
+                            size: 2.w,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
         SizedBox(height: 2.h),
         FloatingActionButton(
@@ -870,42 +901,72 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   void _showExportOptions() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(4.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Export Note',
-              style: Theme.of(context).textTheme.titleLarge,
+      builder: (context) => Consumer<EntitlementService>(
+        builder: (context, entitlementService, _) {
+          return Container(
+            padding: EdgeInsets.all(4.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Export Note',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                SizedBox(height: 3.h),
+                ListTile(
+                  leading: CustomIconWidget(
+                    iconName: 'text_snippet',
+                    size: 6.w,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  title: const Text('Export as TXT'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _exportAsTxt();
+                  },
+                ),
+                FeatureGate(
+                  feature: PremiumFeature.exportFormats,
+                  child: ListTile(
+                    leading: CustomIconWidget(
+                      iconName: 'picture_as_pdf',
+                      size: 6.w,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    title: const Text('Export as PDF'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _exportAsPdf();
+                    },
+                  ),
+                  fallback: ListTile(
+                    leading: CustomIconWidget(
+                      iconName: 'picture_as_pdf',
+                      size: 6.w,
+                      color: Colors.grey,
+                    ),
+                    title: Row(
+                      children: [
+                        const Text('Export as PDF'),
+                        SizedBox(width: 2.w),
+                        Icon(
+                          Icons.star,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                    subtitle: const Text('Premium feature'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showPremiumDialog(PremiumFeature.exportFormats);
+                    },
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 3.h),
-            ListTile(
-              leading: CustomIconWidget(
-                iconName: 'text_snippet',
-                size: 6.w,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: const Text('Export as TXT'),
-              onTap: () {
-                Navigator.pop(context);
-                _exportAsTxt();
-              },
-            ),
-            ListTile(
-              leading: CustomIconWidget(
-                iconName: 'picture_as_pdf',
-                size: 6.w,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: const Text('Export as PDF'),
-              onTap: () {
-                Navigator.pop(context);
-                _exportAsPdf();
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
