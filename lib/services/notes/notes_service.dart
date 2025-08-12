@@ -206,6 +206,54 @@ class NotesService extends ChangeNotifier {
       await saveNote(updatedNote);
     }
   }
+
+  /// Add doodle to current note
+  Future<String?> addDoodleToCurrentNote(String doodleJsonData) async {
+    if (_currentNote == null) return null;
+    
+    try {
+      // Save doodle JSON data to app directory
+      final doodlePath = await _repository.saveDoodleData(
+        _currentNote!.id,
+        doodleJsonData,
+      );
+      
+      if (doodlePath != null) {
+        final updatedNote = _currentNote!.copyWith(
+          doodlePaths: [..._currentNote!.doodlePaths, doodlePath],
+        );
+        
+        await saveNote(updatedNote);
+        return doodlePath;
+      }
+    } catch (e) {
+      _setError('Failed to save doodle: $e');
+    }
+    
+    return null;
+  }
+
+  /// Update existing doodle in current note
+  Future<void> updateDoodleInCurrentNote(String doodlePath, String doodleJsonData) async {
+    if (_currentNote == null) return;
+    
+    try {
+      await _repository.updateDoodleData(doodlePath, doodleJsonData);
+      // Note: No need to update the note model as the path remains the same
+    } catch (e) {
+      _setError('Failed to update doodle: $e');
+    }
+  }
+
+  /// Load doodle data from path
+  Future<String?> loadDoodleData(String doodlePath) async {
+    try {
+      return await _repository.loadDoodleData(doodlePath);
+    } catch (e) {
+      _setError('Failed to load doodle: $e');
+      return null;
+    }
+  }
   
   /// Remove media from current note
   Future<void> removeMediaFromCurrentNote(String mediaPath, String mediaType) async {
@@ -225,6 +273,16 @@ class NotesService extends ChangeNotifier {
       case 'voice':
         final newVoiceNotes = _currentNote!.voiceNotePaths.where((path) => path != mediaPath).toList();
         updatedNote = _currentNote!.copyWith(voiceNotePaths: newVoiceNotes);
+        break;
+      case 'doodle':
+        final newDoodles = _currentNote!.doodlePaths.where((path) => path != mediaPath).toList();
+        updatedNote = _currentNote!.copyWith(doodlePaths: newDoodles);
+        // Also delete the doodle file
+        try {
+          await _repository.deleteDoodleData(mediaPath);
+        } catch (e) {
+          _setError('Failed to delete doodle file: $e');
+        }
         break;
       default:
         return;
