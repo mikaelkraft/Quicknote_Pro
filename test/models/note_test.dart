@@ -44,6 +44,42 @@ void main() {
       );
     });
 
+    test('should create note using Note.create() factory', () {
+      final createdNote = Note.create(
+        title: 'Factory Note',
+        content: 'Content from factory',
+      );
+
+      expect(createdNote.title, 'Factory Note');
+      expect(createdNote.content, 'Content from factory');
+      expect(createdNote.attachments, isEmpty);
+      expect(createdNote.id, isNotEmpty);
+      expect(createdNote.id, startsWith('note_'));
+      expect(createdNote.createdAt, isA<DateTime>());
+      expect(createdNote.updatedAt, isA<DateTime>());
+      expect(createdNote.createdAt, equals(createdNote.updatedAt));
+    });
+
+    test('should create note with default empty values using Note.create()', () {
+      final createdNote = Note.create();
+
+      expect(createdNote.title, isEmpty);
+      expect(createdNote.content, isEmpty);
+      expect(createdNote.attachments, isEmpty);
+      expect(createdNote.id, isNotEmpty);
+    });
+
+    test('should create note with attachments using Note.create()', () {
+      final createdNote = Note.create(
+        title: 'Note with attachments',
+        content: 'Content',
+        attachments: [testImageAttachment],
+      );
+
+      expect(createdNote.attachments.length, 1);
+      expect(createdNote.attachments[0], testImageAttachment);
+    });
+
     test('should create note with all properties', () {
       expect(testNote.id, 'test_note_id');
       expect(testNote.title, 'Test Note');

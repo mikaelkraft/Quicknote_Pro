@@ -19,6 +19,24 @@ class Note {
     required this.updatedAt,
   });
 
+  /// Create a new note with auto-generated ID and timestamps
+  factory Note.create({
+    String title = '',
+    String content = '',
+    List<Attachment> attachments = const [],
+  }) {
+    final now = DateTime.now();
+    final id = 'note_${now.millisecondsSinceEpoch}_${now.microsecond}';
+    return Note(
+      id: id,
+      title: title,
+      content: content,
+      attachments: attachments,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+
   /// Create a copy of the note with updated fields
   Note copyWith({
     String? id,

@@ -172,6 +172,10 @@ class _NotesDashboardState extends State<NotesDashboard>
       case 'template':
         Navigator.pushNamed(context, '/note-creation-editor');
         break;
+      case 'attachments':
+        // Navigate to the new note editor with attachment support
+        Navigator.pushNamed(context, '/note-editor');
+        break;
     }
   }
 

@@ -8,6 +8,7 @@ import '../presentation/search_discovery/search_discovery.dart';
 import '../presentation/premium_upgrade/premium_upgrade.dart';
 import '../presentation/settings_profile/settings_profile.dart';
 import '../presentation/settings_profile/backup_import_screen.dart';
+import '../ui/note_editor_screen.dart';
 
 class AppRoutes {
   // TODO: Add your routes here
@@ -17,6 +18,7 @@ class AppRoutes {
   static const String folderOrganization = '/folder-organization';
   static const String notesDashboard = '/notes-dashboard';
   static const String noteCreationEditor = '/note-creation-editor';
+  static const String noteEditor = '/note-editor';
   static const String searchDiscovery = '/search-discovery';
   static const String premiumUpgrade = '/premium-upgrade';
   static const String settingsProfile = '/settings-profile';
@@ -29,6 +31,7 @@ class AppRoutes {
     folderOrganization: (context) => const FolderOrganization(),
     notesDashboard: (context) => const NotesDashboard(),
     noteCreationEditor: (context) => const NoteCreationEditor(),
+    noteEditor: (context) => const NoteEditorScreen(),
     searchDiscovery: (context) => const SearchDiscovery(),
     premiumUpgrade: (context) => const PremiumUpgrade(),
     settingsProfile: (context) => const SettingsProfile(),
