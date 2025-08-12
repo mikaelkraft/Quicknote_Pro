@@ -128,9 +128,10 @@ class MediaPicker {
     if (!Platform.isAndroid) return false;
     
     try {
-      // This is a simplified check - in a real app you might want to use 
-      // device_info_plus package for more accurate version detection
-      return true; // Assume Android 13+ for now and use granular permissions
+      // For this implementation, we'll use the more specific permissions
+      // available in permission_handler. In a production app, you might want to
+      // check the actual SDK version using device_info_plus package
+      return true;
     } catch (e) {
       return false;
     }
@@ -169,7 +170,7 @@ class MediaPicker {
   }
 
   /// Open app settings for permission management
-  Future<bool> openAppSettings() async {
+  Future<bool> openSettings() async {
     return await openAppSettings();
   }
 }

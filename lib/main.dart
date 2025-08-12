@@ -8,6 +8,9 @@ import '../widgets/custom_error_widget.dart';
 import '../services/sync/sync_manager.dart';
 import '../services/notes/notes_service.dart';
 import '../services/widget/home_screen_widget_service.dart';
+import '../services/note_persistence_service.dart';
+import '../services/attachment_service.dart';
+import '../controllers/note_controller.dart';
 import '../repositories/notes_repository.dart';
 
 void main() async {
@@ -21,10 +24,19 @@ void main() async {
   final syncManager = SyncManager();
   await syncManager.initialize();
 
-  // Initialize notes service
+  // Initialize notes repository and services
   final notesRepository = NotesRepository();
   final notesService = NotesService(notesRepository);
   await notesService.initialize();
+
+  // Initialize new attachment and persistence services
+  final persistenceService = NotePersistenceService(notesRepository);
+  final attachmentService = AttachmentService();
+  await persistenceService.initialize();
+  await attachmentService.initialize();
+
+  // Initialize note controller
+  final noteController = NoteController(persistenceService, attachmentService);
 
   // Initialize home screen widget service
   final homeScreenWidgetService = HomeScreenWidgetService();
@@ -44,6 +56,7 @@ void main() async {
       themeService: themeService,
       syncManager: syncManager,
       notesService: notesService,
+      noteController: noteController,
       homeScreenWidgetService: homeScreenWidgetService,
     ));
   });
@@ -53,6 +66,7 @@ class MyApp extends StatelessWidget {
   final ThemeService themeService;
   final SyncManager syncManager;
   final NotesService notesService;
+  final NoteController noteController;
   final HomeScreenWidgetService homeScreenWidgetService;
 
   const MyApp({
@@ -60,6 +74,7 @@ class MyApp extends StatelessWidget {
     required this.themeService,
     required this.syncManager,
     required this.notesService,
+    required this.noteController,
     required this.homeScreenWidgetService,
   }) : super(key: key);
 
@@ -70,6 +85,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: themeService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
+        ChangeNotifierProvider.value(value: noteController),
         Provider.value(value: homeScreenWidgetService),
       ],
       child: Sizer(builder: (context, orientation, screenType) {
