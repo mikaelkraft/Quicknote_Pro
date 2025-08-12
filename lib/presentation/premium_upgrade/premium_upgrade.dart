@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -200,13 +201,17 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     });
 
     try {
+      // Get subscription service
+      final subscriptionService = Provider.of<SubscriptionService>(context, listen: false);
+      
       // Simulate purchase process
       await Future.delayed(const Duration(seconds: 2));
 
       if (kIsWeb) {
         _showWebCheckout();
       } else {
-        _handleNativePurchase();
+        // Handle native purchase with subscription service
+        await _handleNativePurchase(subscriptionService);
       }
     } catch (e) {
       _showErrorDialog('Purchase failed. Please try again.');
@@ -234,24 +239,33 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     );
   }
 
-  void _handleNativePurchase() {
-    // Native purchase simulation
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Purchase Successful'),
-        content: const Text('Welcome to QuickNote Pro Premium!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('Get Started'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _handleNativePurchase(SubscriptionService subscriptionService) async {
+    // Mock successful purchase - in real implementation this would trigger IAP
+    final productId = _selectedPlan == 'lifetime' 
+        ? ProductIds.premiumLifetime 
+        : ProductIds.premiumMonthly;
+    
+    await subscriptionService.handlePurchaseSuccess(productId);
+    
+    // Show success dialog
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Purchase Successful'),
+          content: const Text('Welcome to QuickNote Pro Premium! Ads have been removed.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: const Text('Get Started'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _restorePurchases() async {
@@ -259,26 +273,56 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       _isLoading = true;
     });
 
-    // Simulate restore process
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      // Get subscription service and refresh purchases
+      final subscriptionService = Provider.of<SubscriptionService>(context, listen: false);
+      await subscriptionService.refresh();
+      
+      await Future.delayed(const Duration(seconds: 1));
 
-    setState(() {
-      _isLoading = false;
-    });
+      setState(() {
+        _isLoading = false;
+      });
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restore Complete'),
-        content: const Text('No previous purchases found.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+      // Check if premium was restored
+      if (subscriptionService.isPremium) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Complete'),
+            content: Text('Premium subscription restored: ${subscriptionService.statusText}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Restore Complete'),
+            content: const Text('No previous purchases found.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('Failed to restore purchases. Please try again.');
+    }
   }
 
   void _showErrorDialog(String message) {
