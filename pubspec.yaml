@@ -49,6 +49,13 @@ dependencies:
   
   # Home screen widgets
   home_widget: ^0.6.0
+  
+  # Ads and consent management
+  google_mobile_ads: ^5.0.0
+  app_tracking_transparency: ^2.0.5
+  
+  # Subscription management  
+  in_app_purchase: ^3.1.13
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
