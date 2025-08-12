@@ -10,6 +10,7 @@ import '../services/notes/notes_service.dart';
 import '../services/widget/home_screen_widget_service.dart';
 import '../services/note_persistence_service.dart';
 import '../services/attachment_service.dart';
+import '../services/theme/theme_entitlement_service.dart';
 import '../controllers/note_controller.dart';
 import '../repositories/notes_repository.dart';
 
@@ -19,6 +20,10 @@ void main() async {
   // Initialize theme service
   final themeService = ThemeService();
   await themeService.initialize();
+
+  // Initialize theme entitlement service
+  final entitlementService = ThemeEntitlementService();
+  await entitlementService.initialize();
 
   // Initialize sync manager
   final syncManager = SyncManager();
@@ -54,6 +59,7 @@ void main() async {
   ]).then((value) {
     runApp(MyApp(
       themeService: themeService,
+      entitlementService: entitlementService,
       syncManager: syncManager,
       notesService: notesService,
       noteController: noteController,
@@ -64,6 +70,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final ThemeEntitlementService entitlementService;
   final SyncManager syncManager;
   final NotesService notesService;
   final NoteController noteController;
@@ -72,6 +79,7 @@ class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
     required this.themeService,
+    required this.entitlementService,
     required this.syncManager,
     required this.notesService,
     required this.noteController,
@@ -83,6 +91,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: entitlementService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
         ChangeNotifierProvider.value(value: noteController),
@@ -93,7 +102,7 @@ class MyApp extends StatelessWidget {
           builder: (context, themeService, child) {
             return MaterialApp(
               title: 'quicknote_pro',
-              theme: AppTheme.lightTheme,
+              theme: themeService.currentTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: themeService.themeMode,
               // 🚨 CRITICAL: NEVER REMOVE OR MODIFY

@@ -8,6 +8,7 @@ import '../presentation/search_discovery/search_discovery.dart';
 import '../presentation/premium_upgrade/premium_upgrade.dart';
 import '../presentation/settings_profile/settings_profile.dart';
 import '../presentation/settings_profile/backup_import_screen.dart';
+import '../widgets/theme_picker_widget.dart';
 import '../ui/note_editor_screen.dart';
 
 class AppRoutes {
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String premiumUpgrade = '/premium-upgrade';
   static const String settingsProfile = '/settings-profile';
   static const String backupImport = '/backup-import';
+  static const String themePicker = '/theme-picker';
 
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
@@ -36,6 +38,14 @@ class AppRoutes {
     premiumUpgrade: (context) => const PremiumUpgrade(),
     settingsProfile: (context) => const SettingsProfile(),
     backupImport: (context) => const BackupImportScreen(),
+    themePicker: (context) => Scaffold(
+      backgroundColor: Colors.black54,
+      body: SafeArea(
+        child: Center(
+          child: const ThemePickerWidget(),
+        ),
+      ),
+    ),
     // TODO: Add your other routes here
   };
 }

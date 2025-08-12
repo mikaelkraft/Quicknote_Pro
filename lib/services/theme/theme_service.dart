@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../theme/app_theme.dart';
 
 /// Service to manage theme state with persistence and reactive updates.
 /// 
 /// Provides centralized theme management that persists across app restarts
-/// and notifies listeners when theme changes occur.
+/// and notifies listeners when theme changes occur. Supports Pro themes.
 class ThemeService extends ChangeNotifier {
   static const String _themeModeKey = 'theme_mode';
   static const String _accentColorKey = 'accent_color';
+  static const String _selectedThemeKey = 'selected_theme';
 
   ThemeMode _themeMode = ThemeMode.system;
   Color? _accentColor;
+  String _selectedTheme = 'default_light';
   SharedPreferences? _prefs;
 
   /// Current theme mode (system, light, or dark)
@@ -18,6 +21,12 @@ class ThemeService extends ChangeNotifier {
 
   /// Current accent color (null for default)
   Color? get accentColor => _accentColor;
+
+  /// Current selected theme ID
+  String get selectedTheme => _selectedTheme;
+
+  /// Get the current theme data based on selected theme
+  ThemeData get currentTheme => AppTheme.getThemeById(_selectedTheme);
 
   /// Initialize the theme service and load saved preferences
   Future<void> initialize() async {
@@ -43,6 +52,9 @@ class ThemeService extends ChangeNotifier {
     if (accentColorValue != null) {
       _accentColor = Color(accentColorValue);
     }
+
+    // Load selected theme
+    _selectedTheme = _prefs!.getString(_selectedThemeKey) ?? 'default_light';
 
     notifyListeners();
   }
@@ -72,6 +84,19 @@ class ThemeService extends ChangeNotifier {
       } else {
         await _prefs!.remove(_accentColorKey);
       }
+    }
+    
+    notifyListeners();
+  }
+
+  /// Update selected theme and persist the change
+  Future<void> setSelectedTheme(String themeId) async {
+    if (_selectedTheme == themeId) return;
+
+    _selectedTheme = themeId;
+    
+    if (_prefs != null) {
+      await _prefs!.setString(_selectedThemeKey, themeId);
     }
     
     notifyListeners();
@@ -108,5 +133,17 @@ class ThemeService extends ChangeNotifier {
   Future<void> resetToDefaults() async {
     await setThemeMode(ThemeMode.system);
     await setAccentColor(null);
+    await setSelectedTheme('default_light');
+  }
+
+  /// Get available themes (filtered by Pro access if needed)
+  Map<String, ThemeDefinition> getAvailableThemes({bool includeProThemes = true}) {
+    if (includeProThemes) {
+      return AppTheme.availableThemes;
+    } else {
+      return Map.fromEntries(
+        AppTheme.availableThemes.entries.where((entry) => !entry.value.isPro),
+      );
+    }
   }
 }

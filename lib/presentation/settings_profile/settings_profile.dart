@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/theme/theme_entitlement_service.dart';
+import '../../services/theme/paywall_analytics_service.dart';
+import '../../widgets/theme_picker_widget.dart';
+import '../../widgets/dev_theme_tools_widget.dart';
 import './widgets/biometric_dialog_widget.dart';
 import './widgets/profile_header_widget.dart';
 import './widgets/settings_section_widget.dart';
@@ -463,6 +467,9 @@ class _SettingsProfileState extends State<SettingsProfile>
                               ],
                             ),
 
+                            // Developer tools (debug mode only)
+                            const DevThemeToolsWidget(),
+
                             SizedBox(height: 4.h),
                           ],
                         ),
@@ -479,17 +486,164 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   Widget _buildThemeSelector() {
-    return Consumer<ThemeService>(
-      builder: (context, themeService, child) {
+    return Consumer2<ThemeService, ThemeEntitlementService>(
+      builder: (context, themeService, entitlementService, child) {
+        final currentTheme = AppTheme.availableThemes[themeService.selectedTheme];
+        
         return Container(
           padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Theme & Appearance',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      PaywallAnalyticsService.logUpsellEntryPoint(
+                        entryPoint: 'settings',
+                        action: 'clicked',
+                        targetFeature: 'theme_picker',
+                      );
+                      
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const ThemePickerWidget(),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withAlpha(26),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(77),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.palette,
+                            size: 4.w,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          SizedBox(width: 1.w),
+                          Text(
+                            'Choose Theme',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 1.h),
+              
+              // Current theme preview
+              Container(
+                padding: EdgeInsets.all(3.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Theme preview colors
+                    if (currentTheme != null) ...[
+                      Row(
+                        children: currentTheme.previewColors.take(3).map((color) {
+                          return Container(
+                            width: 6.w,
+                            height: 6.w,
+                            margin: EdgeInsets.only(right: 1.w),
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(width: 3.w),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                currentTheme?.name ?? 'Classic Light',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              if (currentTheme?.isPro == true) ...[
+                                SizedBox(width: 2.w),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 1.5.w,
+                                    vertical: 0.5.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.warningLight,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'PRO',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (currentTheme?.description.isNotEmpty == true)
+                            Text(
+                              currentTheme!.description,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 4.w,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: 2.h),
+              
+              // Theme mode selector (Light/Dark/System)
               Text(
-                'Theme',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                'Brightness',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
                     ),
               ),
               SizedBox(height: 1.h),
@@ -509,7 +663,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                               ? Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.1)
+                                  .withAlpha(26)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
