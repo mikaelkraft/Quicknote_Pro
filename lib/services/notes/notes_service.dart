@@ -206,6 +206,40 @@ class NotesService extends ChangeNotifier {
       await saveNote(updatedNote);
     }
   }
+
+  /// Add audio attachment to current note (new structured approach)
+  Future<void> addAudioToCurrentNote(String audioPath, int durationSeconds) async {
+    if (_currentNote == null) return;
+    
+    // Copy audio file to app directory
+    final appAudioPath = await _repository.copyFileToAppDirectory(
+      audioPath,
+      _currentNote!.id,
+      'audio',
+    );
+    
+    if (appAudioPath != null) {
+      // For now, just add to voice note paths since we're using the old model
+      // In a full implementation, we'd migrate to the new attachment model
+      final updatedNote = _currentNote!.copyWith(
+        voiceNotePaths: [..._currentNote!.voiceNotePaths, appAudioPath],
+      );
+      
+      await saveNote(updatedNote);
+    }
+  }
+
+  /// Remove attachment from current note by ID
+  Future<void> removeAttachmentFromCurrentNote(String attachmentId) async {
+    if (_currentNote == null) return;
+    
+    // For this simple implementation, remove from voice notes based on path matching
+    final newVoiceNotes = _currentNote!.voiceNotePaths.where((path) => 
+        !path.contains(attachmentId)).toList();
+    
+    final updatedNote = _currentNote!.copyWith(voiceNotePaths: newVoiceNotes);
+    await saveNote(updatedNote);
+  }
   
   /// Remove media from current note
   Future<void> removeMediaFromCurrentNote(String mediaPath, String mediaType) async {

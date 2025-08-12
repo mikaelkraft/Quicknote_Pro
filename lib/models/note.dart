@@ -137,6 +137,10 @@ class Note {
   List<Attachment> get fileAttachments => 
       attachments.where((attachment) => attachment.isFile).toList();
 
+  /// Get all audio attachments
+  List<Attachment> get audioAttachments => 
+      attachments.where((attachment) => attachment.isAudio).toList();
+
   /// Get total size of all attachments
   int get totalAttachmentSize {
     return attachments
