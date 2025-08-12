@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -463,6 +464,19 @@ class _SettingsProfileState extends State<SettingsProfile>
                               ],
                             ),
 
+                            // Debug & Analytics (Debug mode only)
+                            if (kDebugMode) ...[
+                              SettingsSectionWidget(
+                                title: 'Debug & Analytics',
+                                icon: 'code',
+                                children: [
+                                  _buildDebugPremiumToggle(),
+                                  _buildAdsAnalytics(),
+                                  _buildConsentStatus(),
+                                ],
+                              ),
+                            ],
+
                             SizedBox(height: 4.h),
                           ],
                         ),
@@ -737,59 +751,63 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   Widget _buildSubscriptionStatus() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              color: (_userProfile['isPremium']
+    return Consumer<SubscriptionService>(
+      builder: (context, subscriptionService, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: (subscriptionService.isPremium
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.secondary)
+                      .withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: CustomIconWidget(
+                  iconName: subscriptionService.isPremium ? 'star' : 'person',
+                  color: subscriptionService.isPremium
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.secondary)
-                  .withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: CustomIconWidget(
-              iconName: _userProfile['isPremium'] ? 'star' : 'person',
-              color: _userProfile['isPremium']
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
-              size: 20,
-            ),
-          ),
-          SizedBox(width: 3.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _userProfile['isPremium'] ? 'Premium Member' : 'Free Account',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      : Theme.of(context).colorScheme.secondary,
+                  size: 20,
                 ),
-                Text(
-                  _userProfile['isPremium']
-                      ? 'All features unlocked'
-                      : 'Upgrade to unlock premium features',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          if (!_userProfile['isPremium'])
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
               ),
-              child: const Text('Upgrade'),
-            ),
-        ],
-      ),
+              SizedBox(width: 3.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subscriptionService.statusText,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    Text(
+                      subscriptionService.isPremium
+                          ? 'All features unlocked, ads removed'
+                          : 'Upgrade to unlock premium features',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              if (!subscriptionService.isPremium)
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.premiumUpgrade);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+                  ),
+                  child: const Text('Upgrade'),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 

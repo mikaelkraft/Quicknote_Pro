@@ -17,6 +17,25 @@ void main() async {
   final themeService = ThemeService();
   await themeService.initialize();
 
+  // Initialize subscription service
+  final subscriptionService = SubscriptionService();
+  await subscriptionService.initialize();
+
+  // Initialize consent service
+  final consentService = ConsentService();
+  await consentService.initialize();
+
+  // Initialize ads analytics service
+  final adsAnalyticsService = AdsAnalyticsService();
+  await adsAnalyticsService.initialize();
+
+  // Initialize ads service
+  final adsService = AdsService(
+    consentService: consentService,
+    subscriptionService: subscriptionService,
+  );
+  await adsService.initialize();
+
   // Initialize sync manager
   final syncManager = SyncManager();
   await syncManager.initialize();
@@ -30,6 +49,11 @@ void main() async {
   final homeScreenWidgetService = HomeScreenWidgetService();
   await homeScreenWidgetService.initializeWidgets();
 
+  // Request consent if required (non-blocking)
+  Future.microtask(() async {
+    await consentService.requestConsentIfRequired();
+  });
+
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return CustomErrorWidget(
@@ -42,6 +66,10 @@ void main() async {
   ]).then((value) {
     runApp(MyApp(
       themeService: themeService,
+      subscriptionService: subscriptionService,
+      consentService: consentService,
+      adsService: adsService,
+      adsAnalyticsService: adsAnalyticsService,
       syncManager: syncManager,
       notesService: notesService,
       homeScreenWidgetService: homeScreenWidgetService,
@@ -51,6 +79,10 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final ThemeService themeService;
+  final SubscriptionService subscriptionService;
+  final ConsentService consentService;
+  final AdsService adsService;
+  final AdsAnalyticsService adsAnalyticsService;
   final SyncManager syncManager;
   final NotesService notesService;
   final HomeScreenWidgetService homeScreenWidgetService;
@@ -58,6 +90,10 @@ class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
     required this.themeService,
+    required this.subscriptionService,
+    required this.consentService,
+    required this.adsService,
+    required this.adsAnalyticsService,
     required this.syncManager,
     required this.notesService,
     required this.homeScreenWidgetService,
@@ -68,6 +104,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: themeService),
+        ChangeNotifierProvider.value(value: subscriptionService),
+        ChangeNotifierProvider.value(value: consentService),
+        ChangeNotifierProvider.value(value: adsService),
+        ChangeNotifierProvider.value(value: adsAnalyticsService),
         ChangeNotifierProvider.value(value: syncManager),
         ChangeNotifierProvider.value(value: notesService),
         Provider.value(value: homeScreenWidgetService),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../widgets/ads/ad_banner_widget.dart';
 import './widgets/empty_state_widget.dart';
 import './widgets/filter_chip_widget.dart';
 import './widgets/note_card_widget.dart';
@@ -386,8 +387,16 @@ class _NotesDashboardState extends State<NotesDashboard>
 
   Widget _buildNotesTab() {
     if (_filteredNotes.isEmpty) {
-      return EmptyStateWidget(
-        onCreateNote: _showNoteTypeSelector,
+      return Column(
+        children: [
+          // Show ad banner even when no notes
+          const AdBannerWidget(),
+          Expanded(
+            child: EmptyStateWidget(
+              onCreateNote: _showNoteTypeSelector,
+            ),
+          ),
+        ],
       );
     }
 
@@ -399,16 +408,36 @@ class _NotesDashboardState extends State<NotesDashboard>
           // Refresh data
         });
       },
-      child: _isGridView ? _buildGridView() : _buildListView(),
+      child: Column(
+        children: [
+          // Top ad banner
+          const AdBannerWidget(),
+          // Notes content
+          Expanded(
+            child: _isGridView ? _buildGridView() : _buildListView(),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildListView() {
     return ListView.builder(
       padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
+      itemCount: _filteredNotes.length + (_filteredNotes.length ~/ 4), // Add space for ads every 4 notes
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        // Show ad banner every 4 notes (after notes 3, 7, 11, etc.)
+        if (index > 0 && (index + 1) % 5 == 0) {
+          return const AdBannerWidget();
+        }
+        
+        // Calculate the actual note index accounting for ad insertions
+        int noteIndex = index - (index ~/ 5);
+        if (noteIndex >= _filteredNotes.length) {
+          return const SizedBox.shrink();
+        }
+        
+        final note = _filteredNotes[noteIndex];
         return NoteCardWidget(
           note: note,
           onTap: () {
@@ -435,6 +464,10 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   Widget _buildGridView() {
+    // Calculate total items including ads
+    final adCount = _filteredNotes.length ~/ 6; // Add ad every 6 notes in grid
+    final totalItems = _filteredNotes.length + adCount;
+    
     return GridView.builder(
       padding: EdgeInsets.all(4.w).copyWith(bottom: 10.h),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -443,9 +476,48 @@ class _NotesDashboardState extends State<NotesDashboard>
         mainAxisSpacing: 2.w,
         childAspectRatio: 0.8,
       ),
-      itemCount: _filteredNotes.length,
+      itemCount: totalItems,
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        // Show ad every 6 items in grid (after notes 5, 11, 17, etc.)
+        if (index > 0 && (index + 1) % 7 == 0) {
+          return Container(
+            child: const AdBannerWidget(
+              margin: EdgeInsets.zero,
+            ),
+          );
+        }
+        
+        // Calculate the actual note index accounting for ad insertions
+        int noteIndex = index - (index ~/ 7);
+        if (noteIndex >= _filteredNotes.length) {
+          return const SizedBox.shrink();
+        }
+        
+        final note = _filteredNotes[noteIndex];
+        return NoteCardWidget(
+          note: note,
+          onTap: () {
+            Navigator.pushNamed(context, '/note-creation-editor');
+          },
+          onPin: () => _onNoteAction(note['id'], 'pin'),
+          onShare: () {
+            // Implement share functionality
+          },
+          onMove: () {
+            Navigator.pushNamed(context, '/folder-organization');
+          },
+          onDelete: () => _onNoteAction(note['id'], 'delete'),
+          onDuplicate: () => _onNoteAction(note['id'], 'duplicate'),
+          onExport: () {
+            // Implement export functionality
+          },
+          onSetReminder: () {
+            // Implement reminder functionality
+          },
+        );
+      },
+    );
+  }
         return NoteCardWidget(
           note: note,
           onTap: () {

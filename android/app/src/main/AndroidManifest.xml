@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <!-- Record audio permission for voice notes -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
+    <!-- Ads permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
             android:label="quicknote_pro"
@@ -36,6 +41,12 @@
                     android:name="io.flutter.embedding.android.NormalTheme"
                     android:resource="@style/NormalTheme"
             />
+            
+            <!-- AdMob App ID -->
+            <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-3940256099942544~3347511713"/>
+                
             <!-- Displays an Android View that continues showing the launch screen
                  Drawable until Flutter paints its first frame, then this splash
                  screen fades out. A splash screen is useful to avoid any visual

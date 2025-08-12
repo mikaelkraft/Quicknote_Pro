@@ -64,6 +64,11 @@
     <!-- Microphone permission for voice notes -->
     <key>NSMicrophoneUsageDescription</key>
     <string>This app needs microphone access to record voice notes.</string>
+    
+    <!-- App Tracking Transparency permission for ads -->
+    <key>NSUserTrackingUsageDescription</key>
+    <string>This app uses tracking to provide personalized ads and improve your experience.</string>
+    
     <!-- File access for attachments -->
     <key>NSDocumentDirectory</key>
     <true/>

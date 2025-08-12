@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import '../../core/app_export.dart';
 import '../../models/note_model.dart';
 import '../../services/notes/notes_service.dart';
+import '../../widgets/ads/ad_banner_widget.dart';
 import './widgets/drawing_canvas_widget.dart';
 import './widgets/formatting_toolbar_widget.dart';
 import './widgets/image_insertion_widget.dart';
@@ -152,6 +153,12 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
         _lastSaved = DateTime.now();
       });
 
+      // Try to show interstitial ad after save (non-blocking)
+      if (mounted) {
+        final adsService = Provider.of<AdsService>(context, listen: false);
+        adsService.showInterstitialAd();
+      }
+
       if (showConfirmation) {
         HapticFeedback.lightImpact();
         if (mounted) {
@@ -177,6 +184,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
         );
       }
     }
+  }
   }
 
   Future<bool> _onWillPop() async {
