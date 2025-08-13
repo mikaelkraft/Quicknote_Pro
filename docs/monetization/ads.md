@@ -142,7 +142,17 @@ This document outlines the advertising implementation for Quicknote Pro, focusin
 ```dart
 class AdService {
   // Initialize ad networks
-  static Future<void> initialize() async {
+/// AdService handles ad network initialization and contextual ad loading for Quicknote Pro.
+///
+/// Dependencies:
+/// - GoogleMobileAds (GoogleMobileAds.instance)
+/// - FacebookAudienceNetwork (FacebookAudienceNetwork.initialize)
+///
+/// Usage:
+/// 1. Call `AdService.initialize()` during app startup to initialize ad networks.
+/// 2. Use `AdService.loadNativeAd(placement)` to load contextual native ads for a given placement.
+class AdService {
+  // Initialize ad networks
     await GoogleMobileAds.instance.initialize();
     await FacebookAudienceNetwork.initialize();
   }
