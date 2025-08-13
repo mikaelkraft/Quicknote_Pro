@@ -153,6 +153,7 @@ class AdService {
 /// 2. Use `AdService.loadNativeAd(placement)` to load contextual native ads for a given placement.
 class AdService {
   // Initialize ad networks
+  static Future<void> initialize() async {
     await GoogleMobileAds.instance.initialize();
     await FacebookAudienceNetwork.initialize();
   }
