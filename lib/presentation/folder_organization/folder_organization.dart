@@ -607,7 +607,7 @@ class _FolderOrganizationState extends State<FolderOrganization>
               padding: EdgeInsets.all(2.w),
               decoration: BoxDecoration(
                 color: _getColorForTheme(folder['color'], isDark)
-                    .withValues(alpha: 0.2),
+                    .withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: CustomIconWidget(

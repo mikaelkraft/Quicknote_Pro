@@ -544,7 +544,7 @@ class _SearchDiscoveryState extends State<SearchDiscovery>
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withValues(alpha: 0.1),
+                      .withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomIconWidget(

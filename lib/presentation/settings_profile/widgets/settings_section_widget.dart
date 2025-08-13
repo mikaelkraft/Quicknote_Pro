@@ -80,11 +80,11 @@ class _SettingsSectionWidgetState extends State<SettingsSectionWidget>
     return Container(
       decoration: BoxDecoration(
         color: (isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight)
-            .withValues(alpha: 0.8),
+            .withOpacity(0.8),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: (isDark ? AppTheme.dividerDark : AppTheme.dividerLight)
-              .withValues(alpha: 0.5),
+              .withOpacity(0.5),
           width: 1,
         ),
         boxShadow: [
@@ -113,7 +113,7 @@ class _SettingsSectionWidgetState extends State<SettingsSectionWidget>
                           (isDark
                                   ? AppTheme.primaryDark
                                   : AppTheme.primaryLight)
-                              .withValues(alpha: 0.8),
+                              .withOpacity(0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -172,7 +172,7 @@ class _SettingsSectionWidgetState extends State<SettingsSectionWidget>
                   top: BorderSide(
                     color:
                         (isDark ? AppTheme.dividerDark : AppTheme.dividerLight)
-                            .withValues(alpha: 0.3),
+                            .withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -188,7 +188,7 @@ class _SettingsSectionWidgetState extends State<SettingsSectionWidget>
                                 color: (isDark
                                         ? AppTheme.dividerDark
                                         : AppTheme.dividerLight)
-                                    .withValues(alpha: 0.2),
+                                    .withOpacity(0.2),
                                 width: 0.5,
                               ),
                             )
