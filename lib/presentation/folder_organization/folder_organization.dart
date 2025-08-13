@@ -502,27 +502,49 @@ class _FolderOrganizationState extends State<FolderOrganization>
                             )
                       : RefreshIndicator(
                           onRefresh: _refreshFolders,
-                          child: GridView.builder(
-                            padding: EdgeInsets.all(4.w),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 4.w,
-                              mainAxisSpacing: 2.h,
-                              childAspectRatio: 0.8,
-                            ),
-                            itemCount: filteredFolders.length,
-                            itemBuilder: (context, index) {
-                              final folder = filteredFolders[index];
-                              return FolderCardWidget(
-                                folder: folder,
-                                onTap: () => _openFolder(folder),
-                                onLongPress: () =>
-                                    _showFolderContextMenu(folder),
-                                onPinSwipe: () => _toggleFolderPin(folder),
-                                onDeleteSwipe: () => _deleteFolder(folder),
-                              );
-                            },
+                          child: CustomScrollView(
+                            slivers: [
+                              SliverPadding(
+                                padding: EdgeInsets.all(4.w),
+                                sliver: SliverGrid(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      // Insert native ad after every 6 folders
+                                      if (index != 0 && (index + 1) % 7 == 0) {
+                                        return Container(
+                                          height: 200,
+                                          child: const SimpleNativeAd(
+                                            placementId: AdsConfig.placementFolders,
+                                            template: NativeAdTemplate.medium,
+                                          ),
+                                        );
+                                      }
+                                      
+                                      // Calculate the actual folder index (accounting for ads)
+                                      final folderIndex = index - (index ~/ 7);
+                                      if (folderIndex >= filteredFolders.length) return const SizedBox.shrink();
+                                      
+                                      final folder = filteredFolders[folderIndex];
+                                      return FolderCardWidget(
+                                        folder: folder,
+                                        onTap: () => _openFolder(folder),
+                                        onLongPress: () =>
+                                            _showFolderContextMenu(folder),
+                                        onPinSwipe: () => _toggleFolderPin(folder),
+                                        onDeleteSwipe: () => _deleteFolder(folder),
+                                      );
+                                    },
+                                    childCount: filteredFolders.length + (filteredFolders.length ~/ 6),
+                                  ),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 4.w,
+                                    mainAxisSpacing: 2.h,
+                                    childAspectRatio: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                 ),

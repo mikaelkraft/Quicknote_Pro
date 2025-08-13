@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/ads/smart_interstitial_helper.dart';
 import './widgets/empty_state_widget.dart';
 import './widgets/filter_chip_widget.dart';
 import './widgets/note_card_widget.dart';
@@ -209,7 +210,17 @@ class _NotesDashboardState extends State<NotesDashboard>
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        // Show interstitial ad before leaving the app (occasionally)
+        await SmartInterstitialHelper.showSmartInterstitial(
+          context,
+          AdsConfig.placementHome,
+          isImportantTransition: false,
+        );
+        return true;
+      },
+      child: Scaffold(
       backgroundColor:
           isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
       body: SafeArea(
@@ -385,6 +396,7 @@ class _NotesDashboardState extends State<NotesDashboard>
           size: 24,
         ),
       ),
+    ),
     );
   }
 
@@ -410,12 +422,31 @@ class _NotesDashboardState extends State<NotesDashboard>
   Widget _buildListView() {
     return ListView.builder(
       padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
+      itemCount: _filteredNotes.length + (_filteredNotes.length ~/ 5), // Add ads every 5 notes
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        // Insert banner ad every 5 notes
+        if (index != 0 && (index + 1) % 6 == 0) {
+          return const SimpleBannerAd(
+            placementId: AdsConfig.placementNoteList,
+              isImportantTransition: true,
+            margin: EdgeInsets.symmetric(vertical: 8),
+          );
+        }
+        
+        // Calculate the actual note index (accounting for ads)
+        final noteIndex = index - (index ~/ 6);
+        if (noteIndex >= _filteredNotes.length) return const SizedBox.shrink();
+        
+        final note = _filteredNotes[noteIndex];
         return NoteCardWidget(
           note: note,
-          onTap: () {
+          onTap: () async {
+            // Show interstitial ad before navigating to note editor (occasionally)
+            await SmartInterstitialHelper.showSmartInterstitial(
+              context,
+              AdsConfig.placementNoteList,
+              isImportantTransition: true,
+            );
             Navigator.pushNamed(context, '/note-creation-editor');
           },
           onPin: () => _onNoteAction(note['id'], 'pin'),
@@ -452,7 +483,13 @@ class _NotesDashboardState extends State<NotesDashboard>
         final note = _filteredNotes[index];
         return NoteCardWidget(
           note: note,
-          onTap: () {
+          onTap: () async {
+            // Show interstitial ad before navigating to note editor (occasionally)
+            await SmartInterstitialHelper.showSmartInterstitial(
+              context,
+              AdsConfig.placementNoteList,
+              isImportantTransition: true,
+            );
             Navigator.pushNamed(context, '/note-creation-editor');
           },
           onPin: () => _onNoteAction(note['id'], 'pin'),
@@ -616,6 +653,13 @@ class _NotesDashboardState extends State<NotesDashboard>
               ),
             ],
           ),
+        ),
+        SizedBox(height: 3.h),
+
+        // Native ad placement in settings
+        const SimpleNativeAd(
+          placementId: AdsConfig.placementSettings,
+          template: NativeAdTemplate.medium,
         ),
         SizedBox(height: 3.h),
 
