@@ -7,9 +7,12 @@ import './widgets/feature_card_widget.dart';
 import './widgets/premium_header_widget.dart';
 import './widgets/pricing_option_widget.dart';
 import './widgets/purchase_button_widget.dart';
+import './widgets/usage_stats_widget.dart';
 
 class PremiumUpgrade extends StatefulWidget {
-  const PremiumUpgrade({Key? key}) : super(key: key);
+  final String? source; // Track where user came from
+  
+  const PremiumUpgrade({Key? key, this.source}) : super(key: key);
 
   @override
   State<PremiumUpgrade> createState() => _PremiumUpgradeState();
@@ -23,7 +26,11 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   late Animation<double> _featuresAnimation;
 
   bool _isLoading = false;
-  String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  String _selectedPlan = 'lifetime'; // 'monthly', 'lifetime', or 'trial'
+  
+  // Monetization services
+  final MonetizationService _monetization = MonetizationService();
+  Map<String, dynamic>? _usageStats;
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -31,7 +38,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       'description': 'Record and transcribe unlimited voice memos with AI',
       'icon': 'mic',
       'gradient': [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
-      'currentLimit': '10/month',
+      'currentLimit': '${ProductIds.freeVoiceNotesLimit}/month',
       'premiumLimit': 'Unlimited',
       'hasDemo': true,
     },
@@ -68,6 +75,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   void initState() {
     super.initState();
     _initializeAnimations();
+    _initializeMonetization();
   }
 
   void _initializeAnimations() {
@@ -101,6 +109,21 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     _featuresController.forward();
   }
 
+  void _initializeMonetization() async {
+    await _monetization.initialize();
+    
+    // Track premium screen view
+    await _monetization.trackPremiumScreenView(source: widget.source);
+    
+    // Load usage stats
+    final stats = await _monetization.getUsageStats();
+    if (mounted) {
+      setState(() {
+        _usageStats = stats;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _backgroundController.dispose();
@@ -108,10 +131,13 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     super.dispose();
   }
 
-  void _onPlanSelected(String plan) {
+  void _onPlanSelected(String plan) async {
     setState(() {
       _selectedPlan = plan;
     });
+    
+    // Track plan selection
+    await _monetization.trackUpgradeAttempt(plan, source: widget.source);
   }
 
   void _onFeatureTapped(Map<String, dynamic> feature) {
@@ -200,6 +226,14 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     });
 
     try {
+      // Track purchase start
+      await _monetization.trackPurchaseEvent(
+        'purchase_started',
+        planType: _selectedPlan,
+        price: ProductIds.fallbackPrices[_selectedPlan == 'monthly' ? ProductIds.premiumMonthly : ProductIds.premiumLifetime],
+        currency: 'USD',
+      );
+
       // Simulate purchase process
       await Future.delayed(const Duration(seconds: 2));
 
@@ -209,6 +243,12 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
         _handleNativePurchase();
       }
     } catch (e) {
+      // Track purchase failure
+      await _monetization.trackPurchaseEvent(
+        'purchase_failed',
+        planType: _selectedPlan,
+        errorMessage: e.toString(),
+      );
       _showErrorDialog('Purchase failed. Please try again.');
     } finally {
       setState(() {
@@ -234,7 +274,18 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     );
   }
 
-  void _handleNativePurchase() {
+  void _handleNativePurchase() async {
+    // Track successful purchase
+    await _monetization.trackPurchaseEvent(
+      'purchase_completed',
+      planType: _selectedPlan,
+      price: ProductIds.fallbackPrices[_selectedPlan == 'monthly' ? ProductIds.premiumMonthly : ProductIds.premiumLifetime],
+      currency: 'USD',
+    );
+
+    // Update premium status
+    await _monetization.updatePremiumStatus(true);
+
     // Native purchase simulation
     showDialog(
       context: context,
@@ -345,6 +396,10 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                       child: Column(
                         children: [
                           SizedBox(height: 2.h),
+
+                          // Usage Stats section
+                          if (_usageStats != null)
+                            UsageStatsWidget(usageStats: _usageStats!),
 
                           // Features section
                           AnimatedBuilder(

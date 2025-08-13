@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../ads/widgets/banner_ad_widget.dart';
+import './widgets/dashboard_usage_widget.dart';
 import './widgets/empty_state_widget.dart';
 import './widgets/filter_chip_widget.dart';
 import './widgets/note_card_widget.dart';
@@ -22,6 +24,10 @@ class _NotesDashboardState extends State<NotesDashboard>
   String _selectedFilter = 'All';
   String _searchQuery = '';
   bool _isSearchExpanded = false;
+
+  // Monetization services
+  final MonetizationService _monetization = MonetizationService();
+  final AdService _adService = AdService();
 
   // Mock data for notes
   final List<Map<String, dynamic>> _allNotes = [
@@ -101,6 +107,15 @@ class _NotesDashboardState extends State<NotesDashboard>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _filteredNotes = List.from(_allNotes);
+    _initializeMonetization();
+  }
+
+  void _initializeMonetization() async {
+    await _monetization.initialize();
+    await _adService.initialize();
+    // Track dashboard view
+    final analyticsService = AnalyticsService();
+    await analyticsService.trackRetention(AnalyticsEvents.sessionStarted);
   }
 
   @override
@@ -144,6 +159,14 @@ class _NotesDashboardState extends State<NotesDashboard>
     _filterNotes();
   }
 
+  void _onCreateNotePressed() async {
+    // Check if user can create notes
+    final canCreate = await FeatureGate.checkCreateNote(context);
+    if (canCreate) {
+      _showNoteTypeSelector();
+    }
+  }
+
   void _showNoteTypeSelector() {
     showModalBottomSheet(
       context: context,
@@ -164,10 +187,10 @@ class _NotesDashboardState extends State<NotesDashboard>
         Navigator.pushNamed(context, '/note-creation-editor');
         break;
       case 'voice':
-        Navigator.pushNamed(context, '/note-creation-editor');
+        await _onVoiceNoteSelected();
         break;
       case 'drawing':
-        Navigator.pushNamed(context, '/note-creation-editor');
+        await _onDrawingNoteSelected();
         break;
       case 'template':
         Navigator.pushNamed(context, '/note-creation-editor');
@@ -176,6 +199,22 @@ class _NotesDashboardState extends State<NotesDashboard>
         // Navigate to the new note editor with attachment support
         Navigator.pushNamed(context, '/note-editor');
         break;
+    }
+  }
+
+  Future<void> _onVoiceNoteSelected() async {
+    final canCreate = await FeatureGate.checkVoiceNote(context);
+    if (canCreate) {
+      // Track voice note creation
+      await _monetization.incrementVoiceNotesCount();
+      Navigator.pushNamed(context, '/note-creation-editor', arguments: {'type': 'voice'});
+    }
+  }
+
+  Future<void> _onDrawingNoteSelected() async {
+    final canCreate = await FeatureGate.checkAdvancedDrawing(context);
+    if (canCreate) {
+      Navigator.pushNamed(context, '/note-creation-editor', arguments: {'type': 'drawing'});
     }
   }
 
@@ -271,6 +310,9 @@ class _NotesDashboardState extends State<NotesDashboard>
                     ],
                   ),
                   SizedBox(height: 2.h),
+
+                  // Usage tracking widget
+                  const DashboardUsageWidget(),
 
                   // Search bar
                   SearchBarWidget(
@@ -378,7 +420,7 @@ class _NotesDashboardState extends State<NotesDashboard>
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showNoteTypeSelector,
+        onPressed: _onCreateNotePressed,
         child: CustomIconWidget(
           iconName: 'add',
           color: Colors.white,
@@ -410,9 +452,20 @@ class _NotesDashboardState extends State<NotesDashboard>
   Widget _buildListView() {
     return ListView.builder(
       padding: EdgeInsets.only(bottom: 10.h),
-      itemCount: _filteredNotes.length,
+      itemCount: _filteredNotes.length + (_filteredNotes.length ~/ 5), // Add space for ads every 5 notes
       itemBuilder: (context, index) {
-        final note = _filteredNotes[index];
+        // Show banner ad every 5 notes (at index 4, 9, 14, etc.)
+        if (index > 0 && (index + 1) % 6 == 0) {
+          return const BannerAdWidget(
+            placementId: 'note_list_banner',
+          );
+        }
+        
+        // Calculate actual note index accounting for ads
+        final noteIndex = index - (index ~/ 6);
+        if (noteIndex >= _filteredNotes.length) return const SizedBox.shrink();
+        
+        final note = _filteredNotes[noteIndex];
         return NoteCardWidget(
           note: note,
           onTap: () {
