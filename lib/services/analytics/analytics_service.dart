@@ -1,20 +1,30 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
-/// Analytics service for tracking monetization and usage events.
+/// Firebase Analytics service for tracking monetization and usage events.
 /// 
 /// Provides a centralized system for collecting and managing analytics events
 /// related to user behavior, monetization actions, and feature usage.
+/// 
+/// This service gracefully handles missing Firebase configuration by operating
+/// in a safe no-op mode when Firebase is not available.
 class AnalyticsService extends ChangeNotifier {
   static const String _analyticsEnabledKey = 'analytics_enabled';
   
   SharedPreferences? _prefs;
+  FirebaseAnalytics? _analytics;
   bool _analyticsEnabled = true;
+  bool _firebaseInitialized = false;
   final List<AnalyticsEvent> _eventQueue = [];
   final Map<String, int> _eventCounts = {};
 
   /// Whether analytics tracking is enabled
   bool get analyticsEnabled => _analyticsEnabled;
+
+  /// Whether Firebase is properly initialized
+  bool get firebaseInitialized => _firebaseInitialized;
 
   /// Event counts for debugging and monitoring
   Map<String, int> get eventCounts => Map.unmodifiable(_eventCounts);
@@ -23,6 +33,28 @@ class AnalyticsService extends ChangeNotifier {
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     await _loadAnalyticsSettings();
+    await _initializeFirebase();
+  }
+
+  /// Initialize Firebase Analytics with safe fallback
+  Future<void> _initializeFirebase() async {
+    try {
+      // Try to initialize Firebase
+      await Firebase.initializeApp();
+      _analytics = FirebaseAnalytics.instance;
+      _firebaseInitialized = true;
+      
+      if (kDebugMode) {
+        print('Analytics: Firebase Analytics initialized successfully');
+      }
+    } catch (e) {
+      _firebaseInitialized = false;
+      if (kDebugMode) {
+        print('Analytics: Firebase Analytics not available (${e.toString()})');
+        print('Analytics: Operating in safe no-op mode');
+        print('Analytics: Run "flutterfire configure" to enable Firebase Analytics');
+      }
+    }
   }
 
   /// Load analytics settings from shared preferences
@@ -37,6 +69,12 @@ class AnalyticsService extends ChangeNotifier {
   Future<void> setAnalyticsEnabled(bool enabled) async {
     _analyticsEnabled = enabled;
     await _prefs?.setBool(_analyticsEnabledKey, enabled);
+    
+    // Set Firebase Analytics collection enabled state
+    if (_firebaseInitialized && _analytics != null) {
+      await _analytics!.setAnalyticsCollectionEnabled(enabled);
+    }
+    
     notifyListeners();
     
     if (enabled) {
@@ -46,7 +84,108 @@ class AnalyticsService extends ChangeNotifier {
     }
   }
 
-  /// Track an analytics event
+  /// Set user ID for analytics tracking
+  Future<void> setUserId(String? userId) async {
+    if (!_analyticsEnabled || !_firebaseInitialized || _analytics == null) {
+      if (kDebugMode) {
+        print('Analytics: setUserId($userId) - no-op mode');
+      }
+      return;
+    }
+
+    try {
+      await _analytics!.setUserId(id: userId);
+      if (kDebugMode) {
+        print('Analytics: User ID set to $userId');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Analytics: Failed to set user ID: $e');
+      }
+    }
+  }
+
+  /// Set user property for analytics
+  Future<void> setUserProperty(String name, String? value) async {
+    if (!_analyticsEnabled || !_firebaseInitialized || _analytics == null) {
+      if (kDebugMode) {
+        print('Analytics: setUserProperty($name, $value) - no-op mode');
+      }
+      return;
+    }
+
+    try {
+      await _analytics!.setUserProperty(name: name, value: value);
+      if (kDebugMode) {
+        print('Analytics: User property $name set to $value');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Analytics: Failed to set user property: $e');
+      }
+    }
+  }
+
+  /// Log screen view event
+  Future<void> logScreenView(String screenName, {String? screenClass}) async {
+    if (!_analyticsEnabled) return;
+
+    if (_firebaseInitialized && _analytics != null) {
+      try {
+        await _analytics!.logScreenView(
+          screenName: screenName,
+          screenClass: screenClass,
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          print('Analytics: Failed to log screen view: $e');
+        }
+      }
+    }
+
+    // Also track in local queue for debugging
+    trackEvent(AnalyticsEvent(
+      name: 'screen_view',
+      properties: {
+        'screen_name': screenName,
+        if (screenClass != null) 'screen_class': screenClass,
+      },
+    ));
+  }
+
+  /// Log custom event with Firebase Analytics
+  Future<void> logEvent(String name, Map<String, Object?>? parameters) async {
+    if (!_analyticsEnabled) return;
+
+    // Filter out null values
+    final filteredParams = parameters?.entries
+        .where((entry) => entry.value != null)
+        .fold<Map<String, Object>>(
+          {},
+          (map, entry) => map..[entry.key] = entry.value!,
+        );
+
+    if (_firebaseInitialized && _analytics != null) {
+      try {
+        await _analytics!.logEvent(
+          name: name,
+          parameters: filteredParams,
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          print('Analytics: Failed to log event $name: $e');
+        }
+      }
+    }
+
+    // Also track in local system for backward compatibility
+    trackEvent(AnalyticsEvent(
+      name: name,
+      properties: filteredParams ?? {},
+    ));
+  }
+
+  /// Track an analytics event (legacy API)
   void trackEvent(AnalyticsEvent event) {
     if (!_analyticsEnabled) return;
     
@@ -55,6 +194,11 @@ class AnalyticsService extends ChangeNotifier {
     
     if (kDebugMode) {
       print('Analytics: ${event.name} - ${event.properties}');
+    }
+    
+    // Send to Firebase if available
+    if (_firebaseInitialized && _analytics != null) {
+      logEvent(event.name, event.properties);
     }
     
     notifyListeners();
