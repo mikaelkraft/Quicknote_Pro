@@ -56,6 +56,14 @@ class MonetizationParams {
   static const String transactionId = 'transaction_id';
   static const String originalTransactionId = 'original_transaction_id';
   
+  // New pricing parameters
+  static const String planTerm = 'plan_term';           // monthly|annual|lifetime
+  static const String region = 'region';               // base|africa
+  static const String perUser = 'per_user';            // boolean for enterprise
+  static const String seats = 'seats';                 // number of seats for enterprise
+  static const String basePrice = 'base_price';        // base price before localization
+  static const String localizedPrice = 'localized_price'; // final price in local currency
+  
   // Feature-related parameters
   static const String featureName = 'feature_name';
   static const String limitType = 'limit_type';
@@ -153,6 +161,12 @@ class MonetizationEventHelpers {
     String? priceTier,
     String? paymentMethod,
     String? transactionId,
+    String? planTerm,
+    String? region,
+    bool? perUser,
+    int? seats,
+    double? basePrice,
+    double? localizedPrice,
   }) {
     final params = <String, Object?>{
       MonetizationParams.upgradeContext: context,
@@ -162,6 +176,12 @@ class MonetizationEventHelpers {
     if (priceTier != null) params[MonetizationParams.priceTier] = priceTier;
     if (paymentMethod != null) params[MonetizationParams.paymentMethod] = paymentMethod;
     if (transactionId != null) params[MonetizationParams.transactionId] = transactionId;
+    if (planTerm != null) params[MonetizationParams.planTerm] = planTerm;
+    if (region != null) params[MonetizationParams.region] = region;
+    if (perUser != null) params[MonetizationParams.perUser] = perUser;
+    if (seats != null) params[MonetizationParams.seats] = seats;
+    if (basePrice != null) params[MonetizationParams.basePrice] = basePrice;
+    if (localizedPrice != null) params[MonetizationParams.localizedPrice] = localizedPrice;
     
     return params..removeWhere((key, value) => value == null);
   }

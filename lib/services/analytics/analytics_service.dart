@@ -343,18 +343,50 @@ class MonetizationEvent {
       'user_tier': userTier,
     });
   
-  static MonetizationEvent upgradeStarted({String? tier, String? context, String? pricePoint}) => 
+  static MonetizationEvent upgradeStarted({
+    String? tier, 
+    String? context, 
+    String? pricePoint,
+    String? planTerm,
+    String? region,
+    bool? perUser,
+    int? seats,
+    double? basePrice,
+    double? localizedPrice,
+  }) => 
     MonetizationEvent('upgrade_started', {
       'tier': tier,
       'context': context,
       'price_point': pricePoint,
+      'plan_term': planTerm,
+      'region': region,
+      'per_user': perUser,
+      'seats': seats,
+      'base_price': basePrice,
+      'localized_price': localizedPrice,
     });
   
-  static MonetizationEvent upgradeCompleted({String? tier, String? transactionId, String? pricePaid}) => 
+  static MonetizationEvent upgradeCompleted({
+    String? tier, 
+    String? transactionId, 
+    String? pricePaid,
+    String? planTerm,
+    String? region,
+    bool? perUser,
+    int? seats,
+    double? basePrice,
+    double? localizedPrice,
+  }) => 
     MonetizationEvent('upgrade_completed', {
       'tier': tier,
       'transaction_id': transactionId,
       'price_paid': pricePaid,
+      'plan_term': planTerm,
+      'region': region,
+      'per_user': perUser,
+      'seats': seats,
+      'base_price': basePrice,
+      'localized_price': localizedPrice,
     });
   
   static MonetizationEvent upgradeCancelled({String? tier, String? stage, String? reason}) => 

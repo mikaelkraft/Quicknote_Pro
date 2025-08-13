@@ -14,11 +14,14 @@ void main() {
       expect(monetizationService.isPremium, false);
     });
 
-    test('should recognize premium status for premium and pro tiers', () async {
+    test('should recognize premium status for premium, pro, and enterprise tiers', () async {
       await monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isPremium, true);
 
       await monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.isPremium, true);
+
+      await monetizationService.setUserTier(UserTier.enterprise);
       expect(monetizationService.isPremium, true);
 
       await monetizationService.setUserTier(UserTier.free);
@@ -36,6 +39,15 @@ void main() {
       
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
+    });
+
+    test('should allow all features for enterprise tier', () {
+      monetizationService.setUserTier(UserTier.enterprise);
+      
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.noteCreation), true);
+      expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
     test('should track feature usage correctly', () async {
