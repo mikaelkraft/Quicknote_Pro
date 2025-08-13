@@ -191,7 +191,7 @@ class AnalyticsService {
   static Future<void> trackEvent(String eventName, Map<String, dynamic> properties) async {
     // Add common properties
     properties['timestamp'] = DateTime.now().toIso8601String();
-    properties['app_version'] = await PackageInfo.fromPlatform().version;
+    properties['app_version'] = (await PackageInfo.fromPlatform()).version;
     
     // Send to analytics platform
     await FirebaseAnalytics.instance.logEvent(
