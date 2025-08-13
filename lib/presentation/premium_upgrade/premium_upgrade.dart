@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
@@ -26,7 +27,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   bool _isLoading = false;
   String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
   bool _hasLoggedPromptShown = false;
-  final AnalyticsService _analyticsService = AnalyticsService();
+  late AnalyticsService _analyticsService;
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -70,6 +71,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   @override
   void initState() {
     super.initState();
+    _analyticsService = Provider.of<AnalyticsService>(context, listen: false);
     _initializeAnimations();
     _trackScreenView();
   }
@@ -155,7 +157,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -348,13 +350,13 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                 colors: isDark
                     ? [
                         AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.8),
-                        AppTheme.primaryDark.withValues(alpha: 0.1),
+                        AppTheme.surfaceDark.withOpacity(0.8),
+                        AppTheme.primaryDark.withOpacity(0.1),
                       ]
                     : [
                         AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.8),
-                        AppTheme.primaryLight.withValues(alpha: 0.1),
+                        AppTheme.surfaceLight.withOpacity(0.8),
+                        AppTheme.primaryLight.withOpacity(0.1),
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -420,13 +422,13 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                               color: (isDark
                                       ? AppTheme.surfaceDark
                                       : AppTheme.surfaceLight)
-                                  .withValues(alpha: 0.8),
+                                  .withOpacity(0.8),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: (isDark
                                         ? AppTheme.primaryDark
                                         : AppTheme.primaryLight)
-                                    .withValues(alpha: 0.2),
+                                    .withOpacity(0.2),
                                 width: 1,
                               ),
                             ),

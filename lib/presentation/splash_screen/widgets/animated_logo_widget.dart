@@ -85,7 +85,7 @@ class _AnimatedLogoWidgetState extends State<AnimatedLogoWidget>
                 boxShadow: [
                   BoxShadow(
                     color: (isDark ? AppTheme.shadowDark : AppTheme.shadowLight)
-                        .withValues(alpha: 0.3),
+                        .withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),

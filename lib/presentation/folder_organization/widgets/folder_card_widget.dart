@@ -35,7 +35,7 @@ class FolderCardWidget extends StatelessWidget {
       key: Key('folder_${folder['id']}'),
       background: Container(
         decoration: BoxDecoration(
-          color: AppTheme.getSuccessColor(isDark).withValues(alpha: 0.2),
+          color: AppTheme.getSuccessColor(isDark).withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.centerLeft,
@@ -49,7 +49,7 @@ class FolderCardWidget extends StatelessWidget {
       secondaryBackground: Container(
         decoration: BoxDecoration(
           color: (isDark ? AppTheme.errorDark : AppTheme.errorLight)
-              .withValues(alpha: 0.2),
+              .withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.centerRight,
@@ -87,7 +87,7 @@ class FolderCardWidget extends StatelessWidget {
             color: isDark ? AppTheme.cardDark : AppTheme.cardLight,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: folderColor.withValues(alpha: 0.3),
+              color: folderColor.withOpacity(0.3),
               width: 1,
             ),
             boxShadow: [
@@ -109,7 +109,7 @@ class FolderCardWidget extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(2.w),
                       decoration: BoxDecoration(
-                        color: folderColor.withValues(alpha: 0.2),
+                        color: folderColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: CustomIconWidget(
@@ -190,7 +190,7 @@ class FolderCardWidget extends StatelessWidget {
                           width: 8.w,
                           height: 8.w,
                           decoration: BoxDecoration(
-                            color: folderColor.withValues(alpha: 0.2),
+                            color: folderColor.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Center(

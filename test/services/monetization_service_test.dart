@@ -4,9 +4,11 @@ import 'package:quicknote_pro/services/monetization/monetization_service.dart';
 void main() {
   group('MonetizationService', () {
     late MonetizationService monetizationService;
+    late AnalyticsService analyticsService;
 
     setUp(() {
-      monetizationService = MonetizationService();
+      analyticsService = AnalyticsService();
+      monetizationService = MonetizationService(analyticsService);
     });
 
     test('should initialize with free tier by default', () {

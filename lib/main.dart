@@ -36,7 +36,7 @@ void main() async {
   final adsService = AdsService();
   await adsService.initialize();
   
-  final monetizationService = MonetizationService();
+  final monetizationService = MonetizationService(analyticsService);
   await monetizationService.initialize();
 
   // Initialize new attachment and persistence services

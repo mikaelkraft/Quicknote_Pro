@@ -15,7 +15,10 @@ class MonetizationService extends ChangeNotifier {
   UserTier _currentTier = UserTier.free;
   final Map<FeatureType, int> _usageCounts = {};
   int _upgradePromptCount = 0;
-  final AnalyticsService _analyticsService = AnalyticsService();
+  final AnalyticsService _analyticsService;
+
+  /// Constructor accepting AnalyticsService dependency
+  MonetizationService(this._analyticsService);
 
   /// Current user tier
   UserTier get currentTier => _currentTier;

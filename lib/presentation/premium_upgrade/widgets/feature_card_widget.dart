@@ -78,12 +78,12 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: gradientColors.first.withValues(alpha: 0.3),
+              color: gradientColors.first.withOpacity(0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: gradientColors.first.withValues(alpha: 0.2),
+                color: gradientColors.first.withOpacity(0.2),
                 blurRadius: _isHovered ? 20 : 10,
                 offset: const Offset(0, 8),
               ),
@@ -107,7 +107,7 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                           gradient: LinearGradient(
                             colors: [
                               Colors.transparent,
-                              Colors.white.withValues(alpha: 0.1),
+                              Colors.white.withOpacity(0.1),
                               Colors.transparent,
                             ],
                             stops: const [0.0, 0.5, 1.0],
@@ -129,10 +129,10 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                           Container(
                             padding: EdgeInsets.all(3.w),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
+                                color: Colors.white.withOpacity(0.3),
                                 width: 1,
                               ),
                             ),
@@ -150,10 +150,10 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                                 vertical: 0.5.h,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.3),
+                                  color: Colors.white.withOpacity(0.3),
                                   width: 1,
                                 ),
                               ),
@@ -193,7 +193,7 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                       Text(
                         widget.feature['description'],
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: Colors.white.withOpacity(0.9),
                             ),
                       ),
                       SizedBox(height: 2.h),
@@ -210,7 +210,7 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                                       .bodySmall
                                       ?.copyWith(
                                         color:
-                                            Colors.white.withValues(alpha: 0.7),
+                                            Colors.white.withOpacity(0.7),
                                         fontWeight: FontWeight.w500,
                                       ),
                                 ),
@@ -230,7 +230,7 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                           Container(
                             height: 4.h,
                             width: 1,
-                            color: Colors.white.withValues(alpha: 0.3),
+                            color: Colors.white.withOpacity(0.3),
                           ),
                           SizedBox(width: 4.w),
                           Expanded(
@@ -246,7 +246,7 @@ class _FeatureCardWidgetState extends State<FeatureCardWidget>
                                           .bodySmall
                                           ?.copyWith(
                                             color: Colors.white
-                                                .withValues(alpha: 0.7),
+                                                .withOpacity(0.7),
                                             fontWeight: FontWeight.w500,
                                           ),
                                     ),
