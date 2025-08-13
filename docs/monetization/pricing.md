@@ -73,7 +73,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ### Enterprise Tier
 **Target**: Teams, organizations, educational institutions
-**Price**: Custom pricing starting at $4.99/user/month
+**Price**: Custom pricing (volume discounts available; contact sales for a tailored quote based on team size and requirements, starting at $4.99/user/month)
 **Core Value**: Team collaboration and administrative controls
 
 #### Everything in Premium, Plus:
