@@ -17,7 +17,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - ✅ Local storage and basic search
 - ✅ Export to text format
 - ✅ Basic folder organization (up to 5 folders)
-- ✅ Dark/light theme
+- ✅ Basic dark/light theme
 
 #### Limitations
 - 📱 Single device sync only
@@ -42,6 +42,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - ✅ Export to PDF, Word, Markdown
 - ✅ Advanced search (full-text, voice content, OCR)
 - ✅ Unlimited folders and advanced organization
+- ✅ Advanced themes (futuristic, neon, floral)
 - ✅ Ad-free experience
 - ✅ Weekly automatic backups
 - ✅ Priority email support
@@ -113,6 +114,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 | Voice Transcription | - | ✅ (English) | ✅ (20+ langs) | ✅ (Custom) |
 | OCR | - | ✅ | ✅ | ✅ |
 | Advanced Doodle | - | ✅ | ✅ (Layers) | ✅ (Custom) |
+| Themes | Basic (Dark/Light) | Advanced (Futuristic, Neon, Floral) | Advanced (Futuristic, Neon, Floral) | Advanced (Futuristic, Neon, Floral) |
 | Collaboration | - | - | ✅ | ✅ (Advanced) |
 | API Access | - | - | ✅ | ✅ (Extended) |
 
