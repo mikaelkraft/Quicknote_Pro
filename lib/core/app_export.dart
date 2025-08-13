@@ -8,6 +8,7 @@ export 'services/notes/notes_service.dart';
 export 'services/analytics/analytics_service.dart';
 export 'services/ads/ads_service.dart';
 export 'services/monetization/monetization_service.dart';
+export 'services/monetization/monetization_helper.dart';
 export 'repositories/notes_repository.dart';
 export 'models/note_model.dart';
 export 'constants/product_ids.dart';
