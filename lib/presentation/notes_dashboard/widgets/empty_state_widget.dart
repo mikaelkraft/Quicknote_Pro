@@ -27,7 +27,7 @@ class EmptyStateWidget extends StatelessWidget {
               height: 30.h,
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -43,7 +43,7 @@ class EmptyStateWidget extends StatelessWidget {
                   CustomIconWidget(
                     iconName: 'edit',
                     color: (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                        .withValues(alpha: 0.6),
+                        .withOpacity(0.6),
                     size: 24,
                   ),
                 ],
@@ -100,11 +100,11 @@ class EmptyStateWidget extends StatelessWidget {
               padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                      .withValues(alpha: 0.2),
+                      .withOpacity(0.2),
                 ),
               ),
               child: Column(

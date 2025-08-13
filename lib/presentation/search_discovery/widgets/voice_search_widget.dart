@@ -199,13 +199,13 @@ class _VoiceSearchWidgetState extends State<VoiceSearchWidget>
                 color: Theme.of(context)
                     .colorScheme
                     .surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                    .withOpacity(0.5),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: Theme.of(context)
                       .colorScheme
                       .outline
-                      .withValues(alpha: 0.3),
+                      .withOpacity(0.3),
                 ),
               ),
               child: Column(
@@ -262,7 +262,7 @@ class _VoiceSearchWidgetState extends State<VoiceSearchWidget>
                 color: Theme.of(context)
                     .colorScheme
                     .surfaceContainerHighest
-                    .withValues(alpha: 0.3),
+                    .withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -301,7 +301,7 @@ class _VoiceSearchWidgetState extends State<VoiceSearchWidget>
           color: Theme.of(context)
               .colorScheme
               .primary
-              .withValues(alpha: opacity * (1 - _waveAnimation.value)),
+              .withOpacity(opacity * (1 - _waveAnimation.value)),
           width: 2,
         ),
       ),

@@ -64,7 +64,7 @@ class RecentSearchesWidget extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .outline
-                          .withValues(alpha: 0.3),
+                          .withOpacity(0.3),
                     ),
                   ),
                   child: Row(

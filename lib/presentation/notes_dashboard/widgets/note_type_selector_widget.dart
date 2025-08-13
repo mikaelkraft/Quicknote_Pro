@@ -113,7 +113,7 @@ class NoteTypeSelectorWidget extends StatelessWidget {
         padding: EdgeInsets.all(4.w),
         decoration: BoxDecoration(
           color: (isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight)
-              .withValues(alpha: 0.5),
+              .withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDark ? AppTheme.dividerDark : AppTheme.dividerLight,
@@ -125,7 +125,7 @@ class NoteTypeSelectorWidget extends StatelessWidget {
               padding: EdgeInsets.all(3.w),
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: CustomIconWidget(
