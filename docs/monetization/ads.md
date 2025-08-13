@@ -179,7 +179,14 @@ class AdService {
       await nativeAd.load();
       return nativeAd;
     } catch (e) {
-      print('Error loading native ad: \$e');
+            debugPrint('Ad failed to load: \$error');
+          },
+        ),
+      );
+      await nativeAd.load();
+      return nativeAd;
+    } catch (e) {
+      debugPrint('Error loading native ad: \$e');
       // Fallback: return null or a house ad if available
       // return HouseAdService.loadHouseAd(placement);
       return null;
