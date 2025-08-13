@@ -84,20 +84,28 @@ NativeAdWidget(
 )
 ```
 
-#### Interstitial Ads
+### Interstitial Ads
 ```dart
-// Show interstitial ad
-await InterstitialAdHelper.showInterstitialAd(
+// Show interstitial ad with smart timing
+await SmartInterstitialHelper.showSmartInterstitial(
   context,
   AdsConfig.placementNoteList,
-  onAdClosed: () => continueFlow(),
+  isImportantTransition: true,
 );
 
 // Preload for better performance
-await InterstitialAdHelper.preloadInterstitialAd(
+await SmartInterstitialHelper.preloadSmartInterstitial(
   context,
   AdsConfig.placementNoteList,
 );
+
+// Automatic trigger widget
+InterstitialTrigger(
+  placementId: AdsConfig.placementHome,
+  triggerOnInit: true,
+  delaySeconds: 5,
+  child: MyScreenWidget(),
+)
 ```
 
 ### 4. Premium Integration
@@ -115,7 +123,39 @@ adsService.onAdConversion(adId, conversionData: {
 });
 ```
 
-## Frequency Capping
+## Smart Interstitial Timing
+
+The system includes intelligent interstitial ad timing to maximize revenue while respecting user experience:
+
+### Smart Display Logic
+- **Base probability**: 15% chance of showing an ad
+- **Important transitions**: 25% chance (e.g., opening notes)
+- **Session actions**: Requires at least 3 user actions before showing ads
+- **Frequency capping**: Automatic enforcement of time-based caps
+- **User behavior**: Adapts based on user interaction patterns
+
+### Trigger Points
+- Opening note editor from list (important transition)
+- Navigating between major app sections
+- App resume after backgrounding
+- Natural content transition points
+
+### Implementation
+```dart
+// Check if ad should be shown
+bool shouldShow = SmartInterstitialHelper.shouldShowInterstitial(
+  placementId: placementId,
+  sessionActions: userActionCount,
+  isImportantTransition: true,
+);
+
+// Show with smart timing
+await SmartInterstitialHelper.showSmartInterstitial(
+  context,
+  placementId,
+  isImportantTransition: true,
+);
+```
 
 Ads respect frequency caps to avoid user fatigue:
 

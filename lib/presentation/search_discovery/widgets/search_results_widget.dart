@@ -49,9 +49,9 @@ class SearchResultsWidget extends StatelessWidget {
 
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 4.w),
-      itemCount: searchResults.length + (isLoading ? 1 : 0),
+      itemCount: searchResults.length + (searchResults.length ~/ 4) + (isLoading ? 1 : 0), // Add ads every 4 results
       itemBuilder: (context, index) {
-        if (index == searchResults.length) {
+        if (index == searchResults.length + (searchResults.length ~/ 4)) {
           return Center(
             child: Padding(
               padding: EdgeInsets.all(4.w),
@@ -64,7 +64,19 @@ class SearchResultsWidget extends StatelessWidget {
           );
         }
 
-        final note = searchResults[index];
+        // Insert banner ad every 4 search results
+        if (index != 0 && (index + 1) % 5 == 0) {
+          return const SimpleBannerAd(
+            placementId: AdsConfig.placementSearch,
+            margin: EdgeInsets.symmetric(vertical: 8),
+          );
+        }
+
+        // Calculate the actual result index (accounting for ads)
+        final resultIndex = index - (index ~/ 5);
+        if (resultIndex >= searchResults.length) return const SizedBox.shrink();
+
+        final note = searchResults[resultIndex];
         return _buildNoteCard(context, note);
       },
     );

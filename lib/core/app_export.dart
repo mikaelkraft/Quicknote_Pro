@@ -6,6 +6,7 @@ export '../theme/app_theme.dart';
 export '../services/theme/theme_service.dart';
 export '../services/notes/notes_service.dart';
 export '../services/ads/ads_service.dart';
+export '../services/ads/smart_interstitial_helper.dart';
 export '../repositories/notes_repository.dart';
 export '../models/note_model.dart';
 export '../models/ad_placement.dart';

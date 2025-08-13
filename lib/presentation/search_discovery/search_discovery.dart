@@ -443,6 +443,13 @@ class _SearchDiscoveryState extends State<SearchDiscovery>
 
             SizedBox(height: 3.h),
 
+            // Native ad in search suggestions
+            const SimpleNativeAd(
+              placementId: AdsConfig.placementSearch,
+              template: NativeAdTemplate.medium,
+            ),
+            SizedBox(height: 3.h),
+
             // Search Suggestions
             Container(
               margin: EdgeInsets.symmetric(horizontal: 4.w),
