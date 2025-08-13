@@ -4,7 +4,27 @@ This document defines the pricing structure, feature limitations, and upgrade pa
 
 ## Overview
 
-Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Each tier provides increasing value through expanded feature access and higher usage limits.
+Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Enterprise. Each tier provides increasing value through expanded feature access and higher usage limits.
+
+## Pricing Structure
+
+### Base Market Pricing (USD)
+
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $1.99 | $19.99 | $74.99 |
+| **Pro** | $2.99 | $29.99 | $114.99 |
+| **Enterprise** | $2.00/user | $19.99/user | - |
+
+### Africa Region Pricing (USD)
+
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $0.99 | $9.99 | $37.99 |
+| **Pro** | $1.99 | $19.99 | $74.99 |
+| **Enterprise** | $1.00/user | $9.99/user | - |
 
 ## Pricing Tiers
 
@@ -29,7 +49,7 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - Limited cloud storage (100MB)
 
 ### Premium Tier
-**Price**: $4.99/month or $49.99/year
+**Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
 **Target**: Regular users and productivity enthusiasts
 **Value Proposition**: Unlimited core features with advanced tools
 
@@ -51,7 +71,7 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - Dark mode themes
 
 ### Pro Tier
-**Price**: $9.99/month or $99.99/year
+**Price**: $2.99/month, $29.99/year (20% savings), or $114.99 lifetime
 **Target**: Power users and professionals
 **Value Proposition**: All features plus advanced capabilities
 
@@ -62,13 +82,35 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - **Extended Storage**: 10GB cloud storage
 - **Priority Support**: Phone and email support
 - **API Access**: Integration capabilities
-- **Team Features**: Shared folders and collaboration (coming soon)
 
 #### Exclusive Features
 - Advanced search with OCR
 - Automated backup scheduling
 - Custom export templates
 - Advanced encryption options
+
+### Enterprise Tier
+**Price**: $2.00/user/month or $19.99/user/year (20% savings)
+**Target**: Teams, organizations, educational institutions
+**Value Proposition**: Team collaboration and administrative controls
+
+#### Everything in Pro, Plus:
+- ✅ Team workspace management
+- ✅ Admin dashboard and user management
+- ✅ Advanced sharing and permissions
+- ✅ SSO integration
+- ✅ Compliance features (audit logs, data residency)
+- ✅ Custom branding options
+- ✅ Dedicated account manager
+- ✅ SLA guarantees
+- ✅ Custom integrations
+
+#### Enterprise Features
+- Unlimited everything from Pro tier
+- Team collaboration tools
+- Advanced admin controls
+- Enterprise-grade security
+- Custom deployment options
 
 ## Feature Gating Strategy
 

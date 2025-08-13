@@ -28,9 +28,9 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - 📁 Maximum 5 folders
 - 🎯 Contextual ads displayed
 
-### Pro Tier
+### Premium Tier
 **Target**: Regular users, productivity enthusiasts, students
-**Price**: $1.90/month or $18.99/year (17% savings)
+**Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
 **Core Value**: Enhanced productivity and cross-device sync
 
 #### Everything in Free, Plus:
@@ -47,23 +47,22 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - ✅ Weekly automatic backups
 - ✅ Priority email support
 
-#### Pro Limitations
+#### Premium Limitations
 - 📱 Up to 3 devices
 - 💾 1GB cloud storage
 - 🔄 Basic backup (weekly)
 - 🎙️ Voice transcription in English only
 
-### Premium Tier
+### Pro Tier
 **Target**: Power users, professionals, content creators
-**Price**: $3.99/month or $39.99/year (17% savings)
+**Price**: $2.99/month, $29.99/year (20% savings), or $114.99 lifetime
 **Core Value**: Advanced features and unlimited usage
 
-#### Everything in Pro, Plus:
+#### Everything in Premium, Plus:
 - ✅ Unlimited devices and cloud storage
 - ✅ Voice recording unlimited duration
 - ✅ Multi-language voice transcription (20+ languages)
 - ✅ Advanced doodle tools (layers, advanced brushes, vector tools)
-- ✅ Collaboration features (shared notes, comments)
 - ✅ Advanced export options (PowerPoint, custom templates)
 - ✅ Real-time sync across all devices
 - ✅ Daily automatic backups with version history
@@ -135,7 +134,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ### Promotional Strategies
 - **Student Discount**: 50% off for verified students
-- **Annual Discount**: 17% savings for annual subscriptions
+- **Annual Discount**: 20% savings for annual subscriptions
 - **Family Plan**: Pro for $2.99/month (up to 4 users)
 - **Loyalty Discount**: 10% off after 12 months of subscription
 - **Referral Program**: 1 month free for each successful referral
@@ -148,24 +147,25 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ## Regional Pricing
 
-### Tier 1 Markets (USD Base)
-- **United States**: $1.90/$3.99
-- **Canada**: CAD $2.49/CAD $5.29
-- **United Kingdom**: £1.69/£3.59
-- **Australia**: AUD $2.89/AUD $5.99
-- **Germany**: €1.89/€3.79
+### Base Market (USD)
+| Tier | Monthly | Annual | Lifetime |
+|------|---------|--------|----------|
+| **Premium** | $1.99 | $19.99 | $74.99 |
+| **Pro** | $2.99 | $29.99 | $114.99 |
+| **Enterprise** | $2.00/user | $19.99/user | - |
 
-### Tier 2 Markets (30% Discount)
-- **Brazil**: $1.33/$2.79
-- **Mexico**: $1.33/$2.79
-- **Eastern Europe**: €1.33/€2.79
-- **South Korea**: $1.33/$2.79
+### Africa Region (USD)
+| Tier | Monthly | Annual | Lifetime |
+|------|---------|--------|----------|
+| **Premium** | $0.99 | $9.99 | $37.99 |
+| **Pro** | $1.99 | $19.99 | $74.99 |
+| **Enterprise** | $1.00/user | $9.99/user | - |
 
-### Tier 3 Markets (Special Pricing)
-- **India**: $0.95/$1.99
-- **Southeast Asia**: $0.95/$1.99
-- **South America**: $0.95/$1.99
-- **Africa**: $1.00/$1.99
+### Pricing Notes
+- **Annual Discount**: 20% savings on all annual plans
+- **Lifetime**: One-time purchase available for Premium and Pro only
+- **Enterprise**: Per-user pricing for team accounts
+- **Regional Pricing**: Africa region offers significant discounts to improve accessibility
 
 ### Currency Considerations
 - Local payment methods support
