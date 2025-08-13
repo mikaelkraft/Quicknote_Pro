@@ -164,7 +164,25 @@ class AdService {
       contentUrl: 'quicknote-pro://notes',
     );
     
-    // Return native ad with proper error handling
+    try {
+      final nativeAd = NativeAd(
+        adUnitId: getAdUnitIdForPlacement(placement),
+        request: adRequest,
+        listener: AdListener(
+          onAdFailedToLoad: (ad, error) {
+            ad.dispose();
+            print('Ad failed to load: \$error');
+          },
+        ),
+      );
+      await nativeAd.load();
+      return nativeAd;
+    } catch (e) {
+      print('Error loading native ad: \$e');
+      // Fallback: return null or a house ad if available
+      // return HouseAdService.loadHouseAd(placement);
+      return null;
+    }
   }
 }
 ```
