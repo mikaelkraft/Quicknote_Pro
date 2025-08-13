@@ -1,4 +1,4 @@
-name: Apply Monetization v1 labels and milestone after PR merge
+permissionsissions: Apply Monetization v1 labels and milestone after PR merge
 on:
   pull_request:
     types: [closed]
