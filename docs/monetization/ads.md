@@ -189,7 +189,8 @@ class AdService {
       debugPrint('Error loading native ad: \$e');
       // Fallback: return null or a house ad if available
       // return HouseAdService.loadHouseAd(placement);
-      return null;
+      // Fallback: return a house ad if available, otherwise return null.
+      return HouseAdService.loadHouseAd(placement);
     }
   }
 }
