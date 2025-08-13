@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/analytics/analytics_service.dart';
 import './widgets/feature_card_widget.dart';
 import './widgets/premium_header_widget.dart';
 import './widgets/pricing_option_widget.dart';
@@ -24,6 +25,8 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
 
   bool _isLoading = false;
   String _selectedPlan = 'lifetime'; // 'monthly' or 'lifetime'
+  bool _hasLoggedPromptShown = false;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   final List<Map<String, dynamic>> _premiumFeatures = [
     {
@@ -68,6 +71,20 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   void initState() {
     super.initState();
     _initializeAnimations();
+    _trackScreenView();
+  }
+
+  void _trackScreenView() {
+    // Log screen view
+    _analyticsService.logScreenView('premium_upgrade');
+    
+    // Log upgrade prompt shown (once per screen open)
+    if (!_hasLoggedPromptShown) {
+      _analyticsService.trackMonetizationEvent(
+        MonetizationEvent.upgradePromptShown(context: 'upgrade_page'),
+      );
+      _hasLoggedPromptShown = true;
+    }
   }
 
   void _initializeAnimations() {
@@ -112,6 +129,11 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     setState(() {
       _selectedPlan = plan;
     });
+    
+    // Track upgrade started with the selected tier
+    _analyticsService.trackMonetizationEvent(
+      MonetizationEvent.upgradeStarted(tier: plan, context: 'plan_selection'),
+    );
   }
 
   void _onFeatureTapped(Map<String, dynamic> feature) {
@@ -199,6 +221,14 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
       _isLoading = true;
     });
 
+    // Track free trial started
+    _analyticsService.trackMonetizationEvent(
+      MonetizationEvent.upgradeStarted(
+        tier: _selectedPlan,
+        context: 'trial',
+      ),
+    );
+
     try {
       // Simulate purchase process
       await Future.delayed(const Duration(seconds: 2));
@@ -258,6 +288,11 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     setState(() {
       _isLoading = true;
     });
+
+    // Track restore purchases action
+    _analyticsService.trackMonetizationEvent(
+      MonetizationEvent.restorePurchases(source: 'purchase_button'),
+    );
 
     // Simulate restore process
     await Future.delayed(const Duration(seconds: 1));

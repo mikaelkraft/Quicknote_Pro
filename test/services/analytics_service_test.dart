@@ -47,6 +47,43 @@ void main() {
       expect(analyticsService.eventCounts['monetization_upgrade_prompt_shown'], 1);
     });
 
+    test('should track monetization events with extended properties', () {
+      final event = MonetizationEvent.featureLimitReached(
+        feature: 'voice_notes',
+        currentUsage: 5,
+        limit: 10,
+        userTier: 'free',
+      );
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_feature_limit_reached'], 1);
+    });
+
+    test('should track restore purchases events', () {
+      final event = MonetizationEvent.restorePurchases(source: 'purchase_button');
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_restore_purchases'], 1);
+    });
+
+    test('should track premium feature usage events', () {
+      final event = MonetizationEvent.premiumFeatureUsed(
+        feature: 'advanced_drawing',
+        userTier: 'premium',
+      );
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_premium_feature_used'], 1);
+    });
+
+    test('should set subscription status user property safely', () async {
+      // Should not throw errors even without Firebase
+      await analyticsService.setSubscriptionStatus('premium');
+      
+      // Should complete without errors
+      expect(true, true);
+    });
+
     test('should track engagement events correctly', () {
       final event = EngagementEvent.noteCreated();
       analyticsService.trackEngagementEvent(event);
