@@ -6,6 +6,7 @@ export 'theme/app_theme.dart';
 export 'services/theme/theme_service.dart';
 export 'services/notes/notes_service.dart';
 export 'services/analytics/analytics_service.dart';
+export 'services/analytics/events.dart';
 export 'services/ads/ads_service.dart';
 export 'services/monetization/monetization_service.dart';
 export 'repositories/notes_repository.dart';

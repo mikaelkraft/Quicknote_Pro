@@ -13,6 +13,15 @@ void main() {
       expect(analyticsService.analyticsEnabled, true);
     });
 
+    test('should operate in safe no-op mode without Firebase', () {
+      // Should not throw errors even without Firebase configuration
+      expect(analyticsService.firebaseInitialized, false);
+      expect(() => analyticsService.logEvent('test_event', {}), returnsNormally);
+      expect(() => analyticsService.setUserId('test_user'), returnsNormally);
+      expect(() => analyticsService.setUserProperty('test_prop', 'value'), returnsNormally);
+      expect(() => analyticsService.logScreenView('test_screen'), returnsNormally);
+    });
+
     test('should track events when analytics is enabled', () {
       final event = AnalyticsEvent.appStarted();
       analyticsService.trackEvent(event);
@@ -21,8 +30,8 @@ void main() {
       expect(analyticsService.getEventQueue().length, 1);
     });
 
-    test('should not track events when analytics is disabled', () {
-      analyticsService.setAnalyticsEnabled(false);
+    test('should not track events when analytics is disabled', () async {
+      await analyticsService.setAnalyticsEnabled(false);
       
       final event = AnalyticsEvent.appStarted();
       analyticsService.trackEvent(event);
@@ -50,6 +59,17 @@ void main() {
       analyticsService.trackFeatureEvent(event);
       
       expect(analyticsService.eventCounts['feature_voice_note_started'], 1);
+    });
+
+    test('should handle Firebase method calls safely without initialization', () async {
+      // These should not throw errors even without Firebase
+      await analyticsService.setUserId('test_user_123');
+      await analyticsService.setUserProperty('premium_user', 'true');
+      await analyticsService.logScreenView('home_screen', screenClass: 'MainActivity');
+      await analyticsService.logEvent('custom_event', {'param1': 'value1'});
+      
+      // Should complete without errors
+      expect(true, true);
     });
   });
 }

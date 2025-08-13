@@ -49,6 +49,10 @@ dependencies:
   
   # Home screen widgets
   home_widget: ^0.6.0
+  
+  # Firebase Analytics
+  firebase_core: ^3.6.0
+  firebase_analytics: ^11.3.3
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
