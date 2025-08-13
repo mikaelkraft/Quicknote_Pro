@@ -30,7 +30,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ### Pro Tier
 **Target**: Regular users, productivity enthusiasts, students
-**Price**: $4.99/month or $49.99/year (17% savings)
+**Price**: $1.90/month or $18.99/year (17% savings)
 **Core Value**: Enhanced productivity and cross-device sync
 
 #### Everything in Free, Plus:
@@ -54,7 +54,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ### Premium Tier
 **Target**: Power users, professionals, content creators
-**Price**: $9.99/month or $99.99/year (17% savings)
+**Price**: $3.99/month or $39.99/year (17% savings)
 **Core Value**: Advanced features and unlimited usage
 
 #### Everything in Pro, Plus:
@@ -73,7 +73,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ### Enterprise Tier
 **Target**: Teams, organizations, educational institutions
-**Price**: Custom pricing (volume discounts available; contact sales for a tailored quote based on team size and requirements, starting at $4.99/user/month)
+**Price**: $2/user/month (volume discounts available; contact sales for a tailored quote based on team size and requirements)
 **Core Value**: Team collaboration and administrative controls
 
 #### Everything in Premium, Plus:
@@ -134,7 +134,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 ### Promotional Strategies
 - **Student Discount**: 50% off for verified students
 - **Annual Discount**: 17% savings for annual subscriptions
-- **Family Plan**: Pro for $7.99/month (up to 4 users)
+- **Family Plan**: Pro for $2.99/month (up to 4 users)
 - **Loyalty Discount**: 10% off after 12 months of subscription
 - **Referral Program**: 1 month free for each successful referral
 
@@ -147,23 +147,23 @@ This document defines the subscription tiers, feature limitations, and pricing m
 ## Regional Pricing
 
 ### Tier 1 Markets (USD Base)
-- **United States**: $4.99/$9.99
-- **Canada**: CAD $6.49/CAD $12.99
-- **United Kingdom**: £4.49/£8.99
-- **Australia**: AUD $7.49/AUD $14.99
-- **Germany**: €4.99/€9.99
+- **United States**: $1.90/$3.99
+- **Canada**: CAD $2.49/CAD $5.29
+- **United Kingdom**: £1.69/£3.59
+- **Australia**: AUD $2.89/AUD $5.99
+- **Germany**: €1.89/€3.79
 
 ### Tier 2 Markets (30% Discount)
-- **Brazil**: $3.49/$6.99
-- **Mexico**: $3.49/$6.99
-- **Eastern Europe**: €3.49/€6.99
-- **South Korea**: $3.49/$6.99
+- **Brazil**: $1.33/$2.79
+- **Mexico**: $1.33/$2.79
+- **Eastern Europe**: €1.33/€2.79
+- **South Korea**: $1.33/$2.79
 
-### Tier 3 Markets (50% Discount)
-- **India**: $2.49/$4.99
-- **Southeast Asia**: $2.49/$4.99
-- **South America**: $2.49/$4.99
-- **Africa**: $2.49/$4.99
+### Tier 3 Markets (Special Pricing)
+- **India**: $0.95/$1.99
+- **Southeast Asia**: $0.95/$1.99
+- **South America**: $0.95/$1.99
+- **Africa**: $1.00/$1.99
 
 ### Currency Considerations
 - Local payment methods support
@@ -220,8 +220,8 @@ class EntitlementService {
 - **Annual vs Monthly**: Target 60% annual subscriptions
 
 ### Revenue Metrics
-- **ARPU (Average Revenue Per User)**: Target $2.50/month
-- **LTV (Lifetime Value)**: Target $45 per user
+- **ARPU (Average Revenue Per User)**: Target $1.20/month
+- **LTV (Lifetime Value)**: Target $21 per user
 - **Churn Rate**: Target <5% monthly for Pro, <3% for Premium
 - **MRR Growth**: Target 15% month-over-month
 
