@@ -35,6 +35,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 #### Everything in Free, Plus:
 - ✅ Unlimited cloud sync across all devices
+- ✅ Cloud storage integration with user's preferred provider
 - ✅ Voice recording up to 15 minutes per note
 - ✅ Voice-to-text transcription
 - ✅ Advanced doodle tools (unlimited colors, 10 brush sizes, shapes)
@@ -49,7 +50,6 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 #### Pro Limitations
 - 📱 Up to 3 devices
-- 💾 1GB cloud storage
 - 🔄 Basic backup (weekly)
 - 🎙️ Voice transcription in English only
 
@@ -59,7 +59,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 **Core Value**: Advanced features and unlimited usage
 
 #### Everything in Pro, Plus:
-- ✅ Unlimited devices and cloud storage
+- ✅ Unlimited devices and cloud storage via user's chosen provider
 - ✅ Voice recording unlimited duration
 - ✅ Multi-language voice transcription (20+ languages)
 - ✅ Advanced doodle tools (layers, advanced brushes, vector tools)
@@ -78,7 +78,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 **Core Value**: Team collaboration and administrative controls
 
 #### Everything in Premium, Plus:
-- ✅ Team workspace management
+- ✅ Team workspace management with enterprise-grade cloud storage
 - ✅ Admin dashboard and user management
 - ✅ Advanced sharing and permissions
 - ✅ SSO integration
@@ -90,11 +90,13 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ## Feature Limits and Restrictions
 
+> **Note on Cloud Storage**: Storage capacity and limitations are determined by the user's chosen cloud storage provider (Google Drive, Dropbox, iCloud, etc.), not by Quicknote Pro subscription tiers. Our app provides the sync functionality, while storage space is managed by the selected cloud service.
+
 ### Storage Limits
 | Feature | Free | Pro | Premium | Enterprise |
 |---------|------|-----|---------|------------|
 | Local Storage | Unlimited | Unlimited | Unlimited | Unlimited |
-| Cloud Storage | - | 1GB | Unlimited | Unlimited |
+| Cloud Storage | - | User's chosen cloud provider | User's chosen cloud provider | User's chosen cloud provider |
 | Voice Notes | 2 min/note | 15 min/note | Unlimited | Unlimited |
 | Images per Note | 5 | 20 | Unlimited | Unlimited |
 | Total Notes | Unlimited | Unlimited | Unlimited | Unlimited |
@@ -127,7 +129,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - **Feature Trials**: 24-hour trial of specific premium features
 
 ### Upgrade Triggers
-1. **Storage Limit**: Prompt when approaching cloud storage limit
+1. **Cloud Sync**: Prompt to upgrade when user tries to sync across devices
 2. **Device Limit**: Suggest upgrade when trying to sync 4th device
 3. **Voice Limit**: Offer transcription when voice note >2 minutes
 4. **Export Limit**: Promote Pro when trying to export to PDF
