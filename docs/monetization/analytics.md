@@ -173,6 +173,20 @@ This document defines the analytics strategy for Quicknote Pro, including event 
 ### Event Tracking Implementation
 ```dart
 // Example Dart implementation
+/// AnalyticsService provides event tracking for user actions and app metrics.
+///
+/// **Implementation Approach:**  
+/// - Tracks events using Firebase Analytics for cross-platform support.
+/// - Adds common properties (timestamp, app version) to each event.
+///
+/// **Error Handling Strategy:**  
+/// - Errors during event logging are surfaced via async exceptions.
+/// - It is recommended to wrap calls in try/catch and log failures for monitoring.
+///
+/// **Privacy Considerations:**  
+/// - Only non-sensitive, anonymized data is sent to analytics platforms.
+/// - User identifiers are pseudonymous (UUIDs) and comply with privacy regulations (e.g., GDPR).
+/// - No personally identifiable information (PII) is collected or transmitted.
 class AnalyticsService {
   static Future<void> trackEvent(String eventName, Map<String, dynamic> properties) async {
     // Add common properties
