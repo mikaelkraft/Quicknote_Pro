@@ -14,14 +14,14 @@ void main() {
       expect(monetizationService.isPremium, false);
     });
 
-    test('should recognize premium status for premium and pro tiers', () {
-      monetizationService.setUserTier(UserTier.premium);
+    test('should recognize premium status for premium and pro tiers', () async {
+      await monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isPremium, true);
 
-      monetizationService.setUserTier(UserTier.pro);
+      await monetizationService.setUserTier(UserTier.pro);
       expect(monetizationService.isPremium, true);
 
-      monetizationService.setUserTier(UserTier.free);
+      await monetizationService.setUserTier(UserTier.free);
       expect(monetizationService.isPremium, false);
     });
 
@@ -38,33 +38,62 @@ void main() {
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
     });
 
-    test('should track feature usage correctly', () {
-      monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+    test('should track feature usage correctly', () async {
+      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 2);
     });
 
-    test('should calculate remaining usage correctly', () {
+    test('should track feature usage and emit analytics events', () async {
+      // Record usage for a feature within limits
+      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      
+      expect(monetizationService.usageCounts[FeatureType.noteCreation], 1);
+    });
+
+    test('should emit feature limit reached when feature is blocked', () async {
+      // Reach note creation limit for free tier (50 notes)
+      for (int i = 0; i < 50; i++) {
+        await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      }
+      
+      // Next attempt should be blocked and emit analytics event
+      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      
+      // Usage count should not increment beyond limit
+      expect(monetizationService.usageCounts[FeatureType.noteCreation], 50);
+    });
+
+    test('should record upgrade prompt with analytics', () async {
+      await monetizationService.recordUpgradePromptShown(
+        context: 'voice_limit_reached',
+        featureBlocked: 'voice_notes',
+      );
+      
+      expect(monetizationService.upgradePromptCount, 1);
+    });
+
+    test('should calculate remaining usage correctly', () async {
       // Free tier has 50 note limit
       for (int i = 0; i < 45; i++) {
-        monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+        await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
       
       expect(monetizationService.getRemainingUsage(FeatureType.noteCreation), 5);
     });
 
-    test('should show upgrade prompt when feature limit is reached', () {
+    test('should show upgrade prompt when feature limit is reached', () async {
       // Reach note creation limit for free tier
       for (int i = 0; i < 50; i++) {
-        monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+        await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
       
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), true);
     });
 
-    test('should not show upgrade prompt for premium users', () {
-      monetizationService.setUserTier(UserTier.premium);
+    test('should not show upgrade prompt for premium users', () async {
+      await monetizationService.setUserTier(UserTier.premium);
       
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
     });

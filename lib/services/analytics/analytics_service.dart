@@ -126,6 +126,11 @@ class AnalyticsService extends ChangeNotifier {
     }
   }
 
+  /// Set subscription status user property
+  Future<void> setSubscriptionStatus(String status) async {
+    await setUserProperty('subscription_status', status);
+  }
+
   /// Log screen view event
   Future<void> logScreenView(String screenName, {String? screenClass}) async {
     if (!_analyticsEnabled) return;
@@ -331,21 +336,51 @@ class MonetizationEvent {
     MonetizationEvent('ad_dismissed', {'placement': placement});
 
   // Premium/pricing events
-  static MonetizationEvent upgradePromptShown({String? context}) => 
-    MonetizationEvent('upgrade_prompt_shown', {'context': context});
+  static MonetizationEvent upgradePromptShown({String? context, String? featureBlocked, String? userTier}) => 
+    MonetizationEvent('upgrade_prompt_shown', {
+      'context': context,
+      'feature_blocked': featureBlocked,
+      'user_tier': userTier,
+    });
   
-  static MonetizationEvent upgradeStarted({String? tier}) => 
-    MonetizationEvent('upgrade_started', {'tier': tier});
+  static MonetizationEvent upgradeStarted({String? tier, String? context, String? pricePoint}) => 
+    MonetizationEvent('upgrade_started', {
+      'tier': tier,
+      'context': context,
+      'price_point': pricePoint,
+    });
   
-  static MonetizationEvent upgradeCompleted({String? tier}) => 
-    MonetizationEvent('upgrade_completed', {'tier': tier});
+  static MonetizationEvent upgradeCompleted({String? tier, String? transactionId, String? pricePaid}) => 
+    MonetizationEvent('upgrade_completed', {
+      'tier': tier,
+      'transaction_id': transactionId,
+      'price_paid': pricePaid,
+    });
   
-  static MonetizationEvent upgradeCancelled({String? tier}) => 
-    MonetizationEvent('upgrade_cancelled', {'tier': tier});
+  static MonetizationEvent upgradeCancelled({String? tier, String? stage, String? reason}) => 
+    MonetizationEvent('upgrade_cancelled', {
+      'tier': tier,
+      'stage': stage,
+      'reason': reason,
+    });
+
+  static MonetizationEvent restorePurchases({String? source}) => 
+    MonetizationEvent('restore_purchases', {'source': source});
 
   // Feature limit events
-  static MonetizationEvent featureLimitReached({String? feature}) => 
-    MonetizationEvent('feature_limit_reached', {'feature': feature});
+  static MonetizationEvent featureLimitReached({String? feature, int? currentUsage, int? limit, String? userTier}) => 
+    MonetizationEvent('feature_limit_reached', {
+      'feature': feature,
+      'current_usage': currentUsage,
+      'limit': limit,
+      'user_tier': userTier,
+    });
+
+  static MonetizationEvent premiumFeatureUsed({String? feature, String? userTier}) => 
+    MonetizationEvent('premium_feature_used', {
+      'feature': feature,
+      'user_tier': userTier,
+    });
 }
 
 /// Engagement event types

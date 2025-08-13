@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../analytics/analytics_service.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 /// 
@@ -14,6 +15,7 @@ class MonetizationService extends ChangeNotifier {
   UserTier _currentTier = UserTier.free;
   final Map<FeatureType, int> _usageCounts = {};
   int _upgradePromptCount = 0;
+  final AnalyticsService _analyticsService = AnalyticsService();
 
   /// Current user tier
   UserTier get currentTier => _currentTier;
@@ -69,6 +71,22 @@ class MonetizationService extends ChangeNotifier {
   Future<void> setUserTier(UserTier tier) async {
     _currentTier = tier;
     await _prefs?.setString(_userTierKey, tier.name);
+    
+    // Set analytics user property
+    String subscriptionStatus;
+    switch (tier) {
+      case UserTier.free:
+        subscriptionStatus = 'free';
+        break;
+      case UserTier.premium:
+        subscriptionStatus = 'premium';
+        break;
+      case UserTier.pro:
+        subscriptionStatus = 'pro';
+        break;
+    }
+    await _analyticsService.setSubscriptionStatus(subscriptionStatus);
+    
     notifyListeners();
   }
 
@@ -91,9 +109,45 @@ class MonetizationService extends ChangeNotifier {
 
   /// Record feature usage
   Future<void> recordFeatureUsage(FeatureType feature) async {
+    // Check if user can use this feature before recording
+    if (!canUseFeature(feature)) {
+      // Feature is blocked - emit limit reached event
+      final limits = FeatureLimits.forTier(_currentTier);
+      final currentUsage = _usageCounts[feature] ?? 0;
+      final featureLimit = limits.getFeatureLimit(feature);
+      
+      _analyticsService.trackMonetizationEvent(
+        MonetizationEvent.featureLimitReached(
+          feature: feature.name,
+          currentUsage: currentUsage,
+          limit: featureLimit,
+          userTier: _currentTier.name,
+        ),
+      );
+      return;
+    }
+
+    // Record usage
     _usageCounts[feature] = (_usageCounts[feature] ?? 0) + 1;
     await _prefs?.setInt('${_usageCountKey}${feature.name}', _usageCounts[feature]!);
+    
+    // If this is a premium feature and user is premium, track premium feature usage
+    if (isPremium && _isPremiumFeature(feature)) {
+      _analyticsService.trackMonetizationEvent(
+        MonetizationEvent.premiumFeatureUsed(
+          feature: feature.name,
+          userTier: _currentTier.name,
+        ),
+      );
+    }
+    
     notifyListeners();
+  }
+
+  /// Check if a feature is premium-only
+  bool _isPremiumFeature(FeatureType feature) {
+    final freeLimits = FeatureLimits.forTier(UserTier.free);
+    return !freeLimits.isFeatureAvailable(feature);
   }
 
   /// Get remaining usage for a feature
@@ -118,9 +172,19 @@ class MonetizationService extends ChangeNotifier {
   }
 
   /// Record that upgrade prompt was shown
-  Future<void> recordUpgradePromptShown() async {
+  Future<void> recordUpgradePromptShown({String? context, String? featureBlocked}) async {
     _upgradePromptCount++;
     await _prefs?.setInt(_upgradePromptCountKey, _upgradePromptCount);
+    
+    // Emit analytics event
+    _analyticsService.trackMonetizationEvent(
+      MonetizationEvent.upgradePromptShown(
+        context: context,
+        featureBlocked: featureBlocked,
+        userTier: _currentTier.name,
+      ),
+    );
+    
     notifyListeners();
   }
 
