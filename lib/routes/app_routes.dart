@@ -8,6 +8,7 @@ import '../presentation/search_discovery/search_discovery.dart';
 import '../presentation/premium_upgrade/premium_upgrade.dart';
 import '../presentation/settings_profile/settings_profile.dart';
 import '../presentation/settings_profile/backup_import_screen.dart';
+import '../presentation/monetization_demo/monetization_demo_screen.dart';
 import '../ui/note_editor_screen.dart';
 
 class AppRoutes {
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String premiumUpgrade = '/premium-upgrade';
   static const String settingsProfile = '/settings-profile';
   static const String backupImport = '/backup-import';
+  static const String monetizationDemo = '/monetization-demo';
 
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
@@ -36,6 +38,7 @@ class AppRoutes {
     premiumUpgrade: (context) => const PremiumUpgrade(),
     settingsProfile: (context) => const SettingsProfile(),
     backupImport: (context) => const BackupImportScreen(),
+    monetizationDemo: (context) => const MonetizationDemoScreen(),
     // TODO: Add your other routes here
   };
 }
