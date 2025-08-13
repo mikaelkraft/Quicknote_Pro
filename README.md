@@ -193,6 +193,15 @@ flutter build apk --release
 flutter build ios --release
 ```
 
+## Monetization v1 Documentation
+See docs/monetization for plans, tracking, and outlines:
+- docs/monetization/README.md
+- docs/monetization/architecture.md
+- docs/monetization/ads-integration.md
+- docs/monetization/pricing-tiers.md
+- docs/monetization/metrics.md
+- docs/monetization/release-plan.md
+
 ## 🙏 Acknowledgments
 - Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
 - Styled with Material Design
