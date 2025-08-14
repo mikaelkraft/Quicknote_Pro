@@ -360,7 +360,7 @@ class CouponService extends ChangeNotifier {
 
       // Annual upgrade incentive
       CouponConfig(
-        code: 'ANNUAL2024',
+        code: 'ANNUALBONUS',
         displayName: 'Annual Plan Bonus',
         description: 'Get 2 extra months free with annual subscription',
         discountType: CouponDiscountType.freeMonths,

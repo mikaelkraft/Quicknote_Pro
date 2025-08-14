@@ -266,7 +266,7 @@ Upgrade prompts appear when users encounter limits:
 - **Student Discounts**: 20% off annual plans (STUDENT20)
 - **Holiday Promotions**: $5 off annual subscriptions (HOLIDAY50)
 - **Win-Back Campaigns**: 30% off for churned users (COMEBACK30)
-- **Annual Incentives**: 2 extra months free with annual plans (ANNUAL2024)
+- **Annual Incentives**: 2 extra months free with annual plans (ANNUALBONUS)
 - **Flash Sales**: 40% off limited-time promotions (FLASH48HR)
 
 ### Coupon Features
