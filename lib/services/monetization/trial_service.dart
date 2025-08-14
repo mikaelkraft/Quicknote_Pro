@@ -269,7 +269,7 @@ class TrialService extends ChangeNotifier {
     for (final json in historyJson) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.decodeComponent(json) as Map
+          jsonDecode(json) as Map
         );
         _trialHistory.add(TrialInfo.fromJson(data));
       } catch (e) {
