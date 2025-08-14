@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../analytics/analytics_service.dart';
+import 'referral_service.dart';
+import 'coupon_service.dart';
+import 'trial_service.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 /// 
@@ -17,11 +20,22 @@ class MonetizationService extends ChangeNotifier {
   int _upgradePromptCount = 0;
   final AnalyticsService _analyticsService = AnalyticsService();
 
+  // Retention services
+  final ReferralService _referralService = ReferralService();
+  final CouponService _couponService = CouponService();
+  final TrialService _trialService = TrialService();
+
   /// Current user tier
   UserTier get currentTier => _currentTier;
 
   /// Whether user has premium access
   bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro || _currentTier == UserTier.enterprise;
+
+  /// Whether user has active trial
+  bool get hasActiveTrial => _trialService.hasActiveTrial;
+
+  /// Whether user has access to premium features (paid or trial)
+  bool get hasPremiumAccess => isPremium || hasActiveTrial;
 
   /// Current usage counts by feature
   Map<FeatureType, int> get usageCounts => Map.unmodifiable(_usageCounts);
@@ -29,12 +43,26 @@ class MonetizationService extends ChangeNotifier {
   /// Number of times upgrade prompt has been shown
   int get upgradePromptCount => _upgradePromptCount;
 
+  /// Access to referral service
+  ReferralService get referralService => _referralService;
+
+  /// Access to coupon service
+  CouponService get couponService => _couponService;
+
+  /// Access to trial service
+  TrialService get trialService => _trialService;
+
   /// Initialize the monetization service
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     await _loadUserTier();
     await _loadUsageCounts();
     await _loadUpgradePromptCount();
+    
+    // Initialize retention services
+    await _referralService.initialize();
+    await _couponService.initialize();
+    await _trialService.initialize();
   }
 
   /// Load user tier from storage
@@ -95,6 +123,15 @@ class MonetizationService extends ChangeNotifier {
 
   /// Check if a feature is available for the current tier
   bool isFeatureAvailable(FeatureType feature) {
+    // Check if user has trial access
+    if (hasActiveTrial) {
+      final trialTier = _trialService.currentTrial?.tier ?? UserTier.free;
+      final trialLimits = FeatureLimits.forTier(trialTier);
+      if (trialLimits.isFeatureAvailable(feature)) {
+        return true;
+      }
+    }
+    
     final limits = FeatureLimits.forTier(_currentTier);
     return limits.isFeatureAvailable(feature);
   }
@@ -103,7 +140,12 @@ class MonetizationService extends ChangeNotifier {
   bool canUseFeature(FeatureType feature) {
     if (!isFeatureAvailable(feature)) return false;
 
-    final limits = FeatureLimits.forTier(_currentTier);
+    // Use trial limits if in trial
+    final effectiveTier = hasActiveTrial 
+        ? (_trialService.currentTrial?.tier ?? _currentTier)
+        : _currentTier;
+    
+    final limits = FeatureLimits.forTier(effectiveTier);
     final currentUsage = _usageCounts[feature] ?? 0;
     final featureLimit = limits.getFeatureLimit(feature);
 
@@ -130,16 +172,16 @@ class MonetizationService extends ChangeNotifier {
       return;
     }
 
-    // Record usage
+    // Record feature usage
     _usageCounts[feature] = (_usageCounts[feature] ?? 0) + 1;
     await _prefs?.setInt('${_usageCountKey}${feature.name}', _usageCounts[feature]!);
     
-    // If this is a premium feature and user is premium, track premium feature usage
-    if (isPremium && _isPremiumFeature(feature)) {
+    // If this is a premium feature and user has premium access, track premium feature usage
+    if (hasPremiumAccess && _isPremiumFeature(feature)) {
       _analyticsService.trackMonetizationEvent(
         MonetizationEvent.premiumFeatureUsed(
           feature: feature.name,
-          userTier: _currentTier.name,
+          userTier: hasActiveTrial ? 'trial_${_trialService.currentTrial!.tier.name}' : _currentTier.name,
         ),
       );
     }
@@ -155,7 +197,12 @@ class MonetizationService extends ChangeNotifier {
 
   /// Get remaining usage for a feature
   int getRemainingUsage(FeatureType feature) {
-    final limits = FeatureLimits.forTier(_currentTier);
+    // Use trial limits if in trial
+    final effectiveTier = hasActiveTrial 
+        ? (_trialService.currentTrial?.tier ?? _currentTier)
+        : _currentTier;
+    
+    final limits = FeatureLimits.forTier(effectiveTier);
     final currentUsage = _usageCounts[feature] ?? 0;
     final featureLimit = limits.getFeatureLimit(feature);
 
@@ -165,7 +212,7 @@ class MonetizationService extends ChangeNotifier {
 
   /// Check if upgrade prompt should be shown
   bool shouldShowUpgradePrompt(FeatureType feature, {String? context}) {
-    if (isPremium) return false;
+    if (hasPremiumAccess) return false;
     
     // Don't show if already shown too many times
     if (_upgradePromptCount >= 10) return false;
@@ -193,6 +240,18 @@ class MonetizationService extends ChangeNotifier {
 
   /// Get upgrade benefits for current tier
   List<String> getUpgradeBenefits() {
+    // If user has trial, show conversion benefits
+    if (hasActiveTrial) {
+      final trial = _trialService.currentTrial!;
+      return [
+        'Continue unlimited ${trial.tier.name} features',
+        'No interruption to your workflow',
+        'Keep all your premium notes and features',
+        'Cancel anytime with full refund guarantee',
+        'Priority customer support',
+      ];
+    }
+    
     switch (_currentTier) {
       case UserTier.free:
         return [
@@ -211,6 +270,8 @@ class MonetizationService extends ChangeNotifier {
           'Priority support',
         ];
       case UserTier.pro:
+        return [];
+      case UserTier.enterprise:
         return [];
     }
   }
@@ -256,8 +317,13 @@ class MonetizationService extends ChangeNotifier {
     return {
       'current_tier': _currentTier.name,
       'is_premium': isPremium,
+      'has_active_trial': hasActiveTrial,
+      'has_premium_access': hasPremiumAccess,
       'usage_counts': _usageCounts.map((key, value) => MapEntry(key.name, value)),
       'upgrade_prompt_count': _upgradePromptCount,
+      'referral_data': _referralService.getAnalyticsData(),
+      'coupon_data': _couponService.getAnalyticsData(),
+      'trial_data': _trialService.getAnalyticsData(),
     };
   }
 }
@@ -569,13 +635,15 @@ class FeatureLimits {
   }
 }
 
-/// Pricing information for tiers
+/// Pricing information for tiers (Updated with retention features)
 class PricingInfo {
   final UserTier tier;
   final String displayName;
   final String price;
   final String billingPeriod;
   final List<String> features;
+  final bool hasTrial;
+  final int? trialDays;
 
   const PricingInfo({
     required this.tier,
@@ -583,9 +651,11 @@ class PricingInfo {
     required this.price,
     required this.billingPeriod,
     required this.features,
+    this.hasTrial = false,
+    this.trialDays,
   });
 
-  /// Get pricing info for all tiers
+  /// Get pricing info for all tiers (updated with trial information)
   static List<PricingInfo> getAllTiers() {
     return [
       const PricingInfo(
@@ -593,6 +663,7 @@ class PricingInfo {
         displayName: 'Free',
         price: '\$0',
         billingPeriod: 'forever',
+        hasTrial: false,
         features: [
           '50 notes per month',
           '5 voice recordings (2min each)',
@@ -609,6 +680,8 @@ class PricingInfo {
         displayName: 'Premium',
         price: '\$1.99',
         billingPeriod: 'month',
+        hasTrial: true,
+        trialDays: 7,
         features: [
           'Unlimited notes and folders',
           '100 voice recordings (10min each)',
@@ -627,6 +700,8 @@ class PricingInfo {
         displayName: 'Pro',
         price: '\$2.99',
         billingPeriod: 'month',
+        hasTrial: true,
+        trialDays: 14,
         features: [
           'Everything in Premium',
           'Unlimited voice recordings (30min each)',
@@ -645,6 +720,7 @@ class PricingInfo {
         displayName: 'Enterprise',
         price: '\$2.00',
         billingPeriod: 'per user/month',
+        hasTrial: false,
         features: [
           'Everything in Pro',
           'Team workspace management',
@@ -660,4 +736,11 @@ class PricingInfo {
       ),
     ];
   }
+
+  /// Get trial info text
+  String get trialText {
+    if (!hasTrial || trialDays == null) return '';
+    return '$trialDays-day free trial';
+  }
+}
 }

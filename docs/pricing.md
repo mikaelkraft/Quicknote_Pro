@@ -229,13 +229,21 @@ Upgrade prompts appear when users encounter limits:
 ## Free Trial Strategy
 
 ### Trial Offerings
-- **Premium**: 7-day free trial
-- **Pro**: 14-day free trial
+- **Premium**: 7-day free trial (Standard trial for all new users)
+- **Pro**: 14-day free trial (Extended trial for power users)
 - **Annual Plans**: 30-day money-back guarantee
+
+### Enhanced Trial Types
+- **Standard Trials**: Default offerings for new users
+- **Promotional Trials**: Extended trials (14 days for Premium) after 2+ conversion attempts
+- **Win-Back Trials**: 10-day trials for users with expired trials
+- **Referral Trials**: 14-day Premium trials as referral rewards
+- **Retention Trials**: Special extensions for user retention campaigns
 
 ### Trial Experience
 - Full feature access during trial
-- Clear trial status in app
+- Clear trial status in app with countdown
+- Smart trial extension rewards for referrals and promotions
 - Gentle reminders before trial ends
 - Easy cancellation process
 - Smooth transition to paid or downgrade
@@ -243,8 +251,35 @@ Upgrade prompts appear when users encounter limits:
 ### Trial Conversion Tactics
 - Progressive feature introduction during trial
 - Usage analytics to show value delivered
-- Personalized upgrade recommendations
-- Limited-time upgrade discounts
+- Personalized upgrade recommendations based on trial usage
+- Limited-time upgrade discounts with coupon system
+- Contextual prompts when trial is about to expire
+- Trial extension rewards through referral program
+
+## Referral and Coupon System
+
+### Referral Program
+- **Referral Codes**: Unique 8-character codes (QN + 6 alphanumeric)
+- **Referrer Rewards**: Free month of service when referral converts
+- **Referee Rewards**: 14-day Premium trial upon signup
+- **Tracking**: Comprehensive analytics on referral performance
+- **Eligibility**: All users can generate referral codes
+
+### Coupon System
+- **Welcome Coupons**: 25% off first month for new users (WELCOME25)
+- **Student Discounts**: 20% off annual plans (STUDENT20)
+- **Holiday Promotions**: $5 off annual subscriptions (HOLIDAY50)
+- **Win-Back Campaigns**: 30% off for churned users (COMEBACK30)
+- **Annual Incentives**: 2 extra months free with annual plans (ANNUAL2024)
+- **Flash Sales**: 40% off limited-time promotions (FLASH48HR)
+
+### Coupon Features
+- **Multiple Discount Types**: Percentage, fixed amount, free months, trial extensions
+- **Smart Eligibility**: New users only, existing users, upgrade-only, renewal-only
+- **Usage Limits**: Maximum uses per coupon and per user
+- **Minimum Purchase**: Requirements for certain high-value coupons
+- **Expiration Management**: Automatic validation of coupon validity
+- **Analytics Integration**: Comprehensive tracking of coupon usage and effectiveness
 
 ## Value Communication
 
@@ -302,7 +337,7 @@ Upgrade prompts appear when users encounter limits:
 
 ### Usage Tracking
 ```dart
-// Check feature availability
+// Check feature availability (includes trial access)
 final canUseFeature = monetizationService.canUseFeature(FeatureType.voiceNoteRecording);
 
 // Record feature usage
@@ -310,40 +345,81 @@ await monetizationService.recordFeatureUsage(FeatureType.voiceNoteRecording);
 
 // Check remaining usage
 final remaining = monetizationService.getRemainingUsage(FeatureType.voiceNoteRecording);
+
+// Access retention services
+final referralCode = await monetizationService.referralService.generateReferralCode(userId: 'user123');
+final availableCoupons = monetizationService.couponService.getApplicableCoupons(
+  currentTier: UserTier.free,
+  targetTier: UserTier.premium,
+  term: PlanTerm.monthly,
+  userId: 'user123',
+);
+final trialOffered = await monetizationService.trialService.startTrial(
+  TrialConfig(tier: UserTier.premium, durationDays: 7),
+);
 ```
 
 ### Upgrade Prompts
 ```dart
-// Check if upgrade prompt should be shown
+// Check if upgrade prompt should be shown (considers trial access)
 final shouldShow = monetizationService.shouldShowUpgradePrompt(
   FeatureType.advancedDrawing,
   context: 'drawing_tool_selection'
 );
 
 if (shouldShow) {
-  // Show contextual upgrade prompt
+  // Show contextual upgrade prompt with trial offer
   showUpgradePrompt(FeatureType.advancedDrawing);
   
   // Record prompt shown
   await monetizationService.recordUpgradePromptShown();
 }
+
+// Start trial instead of immediate upgrade
+final trialConfig = TrialConfig(
+  tier: UserTier.premium,
+  durationDays: 7,
+  type: TrialType.standard,
+);
+await monetizationService.trialService.startTrial(trialConfig);
 ```
 
 ### Feature Gating
 ```dart
-// Gate premium features
+// Gate premium features (with trial support)
 Widget buildDrawingTool(DrawingTool tool) {
   final isAvailable = monetizationService.isFeatureAvailable(
     FeatureType.advancedDrawing
   );
   
   return GestureDetector(
-    onTap: isAvailable ? () => selectTool(tool) : () => showUpgradePrompt(),
+    onTap: isAvailable ? () => selectTool(tool) : () => showUpgradeOrTrialPrompt(),
     child: Opacity(
       opacity: isAvailable ? 1.0 : 0.5,
-      child: DrawingToolIcon(tool),
+      child: Stack(
+        children: [
+          DrawingToolIcon(tool),
+          if (!isAvailable && !monetizationService.hasActiveTrial)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: TrialBadge(
+                onTap: () => startTrial(UserTier.premium),
+              ),
+            ),
+        ],
+      ),
     ),
   );
+}
+
+// Smart prompt with trial option
+void showUpgradeOrTrialPrompt() {
+  if (monetizationService.trialService.trialEligibility[UserTier.premium]!) {
+    showTrialOfferDialog();
+  } else {
+    showUpgradeDialog();
+  }
 }
 ```
 
@@ -366,6 +442,11 @@ Widget buildDrawingTool(DrawingTool tool) {
 - Regular feature announcements
 - Usage analytics sharing (Pro tier)
 - Exclusive preview access to new features
+- **Referral Program**: Generate codes, track conversions, earn rewards
+- **Smart Coupon System**: Contextual discounts based on user behavior
+- **Enhanced Trial Management**: Multiple trial types for different user segments
+- **Win-Back Campaigns**: Targeted offers for churned users
+- **Conversion Optimization**: Smart timing and personalized promotions
 
 ## Analytics and Monitoring
 
@@ -373,11 +454,15 @@ Widget buildDrawingTool(DrawingTool tool) {
 
 #### Conversion Funnel
 1. **Feature Limit Encounters**: Users hitting limits
-2. **Upgrade Prompt Views**: Prompts shown to users
-3. **Upgrade Intent**: Users starting upgrade flow
-4. **Trial Starts**: Users beginning free trials
-5. **Trial Conversions**: Trials converting to paid
-6. **Subscription Retention**: Monthly retention rates
+2. **Trial Offers Shown**: Trial prompts displayed to eligible users
+3. **Trial Starts**: Users beginning free trials
+4. **Trial Engagement**: Active usage during trial period
+5. **Upgrade Prompt Views**: Prompts shown to users (trial and non-trial)
+6. **Upgrade Intent**: Users starting upgrade flow
+7. **Coupon Applications**: Discount codes applied to purchases
+8. **Trial Conversions**: Trials converting to paid subscriptions
+9. **Subscription Retention**: Monthly retention rates
+10. **Referral Activations**: Successful referral code applications
 
 #### Revenue Metrics
 - Monthly Recurring Revenue (MRR)
@@ -388,32 +473,42 @@ Widget buildDrawingTool(DrawingTool tool) {
 - Upgrade/downgrade rates
 
 ### Event Tracking
-All monetization events are tracked:
+All monetization and retention events are tracked:
 - Feature limit encounters
-- Upgrade prompt displays
-- Trial starts and conversions
-- Subscription changes
-- Feature usage by tier
+- Trial offers, starts, extensions, and conversions
+- Upgrade prompt displays and interactions
+- Coupon views, applications, and validations
+- Referral code generations and conversions
+- Subscription changes and churn events
+- Feature usage by tier (including trial usage)
+- Retention campaign effectiveness
+- Win-back campaign performance
 
 ## Success Criteria
 
 ### Short-term Goals (Month 1-3)
 - 5% free-to-premium conversion rate
-- 15% trial-to-paid conversion rate
+- 25% trial-to-paid conversion rate (improved with better trial experience)
 - $5,000 monthly recurring revenue
 - <5% monthly churn rate
+- 10% referral program adoption rate
+- 15% coupon utilization rate
 
 ### Medium-term Goals (Month 4-6)
 - 8% free-to-premium conversion rate
-- 25% trial-to-paid conversion rate
+- 35% trial-to-paid conversion rate (optimized trial flows)
 - $15,000 monthly recurring revenue
 - Premium users represent 60% of revenue
+- 20% referral program adoption rate
+- 30% of new users come through referrals or coupons
 
 ### Long-term Goals (Month 7-12)
 - 12% free-to-premium conversion rate
-- 35% trial-to-paid conversion rate
+- 45% trial-to-paid conversion rate (mature retention systems)
 - $50,000 monthly recurring revenue
 - Sustainable unit economics (LTV > 3x CAC)
+- 25% referral program adoption rate
+- 40% of revenue attributed to retention programs
 
 ## Competitive Analysis
 
