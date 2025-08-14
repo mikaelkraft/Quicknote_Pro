@@ -639,7 +639,7 @@ class CouponService extends ChangeNotifier {
     for (final json in usageJson) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.decodeComponent(json) as Map
+          jsonDecode(Uri.decodeComponent(json)) as Map
         );
         _usageHistory.add(CouponUsage.fromJson(data));
       } catch (e) {
