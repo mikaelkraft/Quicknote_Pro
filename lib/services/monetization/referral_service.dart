@@ -230,7 +230,7 @@ class ReferralService extends ChangeNotifier {
     if (dataJson != null) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.encodeComponent(dataJson) as Map
+          jsonDecode(dataJson) as Map
         );
         _referralData = ReferralData.fromJson(data);
       } catch (e) {
