@@ -17,14 +17,55 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 | **Pro** | $2.99 | $29.99 | $114.99 |
 | **Enterprise** | $2.00/user | $19.99/user | - |
 
-### Africa Region Pricing (USD)
+### Regional Pricing (USD)
 
+#### Africa Region
 | Tier | Monthly | Annual (20% savings) | Lifetime |
 |------|---------|---------------------|----------|
 | **Free** | $0 | - | - |
 | **Premium** | $0.99 | $9.99 | $37.99 |
 | **Pro** | $1.99 | $19.99 | $74.99 |
 | **Enterprise** | $1.00/user | $9.99/user | - |
+
+#### Asia Region
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $1.49 | $11.99 | $59.99 |
+| **Pro** | $2.49 | $23.99 | $94.99 |
+| **Enterprise** | $1.50/user | $11.99/user | - |
+
+#### Europe Region
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $2.49 | $19.99 | $94.99 |
+| **Pro** | $3.49 | $33.99 | $134.99 |
+| **Enterprise** | $2.50/user | $19.99/user | - |
+
+#### Latin America Region
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $1.29 | $11.99 | $49.99 |
+| **Pro** | $2.29 | $19.99 | $87.99 |
+| **Enterprise** | $1.30/user | $11.99/user | - |
+
+#### India Region
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $0.79 | $7.99 | $29.99 |
+| **Pro** | $1.49 | $11.99 | $59.99 |
+| **Enterprise** | $0.80/user | $7.99/user | - |
+
+#### Eastern Europe Region
+| Tier | Monthly | Annual (20% savings) | Lifetime |
+|------|---------|---------------------|----------|
+| **Free** | $0 | - | - |
+| **Premium** | $1.19 | $11.99 | $45.99 |
+| **Pro** | $1.99 | $19.99 | $74.99 |
+| **Enterprise** | $1.20/user | $11.99/user | - |
 
 ## Pricing Tiers
 
@@ -37,16 +78,22 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **Notes**: 50 notes per month
 - **Voice Recordings**: 5 recordings per month (max 2 minutes each)
 - **Folders**: 3 folders maximum
-- **Attachments**: 10 attachments per month
+- **Attachments**: 10 attachments per month (images and files)
 - **Cloud Sync**: 10 syncs per month
+- **Cloud Storage**: 100MB storage
+- **Drawing**: Basic doodling and canvas tools
 - **Export**: Basic text export only
+- **Import/Export**: Local file system only
 - **Ads**: Yes (with frequency caps)
 
 #### Restrictions
-- No advanced drawing tools
-- No premium export formats (PDF, DOCX)
-- No transcription for voice notes
-- Limited cloud storage (100MB)
+- No advanced drawing tools (layers, premium brushes, shapes)
+- No voice note transcription
+- No OCR text extraction from images
+- No premium export formats (PDF, DOCX, Markdown)
+- No cloud export/import capabilities
+- No custom themes
+- Limited cloud storage and sync
 
 ### Premium Tier
 **Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
@@ -56,19 +103,25 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 #### Features & Limits
 - **Notes**: Unlimited
 - **Voice Recordings**: 100 recordings per month (max 10 minutes each)
+- **Voice Transcription**: Automatic transcription of all voice notes
 - **Folders**: Unlimited
-- **Attachments**: Unlimited
+- **Attachments**: Unlimited (images and files)
 - **Cloud Sync**: Unlimited
-- **Export**: All formats (PDF, DOCX, Markdown)
-- **Ads**: Removed
-- **Drawing Tools**: Advanced drawing and annotation tools
-- **Transcription**: Voice note transcription included
+- **Cloud Storage**: 1GB storage
+- **Drawing**: Advanced drawing tools, layers, premium brushes, shapes
+- **OCR**: Text extraction from images and scanned documents
+- **Export**: All formats (PDF, DOCX, Markdown, HTML)
+- **Import/Export**: Both local and cloud export/import
+- **Themes**: Custom themes and dark mode
+- **Ads**: Completely removed
 
 #### Additional Benefits
 - Priority cloud sync
-- 1GB cloud storage
 - Email support
-- Dark mode themes
+- Advanced canvas tools with layers
+- Voice note transcription with timestamps
+- OCR text extraction and search
+- Professional export templates
 
 ### Pro Tier
 **Price**: $2.99/month, $29.99/year (20% savings), or $114.99 lifetime
@@ -78,16 +131,22 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 #### Features & Limits
 - **Everything in Premium**
 - **Voice Recordings**: Unlimited (max 30 minutes each)
-- **Advanced Analytics**: Usage insights and productivity metrics
-- **Extended Storage**: 10GB cloud storage
-- **Priority Support**: Phone and email support
-- **API Access**: Integration capabilities
+- **Cloud Storage**: 10GB cloud storage
+- **Analytics**: Advanced usage insights and productivity metrics
+- **Search**: Advanced search with OCR integration
+- **Backup**: Automated backup scheduling and versioning
+- **Templates**: Custom export templates and formatting
+- **Encryption**: Advanced encryption options for sensitive notes
+- **API Access**: Integration capabilities with third-party apps
+- **Support**: Phone and email priority support
 
 #### Exclusive Features
-- Advanced search with OCR
-- Automated backup scheduling
-- Custom export templates
-- Advanced encryption options
+- Usage analytics and productivity insights
+- Automated backup with version history
+- Custom export templates with branding
+- Advanced encryption and security options
+- API access for integrations and workflows
+- Priority support with dedicated channels
 
 ### Enterprise Tier
 **Price**: $2.00/user/month or $19.99/user/year (20% savings)
@@ -95,22 +154,27 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 **Value Proposition**: Team collaboration and administrative controls
 
 #### Everything in Pro, Plus:
-- ✅ Team workspace management
-- ✅ Admin dashboard and user management
-- ✅ Advanced sharing and permissions
-- ✅ SSO integration
-- ✅ Compliance features (audit logs, data residency)
-- ✅ Custom branding options
-- ✅ Dedicated account manager
-- ✅ SLA guarantees
-- ✅ Custom integrations
+- ✅ **Team Features**: Team workspace management and collaboration
+- ✅ **Admin Controls**: Admin dashboard and comprehensive user management
+- ✅ **Advanced Sharing**: Advanced sharing and permissions system
+- ✅ **SSO Integration**: Single sign-on with popular identity providers
+- ✅ **Compliance**: Audit logs, data residency, and compliance features
+- ✅ **Branding**: Custom branding options and white-label capabilities
+- ✅ **Storage**: Unlimited cloud storage for teams
+- ✅ **Support**: Dedicated account manager and priority support
+- ✅ **SLA**: Service level agreements and uptime guarantees
+- ✅ **Integrations**: Custom integrations and enterprise connectors
 
 #### Enterprise Features
-- Unlimited everything from Pro tier
-- Team collaboration tools
-- Advanced admin controls
-- Enterprise-grade security
-- Custom deployment options
+- Team workspace with advanced collaboration tools
+- Comprehensive admin dashboard with user analytics
+- Granular permissions and sharing controls
+- Enterprise SSO integration (SAML, OAuth, LDAP)
+- Audit logs and compliance reporting
+- Custom branding and white-label options
+- Unlimited storage and bandwidth
+- Dedicated account management
+- Custom deployment options (cloud, on-premise, hybrid)
 
 ## Feature Gating Strategy
 
@@ -186,18 +250,38 @@ Upgrade prompts appear when users encounter limits:
 
 ### Benefits Matrix
 
-| Feature | Free | Premium | Pro |
-|---------|------|---------|-----|
-| Monthly Notes | 50 | Unlimited | Unlimited |
-| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) |
-| Folders | 3 | Unlimited | Unlimited |
-| Advanced Drawing | ❌ | ✅ | ✅ |
-| Voice Transcription | ❌ | ✅ | ✅ |
-| Premium Export | ❌ | ✅ | ✅ |
-| Cloud Storage | 100MB | 1GB | 10GB |
-| Ads | ✅ | ❌ | ❌ |
-| Analytics | ❌ | ❌ | ✅ |
-| Priority Support | ❌ | ✅ | ✅ |
+| Feature | Free | Premium | Pro | Enterprise |
+|---------|------|---------|-----|------------|
+| Monthly Notes | 50 | Unlimited | Unlimited | Unlimited |
+| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) | Unlimited (30min) |
+| Voice Transcription | ❌ | ✅ | ✅ | ✅ |
+| Folders | 3 | Unlimited | Unlimited | Unlimited |
+| Attachments | 10/month | Unlimited | Unlimited | Unlimited |
+| Basic Drawing | ✅ | ✅ | ✅ | ✅ |
+| Advanced Drawing | ❌ | ✅ | ✅ | ✅ |
+| Canvas Layers | ❌ | ✅ | ✅ | ✅ |
+| OCR Text Extraction | ❌ | ✅ | ✅ | ✅ |
+| Basic Export | ✅ | ✅ | ✅ | ✅ |
+| Premium Export | ❌ | ✅ | ✅ | ✅ |
+| Local Export/Import | ✅ | ✅ | ✅ | ✅ |
+| Cloud Export/Import | ❌ | ✅ | ✅ | ✅ |
+| Cloud Storage | 100MB | 1GB | 10GB | Unlimited |
+| Cloud Sync | 10/month | Unlimited | Unlimited | Unlimited |
+| Custom Themes | ❌ | ✅ | ✅ | ✅ |
+| Ads | ✅ | ❌ | ❌ | ❌ |
+| Analytics | ❌ | ❌ | ✅ | ✅ |
+| Priority Support | ❌ | ✅ | ✅ | ✅ |
+| API Access | ❌ | ❌ | ✅ | ✅ |
+| Advanced Search | ❌ | ❌ | ✅ | ✅ |
+| Automated Backup | ❌ | ❌ | ✅ | ✅ |
+| Custom Templates | ❌ | ❌ | ✅ | ✅ |
+| Advanced Encryption | ❌ | ❌ | ✅ | ✅ |
+| Team Workspace | ❌ | ❌ | ❌ | ✅ |
+| Admin Dashboard | ❌ | ❌ | ❌ | ✅ |
+| SSO Integration | ❌ | ❌ | ❌ | ✅ |
+| Audit Logs | ❌ | ❌ | ❌ | ✅ |
+| Custom Branding | ❌ | ❌ | ❌ | ✅ |
+| Dedicated Support | ❌ | ❌ | ❌ | ✅ |
 
 ### Key Selling Points
 

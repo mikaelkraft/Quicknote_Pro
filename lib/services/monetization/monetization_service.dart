@@ -232,9 +232,15 @@ class MonetizationService extends ChangeNotifier {
   /// Reset monthly usage counters
   Future<void> resetMonthlyUsage() async {
     final monthlyFeatures = [
+      FeatureType.noteCreation,
       FeatureType.voiceNoteRecording,
       FeatureType.cloudSync,
+      FeatureType.attachments,
+      FeatureType.imageAttachments,
+      FeatureType.fileAttachments,
+      FeatureType.ocrTextExtraction,
       FeatureType.advancedExport,
+      FeatureType.cloudExportImport,
     ];
 
     for (final feature in monthlyFeatures) {
@@ -266,13 +272,58 @@ enum UserTier {
 
 /// Feature types with usage limits
 enum FeatureType {
+  // Core note-taking features
   noteCreation,
-  voiceNoteRecording,
-  advancedDrawing,
-  cloudSync,
-  advancedExport,
   folders,
+  
+  // Voice features
+  voiceNoteRecording,
+  voiceTranscription,
+  
+  // Visual features  
+  advancedDrawing,
+  doodling,
+  canvasLayers,
+  
+  // Content features
   attachments,
+  imageAttachments,
+  fileAttachments,
+  ocrTextExtraction,
+  
+  // Sync and storage
+  cloudSync,
+  cloudStorage,
+  localBackup,
+  
+  // Export and import
+  basicExport,        // Text export for free tier
+  advancedExport,     // PDF, DOCX, Markdown for paid tiers
+  localExportImport,  // Local file system for free tier
+  cloudExportImport,  // Cloud export/import for paid tiers
+  
+  // Premium features
+  analyticsInsights,
+  prioritySupport,
+  customThemes,
+  adRemoval,
+  
+  // Pro features
+  apiAccess,
+  advancedSearch,
+  automatedBackup,
+  customExportTemplates,
+  advancedEncryption,
+  
+  // Enterprise features (team collaboration)
+  teamWorkspace,
+  adminDashboard,
+  userManagement,
+  ssoIntegration,
+  auditLogs,
+  complianceFeatures,
+  customBranding,
+  dedicatedSupport,
 }
 
 /// Feature limits by tier
@@ -291,61 +342,217 @@ class FeatureLimits {
       case UserTier.free:
         return const FeatureLimits(
           limits: {
-            FeatureType.noteCreation: 50,
-            FeatureType.voiceNoteRecording: 5,
-            FeatureType.cloudSync: 10,
-            FeatureType.folders: 3,
-            FeatureType.attachments: 10,
+            // Core features with limits
+            FeatureType.noteCreation: 50,         // 50 notes per month
+            FeatureType.voiceNoteRecording: 5,    // 5 recordings per month (2min each)
+            FeatureType.folders: 3,               // 3 folders maximum
+            FeatureType.attachments: 10,          // 10 attachments per month
+            FeatureType.cloudSync: 10,            // 10 syncs per month
+            FeatureType.cloudStorage: 100,        // 100MB cloud storage (in MB)
+            
+            // Available basic features
+            FeatureType.localBackup: -1,          // Unlimited local backup
+            FeatureType.basicExport: -1,          // Basic text export only
+            FeatureType.localExportImport: -1,    // Local file system access
+            FeatureType.doodling: -1,             // Basic doodling allowed
           },
           unavailableFeatures: {
+            // Premium-only features
             FeatureType.advancedDrawing,
+            FeatureType.canvasLayers,
+            FeatureType.voiceTranscription,
+            FeatureType.ocrTextExtraction,
             FeatureType.advancedExport,
+            FeatureType.cloudExportImport,
+            FeatureType.customThemes,
+            FeatureType.adRemoval,
+            FeatureType.analyticsInsights,
+            FeatureType.prioritySupport,
+            
+            // Pro-only features
+            FeatureType.apiAccess,
+            FeatureType.advancedSearch,
+            FeatureType.automatedBackup,
+            FeatureType.customExportTemplates,
+            FeatureType.advancedEncryption,
+            
+            // Enterprise-only features
+            FeatureType.teamWorkspace,
+            FeatureType.adminDashboard,
+            FeatureType.userManagement,
+            FeatureType.ssoIntegration,
+            FeatureType.auditLogs,
+            FeatureType.complianceFeatures,
+            FeatureType.customBranding,
+            FeatureType.dedicatedSupport,
           },
         );
       
       case UserTier.premium:
         return const FeatureLimits(
           limits: {
-            FeatureType.noteCreation: -1, // Unlimited
-            FeatureType.voiceNoteRecording: 100,
-            FeatureType.advancedDrawing: -1,
-            FeatureType.cloudSync: -1,
-            FeatureType.advancedExport: 20,
+            // Unlimited core features
+            FeatureType.noteCreation: -1,
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.cloudStorage: 1024,       // 1GB cloud storage (in MB)
+            
+            // Voice features with premium limits
+            FeatureType.voiceNoteRecording: 100,  // 100 recordings per month (10min each)
+            FeatureType.voiceTranscription: -1,   // Unlimited transcription
+            
+            // Visual features
+            FeatureType.advancedDrawing: -1,
+            FeatureType.canvasLayers: -1,
+            FeatureType.doodling: -1,
+            
+            // Content features
+            FeatureType.imageAttachments: -1,
+            FeatureType.fileAttachments: -1,
+            FeatureType.ocrTextExtraction: -1,
+            
+            // Export and backup
+            FeatureType.basicExport: -1,
+            FeatureType.advancedExport: -1,       // PDF, DOCX, Markdown
+            FeatureType.localExportImport: -1,
+            FeatureType.cloudExportImport: -1,
+            FeatureType.localBackup: -1,
+            
+            // Premium features
+            FeatureType.adRemoval: -1,
+            FeatureType.customThemes: -1,
+            FeatureType.prioritySupport: -1,
+          },
+          unavailableFeatures: {
+            // Pro-only features
+            FeatureType.analyticsInsights,
+            FeatureType.apiAccess,
+            FeatureType.advancedSearch,
+            FeatureType.automatedBackup,
+            FeatureType.customExportTemplates,
+            FeatureType.advancedEncryption,
+            
+            // Enterprise-only features
+            FeatureType.teamWorkspace,
+            FeatureType.adminDashboard,
+            FeatureType.userManagement,
+            FeatureType.ssoIntegration,
+            FeatureType.auditLogs,
+            FeatureType.complianceFeatures,
+            FeatureType.customBranding,
+            FeatureType.dedicatedSupport,
           },
         );
       
       case UserTier.pro:
         return const FeatureLimits(
           limits: {
+            // Everything from Premium unlimited
             FeatureType.noteCreation: -1,
-            FeatureType.voiceNoteRecording: -1,
-            FeatureType.advancedDrawing: -1,
-            FeatureType.cloudSync: -1,
-            FeatureType.advancedExport: -1,
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.cloudStorage: 10240,      // 10GB cloud storage (in MB)
+            
+            // Voice features - Pro gets unlimited with longer recordings
+            FeatureType.voiceNoteRecording: -1,   // Unlimited (30min each)
+            FeatureType.voiceTranscription: -1,
+            
+            // All visual features
+            FeatureType.advancedDrawing: -1,
+            FeatureType.canvasLayers: -1,
+            FeatureType.doodling: -1,
+            
+            // All content features
+            FeatureType.imageAttachments: -1,
+            FeatureType.fileAttachments: -1,
+            FeatureType.ocrTextExtraction: -1,
+            
+            // All export and backup
+            FeatureType.basicExport: -1,
+            FeatureType.advancedExport: -1,
+            FeatureType.localExportImport: -1,
+            FeatureType.cloudExportImport: -1,
+            FeatureType.localBackup: -1,
+            FeatureType.automatedBackup: -1,
+            
+            // All premium features
+            FeatureType.adRemoval: -1,
+            FeatureType.customThemes: -1,
+            FeatureType.prioritySupport: -1,
+            
+            // Pro-exclusive features
+            FeatureType.analyticsInsights: -1,
+            FeatureType.apiAccess: -1,
+            FeatureType.advancedSearch: -1,
+            FeatureType.customExportTemplates: -1,
+            FeatureType.advancedEncryption: -1,
+          },
+          unavailableFeatures: {
+            // Enterprise-only features
+            FeatureType.teamWorkspace,
+            FeatureType.adminDashboard,
+            FeatureType.userManagement,
+            FeatureType.ssoIntegration,
+            FeatureType.auditLogs,
+            FeatureType.complianceFeatures,
+            FeatureType.customBranding,
+            FeatureType.dedicatedSupport,
           },
         );
       
       case UserTier.enterprise:
-        // Enterprise has unlimited everything + future team/collaboration features
         return const FeatureLimits(
           limits: {
+            // Everything from Pro unlimited
             FeatureType.noteCreation: -1,
-            FeatureType.voiceNoteRecording: -1,
-            FeatureType.advancedDrawing: -1,
-            FeatureType.cloudSync: -1,
-            FeatureType.advancedExport: -1,
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
-            // TODO: Add team features when implemented:
-            // FeatureType.teamWorkspace: -1,
-            // FeatureType.adminDashboard: -1,
-            // FeatureType.ssoIntegration: -1,
-            // FeatureType.auditLogs: -1,
-            // FeatureType.customBranding: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.cloudStorage: -1,         // Unlimited cloud storage
+            
+            // Voice features
+            FeatureType.voiceNoteRecording: -1,
+            FeatureType.voiceTranscription: -1,
+            
+            // All visual features
+            FeatureType.advancedDrawing: -1,
+            FeatureType.canvasLayers: -1,
+            FeatureType.doodling: -1,
+            
+            // All content features
+            FeatureType.imageAttachments: -1,
+            FeatureType.fileAttachments: -1,
+            FeatureType.ocrTextExtraction: -1,
+            
+            // All export and backup
+            FeatureType.basicExport: -1,
+            FeatureType.advancedExport: -1,
+            FeatureType.localExportImport: -1,
+            FeatureType.cloudExportImport: -1,
+            FeatureType.localBackup: -1,
+            FeatureType.automatedBackup: -1,
+            
+            // All premium and pro features
+            FeatureType.adRemoval: -1,
+            FeatureType.customThemes: -1,
+            FeatureType.prioritySupport: -1,
+            FeatureType.analyticsInsights: -1,
+            FeatureType.apiAccess: -1,
+            FeatureType.advancedSearch: -1,
+            FeatureType.customExportTemplates: -1,
+            FeatureType.advancedEncryption: -1,
+            
+            // Enterprise-exclusive features
+            FeatureType.teamWorkspace: -1,
+            FeatureType.adminDashboard: -1,
+            FeatureType.userManagement: -1,
+            FeatureType.ssoIntegration: -1,
+            FeatureType.auditLogs: -1,
+            FeatureType.complianceFeatures: -1,
+            FeatureType.customBranding: -1,
+            FeatureType.dedicatedSupport: -1,
           },
         );
     }
@@ -388,9 +595,13 @@ class PricingInfo {
         billingPeriod: 'forever',
         features: [
           '50 notes per month',
-          '5 voice recordings',
-          '3 folders',
-          'Basic sync',
+          '5 voice recordings (2min each)',
+          '3 folders maximum',
+          '10 attachments per month',
+          'Basic doodling and canvas',
+          'Local export/import',
+          '100MB cloud storage',
+          '10 cloud syncs per month',
         ],
       ),
       const PricingInfo(
@@ -399,10 +610,15 @@ class PricingInfo {
         price: '\$1.99',
         billingPeriod: 'month',
         features: [
-          'Unlimited notes',
-          '100 voice recordings',
-          'Advanced drawing tools',
-          'Premium export formats',
+          'Unlimited notes and folders',
+          '100 voice recordings (10min each)',
+          'Voice note transcription',
+          'Advanced drawing tools & layers',
+          'OCR text extraction',
+          'All export formats (PDF, DOCX)',
+          'Cloud export/import',
+          '1GB cloud storage',
+          'Custom themes',
           'No ads',
         ],
       ),
@@ -413,10 +629,15 @@ class PricingInfo {
         billingPeriod: 'month',
         features: [
           'Everything in Premium',
-          'Unlimited voice recordings',
+          'Unlimited voice recordings (30min each)',
+          'Advanced search with OCR',
+          'Usage analytics & insights',
+          'Automated backup scheduling',
+          'Custom export templates',
+          'Advanced encryption options',
+          'API access for integrations',
+          '10GB cloud storage',
           'Priority support',
-          'Advanced analytics',
-          'Extended storage',
         ],
       ),
       const PricingInfo(
@@ -427,11 +648,14 @@ class PricingInfo {
         features: [
           'Everything in Pro',
           'Team workspace management',
-          'Admin dashboard',
+          'Admin dashboard & user management',
+          'Advanced sharing & permissions',
           'SSO integration',
-          'Audit logs & compliance',
-          'Custom branding',
-          'Dedicated support',
+          'Audit logs & compliance features',
+          'Custom branding options',
+          'Unlimited cloud storage',
+          'Dedicated account manager',
+          'SLA guarantees',
         ],
       ),
     ];

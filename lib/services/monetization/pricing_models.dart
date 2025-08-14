@@ -7,8 +7,13 @@ import 'monetization_service.dart';
 
 /// Regions for pricing localization
 enum Region {
-  base,   // Base market (USD): Premium $1.99, Pro $2.99, Enterprise $2.00/user
-  africa, // Africa region: Premium $0.99, Pro $1.99, Enterprise $1.00/user
+  base,       // Base market (USD): Premium $1.99, Pro $2.99, Enterprise $2.00/user
+  africa,     // Africa region: Premium $0.99, Pro $1.99, Enterprise $1.00/user  
+  asia,       // Asia region: Premium $1.49, Pro $2.49, Enterprise $1.50/user
+  europe,     // Europe region: Premium $2.49, Pro $3.49, Enterprise $2.50/user
+  latinAmerica, // Latin America: Premium $1.29, Pro $2.29, Enterprise $1.30/user
+  india,      // India region: Premium $0.79, Pro $1.49, Enterprise $0.80/user
+  eastEurope, // Eastern Europe: Premium $1.19, Pro $1.99, Enterprise $1.20/user
 }
 
 /// Plan terms for different subscription periods
@@ -92,12 +97,50 @@ class PricingService {
     UserTier.enterprise: 2.00, // per user
   };
 
-  // Africa region monthly prices in USD
-  static const Map<UserTier, double> _africaPrices = {
-    UserTier.free: 0.0,
-    UserTier.premium: 0.99,
-    UserTier.pro: 1.99, // Recalculated from $2.00 to $1.99
-    UserTier.enterprise: 1.00, // per user
+  // Regional pricing maps in USD
+  static const Map<Region, Map<UserTier, double>> _regionalPrices = {
+    Region.base: {
+      UserTier.free: 0.0,
+      UserTier.premium: 1.99,
+      UserTier.pro: 2.99,
+      UserTier.enterprise: 2.00,
+    },
+    Region.africa: {
+      UserTier.free: 0.0,
+      UserTier.premium: 0.99,
+      UserTier.pro: 1.99,
+      UserTier.enterprise: 1.00,
+    },
+    Region.asia: {
+      UserTier.free: 0.0,
+      UserTier.premium: 1.49,
+      UserTier.pro: 2.49,
+      UserTier.enterprise: 1.50,
+    },
+    Region.europe: {
+      UserTier.free: 0.0,
+      UserTier.premium: 2.49,
+      UserTier.pro: 3.49,
+      UserTier.enterprise: 2.50,
+    },
+    Region.latinAmerica: {
+      UserTier.free: 0.0,
+      UserTier.premium: 1.29,
+      UserTier.pro: 2.29,
+      UserTier.enterprise: 1.30,
+    },
+    Region.india: {
+      UserTier.free: 0.0,
+      UserTier.premium: 0.79,
+      UserTier.pro: 1.49,
+      UserTier.enterprise: 0.80,
+    },
+    Region.eastEurope: {
+      UserTier.free: 0.0,
+      UserTier.premium: 1.19,
+      UserTier.pro: 1.99,
+      UserTier.enterprise: 1.20,
+    },
   };
 
   /// Get pricing plan for specific tier, term, and region
@@ -116,9 +159,7 @@ class PricingService {
     }
 
     // Get base monthly price for region
-    final monthlyPrice = region == Region.africa 
-        ? _africaPrices[tier]! 
-        : _basePrices[tier]!;
+    final monthlyPrice = _regionalPrices[region]?[tier] ?? _basePrices[tier]!;
 
     // Calculate price based on term
     double finalPrice;
@@ -152,44 +193,55 @@ class PricingService {
   static double _calculateAnnualPrice(double monthlyPrice) {
     final discountedPrice = monthlyPrice * 12 * 0.8;
     
-    // Round to .99 endings based on the calculated values from requirements
-    if (discountedPrice <= 10) {
-      return 9.99; // Africa Premium
-    } else if (discountedPrice <= 20) {
-      return 19.99; // Premium, Africa Pro, Enterprise per-user
-    } else if (discountedPrice <= 30) {
-      return 29.99; // Pro
+    // Regional-aware pricing with .99 endings
+    if (discountedPrice <= 7.5) {        // India, Very low-tier regions
+      return 7.99;
+    } else if (discountedPrice <= 10) {   // Africa Premium, India Pro
+      return 9.99;
+    } else if (discountedPrice <= 14) {   // East Europe Premium, Latin America Pro
+      return 11.99;
+    } else if (discountedPrice <= 20) {   // Premium base/asia, Africa/India Pro, Enterprise per-user
+      return 19.99;
+    } else if (discountedPrice <= 24) {   // Asia Pro
+      return 23.99;
+    } else if (discountedPrice <= 30) {   // Pro base
+      return 29.99;
+    } else if (discountedPrice <= 34) {   // Europe Pro
+      return 33.99;
     }
     
-    // Fallback to calculated value for edge cases
-    return double.parse(discountedPrice.toStringAsFixed(2));
+    // For higher prices, round to nearest .99
+    return (discountedPrice / 5).round() * 5 - 0.01;
   }
 
   /// Calculate lifetime price (~3.2x monthly*12) with psychological endings
   static double _calculateLifetimePrice(double monthlyPrice) {
     final baseLifetime = monthlyPrice * 12 * 3.2;
     
-    // Specific values from requirements
-    if (monthlyPrice == 1.99) { // Premium base
-      return 74.99;
-    } else if (monthlyPrice == 2.99) { // Pro base
-      return 114.99;
-    } else if (monthlyPrice == 0.99) { // Africa Premium
+    // Regional-aware lifetime pricing with psychological endings
+    if (monthlyPrice <= 0.8) {           // India Premium
+      return 29.99;
+    } else if (monthlyPrice <= 1.0) {    // Africa Premium  
       return 37.99;
-    } else if (monthlyPrice == 1.99 && monthlyPrice == 1.99) { // Africa Pro (also $1.99)
+    } else if (monthlyPrice <= 1.2) {    // East Europe Premium
+      return 45.99;
+    } else if (monthlyPrice <= 1.3) {    // Latin America Premium
+      return 49.99;
+    } else if (monthlyPrice <= 1.5) {    // Asia Premium, India Pro
+      return 59.99;
+    } else if (monthlyPrice <= 2.0) {    // Premium base, Africa/East Europe Pro
       return 74.99;
+    } else if (monthlyPrice <= 2.3) {    // Latin America Pro
+      return 87.99;
+    } else if (monthlyPrice <= 2.5) {    // Asia Pro
+      return 94.99;
+    } else if (monthlyPrice <= 3.0) {    // Pro base
+      return 114.99;
+    } else if (monthlyPrice <= 3.5) {    // Europe Pro
+      return 134.99;
     }
     
-    // Fallback calculation with .99 or .49 endings
-    if (baseLifetime < 50) {
-      return 37.99;
-    } else if (baseLifetime < 80) {
-      return 74.99;
-    } else if (baseLifetime < 120) {
-      return 114.99;
-    }
-    
-    // Round to nearest .99
+    // For edge cases, use calculated value with .99 ending
     return (baseLifetime / 10).round() * 10 - 0.01;
   }
 
@@ -278,9 +330,12 @@ class LegacyPricingInfo {
         billingPeriod: 'forever',
         features: [
           '50 notes per month',
-          '5 voice recordings',
-          '3 folders',
-          'Basic sync',
+          '5 voice recordings (2min each)',
+          '3 folders maximum',
+          '10 attachments per month',
+          'Basic doodling and canvas',
+          'Local export/import',
+          '100MB cloud storage',
         ],
       ),
       const LegacyPricingInfo(
@@ -289,10 +344,14 @@ class LegacyPricingInfo {
         price: '\$1.99',
         billingPeriod: 'month',
         features: [
-          'Unlimited notes',
-          '100 voice recordings',
-          'Advanced drawing tools',
-          'Premium export formats',
+          'Unlimited notes and folders',
+          '100 voice recordings (10min each)',
+          'Voice note transcription',
+          'Advanced drawing tools & layers',
+          'OCR text extraction',
+          'All export formats (PDF, DOCX)',
+          'Cloud export/import',
+          '1GB cloud storage',
           'No ads',
         ],
       ),
@@ -303,10 +362,15 @@ class LegacyPricingInfo {
         billingPeriod: 'month',
         features: [
           'Everything in Premium',
-          'Unlimited voice recordings',
+          'Unlimited voice recordings (30min each)',
+          'Advanced search with OCR',
+          'Usage analytics & insights',
+          'Automated backup scheduling',
+          'Custom export templates',
+          'Advanced encryption options',
+          'API access for integrations',
+          '10GB cloud storage',
           'Priority support',
-          'Advanced analytics',
-          'Extended storage',
         ],
       ),
       const LegacyPricingInfo(
@@ -317,11 +381,14 @@ class LegacyPricingInfo {
         features: [
           'Everything in Pro',
           'Team workspace management',
-          'Admin dashboard',
+          'Admin dashboard & user management',
+          'Advanced sharing & permissions',
           'SSO integration',
-          'Audit logs & compliance',
-          'Custom branding',
-          'Dedicated support',
+          'Audit logs & compliance features',
+          'Custom branding options',
+          'Unlimited cloud storage',
+          'Dedicated account manager',
+          'SLA guarantees',
         ],
       ),
     ];

@@ -5,6 +5,12 @@ import 'package:quicknote_pro/services/monetization/monetization_service.dart';
 void main() {
   group('PricingService', () {
     test('should return correct base monthly prices', () {
+      final freePlan = PricingService.getPlan(
+        tier: UserTier.free, 
+        term: PlanTerm.monthly,
+      );
+      expect(freePlan.basePrice, 0.0);
+      
       final premiumPlan = PricingService.getPlan(
         tier: UserTier.premium, 
         term: PlanTerm.monthly,
@@ -23,6 +29,48 @@ void main() {
       );
       expect(enterprisePlan.basePrice, 2.00);
       expect(enterprisePlan.perUser, true);
+    });
+
+    test('should return correct regional pricing for all regions', () {
+      // Test Asia region
+      final asiaPremium = PricingService.getPlan(
+        tier: UserTier.premium, 
+        term: PlanTerm.monthly,
+        region: Region.asia,
+      );
+      expect(asiaPremium.basePrice, 1.49);
+      
+      // Test Europe region
+      final europePremium = PricingService.getPlan(
+        tier: UserTier.premium, 
+        term: PlanTerm.monthly,
+        region: Region.europe,
+      );
+      expect(europePremium.basePrice, 2.49);
+      
+      // Test Latin America region
+      final latinAmericaPremium = PricingService.getPlan(
+        tier: UserTier.premium, 
+        term: PlanTerm.monthly,
+        region: Region.latinAmerica,
+      );
+      expect(latinAmericaPremium.basePrice, 1.29);
+      
+      // Test India region
+      final indiaPremium = PricingService.getPlan(
+        tier: UserTier.premium, 
+        term: PlanTerm.monthly,
+        region: Region.india,
+      );
+      expect(indiaPremium.basePrice, 0.79);
+      
+      // Test Eastern Europe region
+      final eastEuropePremium = PricingService.getPlan(
+        tier: UserTier.premium, 
+        term: PlanTerm.monthly,
+        region: Region.eastEurope,
+      );
+      expect(eastEuropePremium.basePrice, 1.19);
     });
 
     test('should return correct Africa region monthly prices', () {

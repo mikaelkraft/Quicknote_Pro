@@ -31,23 +31,64 @@ void main() {
     test('should enforce feature limits for free tier', () {
       expect(monetizationService.isFeatureAvailable(FeatureType.noteCreation), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.cloudExportImport), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.basicExport), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.localExportImport), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.doodling), true);
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
-    test('should allow all features for premium tier', () {
+    test('should allow premium features for premium tier', () {
       monetizationService.setUserTier(UserTier.premium);
       
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.cloudExportImport), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.customThemes), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.adRemoval), true);
+      
+      // Pro-only features should still be unavailable
+      expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), false);
+      
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
     });
 
-    test('should allow all features for enterprise tier', () {
+    test('should allow all pro features for pro tier', () {
+      monetizationService.setUserTier(UserTier.pro);
+      
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedSearch), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.automatedBackup), true);
+      
+      // Enterprise-only features should still be unavailable
+      expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), false);
+      
+      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
+      expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
+    });
+
+    test('should allow all enterprise features for enterprise tier', () {
       monetizationService.setUserTier(UserTier.enterprise);
       
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), true);
+      
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.noteCreation), true);
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
+      expect(monetizationService.canUseFeature(FeatureType.teamWorkspace), true);
     });
 
     test('should track feature usage correctly', () async {
