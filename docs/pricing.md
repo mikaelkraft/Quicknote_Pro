@@ -82,6 +82,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **Drawing**: Basic doodling and canvas tools
 - **Export**: Basic text export only
 - **Storage & Sync**: Local storage and file system access only
+- **Device Sync**: Manual import/export between devices (local files only)
 - **Ads**: Yes (with frequency caps)
 
 #### Restrictions
@@ -90,6 +91,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - No OCR text extraction from images
 - No premium export formats (PDF, DOCX, Markdown)
 - No cloud sync or storage capabilities
+- No automatic device sync (manual import/export only)
 - No custom themes
 - Local storage and export/import only
 
@@ -108,11 +110,12 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **OCR**: Text extraction from images and scanned documents
 - **Export**: All formats (PDF, DOCX, Markdown, HTML)
 - **Storage & Sync**: Cloud sync capabilities (storage managed by your cloud provider)
+- **Device Sync**: Automatic sync across up to 3 devices
 - **Themes**: Custom themes and dark mode
 - **Ads**: Completely removed
 
 #### Additional Benefits
-- Priority cloud sync
+- Priority cloud sync with automatic device synchronization
 - Email support
 - Advanced canvas tools with layers
 - Voice note transcription with timestamps
@@ -134,6 +137,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **Encryption**: Advanced encryption options for sensitive notes
 - **API Access**: Integration capabilities with third-party apps
 - **Storage & Sync**: Enhanced cloud sync capabilities (storage managed by your cloud provider)
+- **Device Sync**: Automatic sync across up to 10 devices
 - **Support**: Phone and email priority support
 
 #### Exclusive Features
@@ -157,6 +161,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - ✅ **Compliance**: Audit logs, data residency, and compliance features
 - ✅ **Branding**: Custom branding options and white-label capabilities
 - ✅ **Storage & Sync**: Enterprise cloud sync capabilities (storage managed by your organization's cloud provider)
+- ✅ **Device Sync**: Unlimited device sync across your organization
 - ✅ **Support**: Dedicated account manager and priority support
 - ✅ **SLA**: Service level agreements and uptime guarantees
 - ✅ **Integrations**: Custom integrations and enterprise connectors
@@ -169,6 +174,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - Audit logs and compliance reporting
 - Custom branding and white-label options
 - Enterprise cloud sync capabilities (storage managed by organization's cloud provider)
+- Unlimited device synchronization across organization
 - Dedicated account management
 - Custom deployment options (cloud, on-premise, hybrid)
 

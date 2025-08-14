@@ -34,6 +34,7 @@ void main() {
       expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), false);
       expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), false);
       expect(monetizationService.isFeatureAvailable(FeatureType.cloudExportImport), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), false);
       expect(monetizationService.isFeatureAvailable(FeatureType.basicExport), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.localExportImport), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.doodling), true);
@@ -47,6 +48,7 @@ void main() {
       expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.cloudExportImport), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.customThemes), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.adRemoval), true);
       
@@ -134,6 +136,24 @@ void main() {
       }
       
       expect(monetizationService.getRemainingUsage(FeatureType.noteCreation), 5);
+    });
+
+    test('should handle device sync limits correctly', () async {
+      // Free tier: device sync not available
+      expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), false);
+      
+      // Premium tier: 3 device sync limit
+      await monetizationService.setUserTier(UserTier.premium);
+      expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), true);
+      expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), 3);
+      
+      // Pro tier: 10 device sync limit
+      await monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), 10);
+      
+      // Enterprise tier: unlimited device sync
+      await monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), -1);
     });
 
     test('should show upgrade prompt when feature limit is reached', () async {

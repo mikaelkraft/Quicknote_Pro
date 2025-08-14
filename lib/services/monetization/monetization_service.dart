@@ -260,13 +260,14 @@ class MonetizationService extends ChangeNotifier {
           'Extended drawing tools',
           'Premium export formats',
           'Priority cloud sync',
+          'Automatic device sync (3 devices)',
           'No ads',
         ];
       case UserTier.premium:
         return [
           'All premium features',
           'Advanced analytics',
-          'Extended storage',
+          'Extended device sync (10 devices)',
           'Priority support',
         ];
       case UserTier.pro:
@@ -359,6 +360,7 @@ enum FeatureType {
   // Sync and storage
   cloudSync,
   cloudStorage,
+  deviceSync,       // Automatic sync between devices
   localBackup,
   
   // Export and import
@@ -429,6 +431,7 @@ class FeatureLimits {
             FeatureType.cloudExportImport,
             FeatureType.cloudSync,
             FeatureType.cloudStorage,
+            FeatureType.deviceSync,
             FeatureType.customThemes,
             FeatureType.adRemoval,
             FeatureType.analyticsInsights,
@@ -461,6 +464,7 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
+            FeatureType.deviceSync: 3,               // 3 device sync limit
             
             // Voice features with premium limits
             FeatureType.voiceNoteRecording: 100,  // 100 recordings per month (10min each)
@@ -517,6 +521,7 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
+            FeatureType.deviceSync: 10,              // 10 device sync limit
             
             // Voice features - Pro gets unlimited with longer recordings
             FeatureType.voiceNoteRecording: -1,   // Unlimited (30min each)
@@ -573,6 +578,7 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
+            FeatureType.deviceSync: -1,             // Unlimited device sync
             
             // Voice features
             FeatureType.voiceNoteRecording: -1,
