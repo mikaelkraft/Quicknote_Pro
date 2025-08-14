@@ -4,6 +4,7 @@ import '../analytics/analytics_service.dart';
 import 'referral_service.dart';
 import 'coupon_service.dart';
 import 'trial_service.dart';
+import '../../l10n/localization.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 /// 
@@ -724,6 +725,88 @@ class PricingInfo {
           'Everything in Pro',
           'Team workspace management',
           'Admin dashboard & user management',
+          'Advanced sharing & permissions',
+          'SSO integration',
+          'Audit logs & compliance features',
+          'Custom branding options',
+          'Enterprise cloud sync capabilities',
+          'Dedicated account manager',
+          'SLA guarantees',
+        ],
+      ),
+    ];
+  }
+
+  /// Get pricing info for all tiers with localized strings
+  /// This version uses localized display names and feature descriptions
+  static List<PricingInfo> getAllTiersLocalized([LocalizationService? localization]) {
+    final l10n = localization ?? LocalizationService.instance;
+    
+    return [
+      PricingInfo(
+        tier: UserTier.free,
+        displayName: l10n.pricingFree,
+        price: '\$0',
+        billingPeriod: 'forever',
+        hasTrial: false,
+        features: [
+          '50 notes per month',
+          '5 voice recordings (2min each)',
+          '3 folders maximum',
+          '10 attachments per month',
+          'Basic doodling and canvas',
+          'Local export/import only',
+        ],
+      ),
+      PricingInfo(
+        tier: UserTier.premium,
+        displayName: l10n.pricingPremium,
+        price: '\$1.99',
+        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        hasTrial: true,
+        trialDays: 7,
+        features: [
+          l10n.featureUnlimitedNotes,
+          '100 voice recordings (10min each)',
+          l10n.featureVoiceTranscription,
+          l10n.featureAdvancedDrawingTools,
+          'OCR text extraction',
+          'All export formats (PDF, DOCX)',
+          'Cloud sync capabilities',
+          'Custom themes',
+          l10n.featureNoAds,
+        ],
+      ),
+      PricingInfo(
+        tier: UserTier.pro,
+        displayName: l10n.pricingPro,
+        price: '\$2.99',
+        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        hasTrial: true,
+        trialDays: 14,
+        features: [
+          'Everything in ${l10n.pricingPremium}',
+          'Unlimited voice recordings (30min each)',
+          'Advanced search with OCR',
+          'Usage analytics & insights',
+          'Automated backup scheduling',
+          'Custom export templates',
+          'Advanced encryption options',
+          'API access for integrations',
+          'Enhanced cloud sync capabilities',
+          l10n.featurePrioritySupport,
+        ],
+      ),
+      PricingInfo(
+        tier: UserTier.enterprise,
+        displayName: l10n.pricingEnterprise,
+        price: '\$2.00',
+        billingPeriod: '${l10n.planTermPerUser.toLowerCase()}/${l10n.planTermMonthly.toLowerCase()}',
+        hasTrial: false,
+        features: [
+          'Everything in ${l10n.pricingPro}',
+          'Team workspace management',
+          l10n.featureAdminControls,
           'Advanced sharing & permissions',
           'SSO integration',
           'Audit logs & compliance features',

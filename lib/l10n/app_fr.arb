@@ -1,0 +1,44 @@
+{
+  "@@locale": "fr",
+  "@@last_modified": "2024-01-01T00:00:00.000Z",
+  
+  "@_TODO": "French translations are placeholders - need proper localization",
+  
+  "@_PRICING_TIERS": {},
+  "pricing_free": "Gratuit",
+  "pricing_premium": "Premium",
+  "pricing_pro": "Pro", 
+  "pricing_enterprise": "Entreprise",
+
+  "@_PLAN_TERMS": {},
+  "planTerm_monthly": "Mensuel",
+  "planTerm_annual": "Annuel",
+  "planTerm_lifetime": "À vie",
+  "planTerm_perUser": "Par utilisateur",
+  "planTerm_save20": "Économiser 20%",
+
+  "@_ACTION_TERMS": {},
+  "action_upgradeNow": "Mettre à niveau maintenant",
+  "action_startFreeTrial": "Commencer l'essai gratuit",
+  "action_restorePurchase": "Restaurer l'achat",
+  "action_continue": "Continuer",
+  "action_cancel": "Annuler",
+  "pricing_pricePerUser": "Prix par utilisateur",
+  "pricing_teamPlan": "Plan d'équipe",
+
+  "@_FEATURE_HIGHLIGHTS": {},
+  "feature_unlimitedNotes": "Notes illimitées",
+  "feature_advancedDrawingTools": "Outils de dessin avancés",
+  "feature_voiceTranscription": "Transcription vocale",
+  "feature_collaboration": "Collaboration",
+  "feature_adminControls": "Contrôles d'administration",
+  "feature_noAds": "Sans publicité",
+  "feature_prioritySupport": "Support prioritaire",
+
+  "@_BASIC_APP_STRINGS": {},
+  "app_notes": "Notes",
+  "app_newNote": "Nouvelle note",
+  "app_delete": "Supprimer",
+  "app_edit": "Modifier",
+  "app_settings": "Paramètres"
+}
