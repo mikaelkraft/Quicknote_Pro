@@ -48,8 +48,8 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - ✅ Priority email support
 
 #### Premium Limitations
-- 📱 Up to 3 devices
-- 💾 1GB cloud storage
+- 📱 Up to 3 devices for automatic sync
+- 💾 Cloud sync capabilities (storage managed by user's cloud provider)
 - 🔄 Basic backup (weekly)
 - 🎙️ Voice transcription in English only
 
@@ -59,7 +59,7 @@ This document defines the subscription tiers, feature limitations, and pricing m
 **Core Value**: Advanced features and unlimited usage
 
 #### Everything in Premium, Plus:
-- ✅ Unlimited devices and cloud storage
+- ✅ Unlimited devices and cloud sync capabilities
 - ✅ Voice recording unlimited duration
 - ✅ Multi-language voice transcription (20+ languages)
 - ✅ Advanced doodle tools (layers, advanced brushes, vector tools)
@@ -89,14 +89,25 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ## Feature Limits and Restrictions
 
-### Storage Limits
-| Feature | Free | Pro | Premium | Enterprise |
-|---------|------|-----|---------|------------|
-| Local Storage | Unlimited | Unlimited | Unlimited | Unlimited |
-| Cloud Storage | - | 1GB | Unlimited | Unlimited |
-| Voice Notes | 2 min/note | 15 min/note | Unlimited | Unlimited |
-| Images per Note | 5 | 20 | Unlimited | Unlimited |
-| Total Notes | Unlimited | Unlimited | Unlimited | Unlimited |
+## 📁 User-Managed Cloud Storage Strategy
+
+**Sustainable and flexible storage approach:**
+- **Free Tier**: Local storage and file system access only - users save/import from device storage
+- **Paid Tiers**: Cloud sync capabilities enabled - storage managed by user's cloud provider (Google Drive, iCloud, Dropbox, etc.)
+- **No Storage Promises**: App handles sync possibility, not storage limits - removes infrastructure costs and scaling concerns
+- **User Control**: Storage limits determined by user's existing cloud service subscriptions
+
+This approach eliminates the need for the app to promise specific storage amounts while providing powerful cloud sync capabilities for paid users.
+
+### Storage and Sync Strategy
+| Feature | Free | Premium | Pro | Enterprise |
+|---------|------|---------|-----|------------|
+| Local Storage | ✅ Unlimited | ✅ Unlimited | ✅ Unlimited | ✅ Unlimited |
+| Cloud Sync | ❌ Manual export/import only | ✅ Up to 3 devices | ✅ Up to 10 devices | ✅ Unlimited devices |
+| Storage Management | User's device storage | User's cloud provider | User's cloud provider | User's cloud provider |
+| Voice Notes | 2 min/note, 5 total | 10 min/note, 100 total | 30 min/note, unlimited | Unlimited |
+| Images per Note | 5 | 100 | Unlimited | Unlimited |
+| Total Notes | 50/month | Unlimited | Unlimited | Unlimited |
 
 ### Device and Sync
 | Feature | Free | Pro | Premium | Enterprise |
@@ -126,11 +137,12 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - **Feature Trials**: 24-hour trial of specific premium features
 
 ### Upgrade Triggers
-1. **Storage Limit**: Prompt when approaching cloud storage limit
-2. **Device Limit**: Suggest upgrade when trying to sync 4th device
-3. **Voice Limit**: Offer transcription when voice note >2 minutes
-4. **Export Limit**: Promote Pro when trying to export to PDF
-5. **Search Limit**: Highlight advanced search when basic search fails
+1. **Device Sync Limit**: Prompt when trying to sync beyond tier limit (4th device for Premium, 11th for Pro)
+2. **Note Limit**: Suggest upgrade when Free tier approaches 50 notes/month limit
+3. **Voice Limit**: Offer transcription when voice note exceeds tier limits
+4. **Export Limit**: Promote Pro when trying to export to advanced formats
+5. **Search Limit**: Highlight advanced search when basic search insufficient
+6. **Feature Access**: Show premium features during trials and suggest upgrade
 
 ### Promotional Strategies
 - **Student Discount**: 50% off for verified students
@@ -193,11 +205,15 @@ class EntitlementService {
   static bool canUseFeature(String feature, UserTier tier) {
     switch (feature) {
       case 'voice_transcription':
-        return tier.isPro || tier.isPremium;
-      case 'unlimited_cloud_storage':
-        return tier.isPremium;
+        return tier.isPremium || tier.isPro || tier.isEnterprise;
+      case 'cloud_sync':
+        return tier.isPremium || tier.isPro || tier.isEnterprise;
+      case 'advanced_export':
+        return tier.isPro || tier.isEnterprise;
       case 'collaboration':
-        return tier.isPremium || tier.isEnterprise;
+        return tier.isPro || tier.isEnterprise;
+      case 'enterprise_features':
+        return tier.isEnterprise;
       default:
         return true; // Free features
     }
