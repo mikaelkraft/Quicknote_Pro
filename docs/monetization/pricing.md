@@ -28,9 +28,9 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - 📁 Maximum 5 folders
 - 🎯 Contextual ads displayed
 
-### Pro Tier
+### Premium Tier
 **Target**: Regular users, productivity enthusiasts, students
-**Price**: $1.90/month or $18.99/year (17% savings)
+**Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
 **Core Value**: Enhanced productivity and cross-device sync
 
 #### Everything in Free, Plus:
@@ -47,23 +47,22 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - ✅ Weekly automatic backups
 - ✅ Priority email support
 
-#### Pro Limitations
-- 📱 Up to 3 devices
-- 💾 1GB cloud storage
+#### Premium Limitations
+- 📱 Up to 3 devices for automatic sync
+- 💾 Cloud sync capabilities (storage managed by user's cloud provider)
 - 🔄 Basic backup (weekly)
 - 🎙️ Voice transcription in English only
 
-### Premium Tier
+### Pro Tier
 **Target**: Power users, professionals, content creators
-**Price**: $3.99/month or $39.99/year (17% savings)
+**Price**: $2.99/month, $29.99/year (20% savings), or $114.99 lifetime
 **Core Value**: Advanced features and unlimited usage
 
-#### Everything in Pro, Plus:
-- ✅ Unlimited devices and cloud storage
+#### Everything in Premium, Plus:
+- ✅ Unlimited devices and cloud sync capabilities
 - ✅ Voice recording unlimited duration
 - ✅ Multi-language voice transcription (20+ languages)
 - ✅ Advanced doodle tools (layers, advanced brushes, vector tools)
-- ✅ Collaboration features (shared notes, comments)
 - ✅ Advanced export options (PowerPoint, custom templates)
 - ✅ Real-time sync across all devices
 - ✅ Daily automatic backups with version history
@@ -90,14 +89,25 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ## Feature Limits and Restrictions
 
-### Storage Limits
-| Feature | Free | Pro | Premium | Enterprise |
-|---------|------|-----|---------|------------|
-| Local Storage | Unlimited | Unlimited | Unlimited | Unlimited |
-| Cloud Storage | - | 1GB | Unlimited | Unlimited |
-| Voice Notes | 2 min/note | 15 min/note | Unlimited | Unlimited |
-| Images per Note | 5 | 20 | Unlimited | Unlimited |
-| Total Notes | Unlimited | Unlimited | Unlimited | Unlimited |
+## 📁 User-Managed Cloud Storage Strategy
+
+**Sustainable and flexible storage approach:**
+- **Free Tier**: Local storage and file system access only - users save/import from device storage
+- **Paid Tiers**: Cloud sync capabilities enabled - storage managed by user's cloud provider (Google Drive, iCloud, Dropbox, etc.)
+- **No Storage Promises**: App handles sync possibility, not storage limits - removes infrastructure costs and scaling concerns
+- **User Control**: Storage limits determined by user's existing cloud service subscriptions
+
+This approach eliminates the need for the app to promise specific storage amounts while providing powerful cloud sync capabilities for paid users.
+
+### Storage and Sync Strategy
+| Feature | Free | Premium | Pro | Enterprise |
+|---------|------|---------|-----|------------|
+| Local Storage | ✅ Unlimited | ✅ Unlimited | ✅ Unlimited | ✅ Unlimited |
+| Cloud Sync | ❌ Manual export/import only | ✅ Up to 3 devices | ✅ Up to 10 devices | ✅ Unlimited devices |
+| Storage Management | User's device storage | User's cloud provider | User's cloud provider | User's cloud provider |
+| Voice Notes | 2 min/note, 5 total | 10 min/note, 100 total | 30 min/note, unlimited | Unlimited |
+| Images per Note | 5 | 100 | Unlimited | Unlimited |
+| Total Notes | 50/month | Unlimited | Unlimited | Unlimited |
 
 ### Device and Sync
 | Feature | Free | Pro | Premium | Enterprise |
@@ -127,15 +137,16 @@ This document defines the subscription tiers, feature limitations, and pricing m
 - **Feature Trials**: 24-hour trial of specific premium features
 
 ### Upgrade Triggers
-1. **Storage Limit**: Prompt when approaching cloud storage limit
-2. **Device Limit**: Suggest upgrade when trying to sync 4th device
-3. **Voice Limit**: Offer transcription when voice note >2 minutes
-4. **Export Limit**: Promote Pro when trying to export to PDF
-5. **Search Limit**: Highlight advanced search when basic search fails
+1. **Device Sync Limit**: Prompt when trying to sync beyond tier limit (4th device for Premium, 11th for Pro)
+2. **Note Limit**: Suggest upgrade when Free tier approaches 50 notes/month limit
+3. **Voice Limit**: Offer transcription when voice note exceeds tier limits
+4. **Export Limit**: Promote Pro when trying to export to advanced formats
+5. **Search Limit**: Highlight advanced search when basic search insufficient
+6. **Feature Access**: Show premium features during trials and suggest upgrade
 
 ### Promotional Strategies
 - **Student Discount**: 50% off for verified students
-- **Annual Discount**: 17% savings for annual subscriptions
+- **Annual Discount**: 20% savings for annual subscriptions
 - **Family Plan**: Pro for $2.99/month (up to 4 users)
 - **Loyalty Discount**: 10% off after 12 months of subscription
 - **Referral Program**: 1 month free for each successful referral
@@ -148,24 +159,25 @@ This document defines the subscription tiers, feature limitations, and pricing m
 
 ## Regional Pricing
 
-### Tier 1 Markets (USD Base)
-- **United States**: $1.90/$3.99
-- **Canada**: CAD $2.49/CAD $5.29
-- **United Kingdom**: £1.69/£3.59
-- **Australia**: AUD $2.89/AUD $5.99
-- **Germany**: €1.89/€3.79
+### Base Market (USD)
+| Tier | Monthly | Annual | Lifetime |
+|------|---------|--------|----------|
+| **Premium** | $1.99 | $19.99 | $74.99 |
+| **Pro** | $2.99 | $29.99 | $114.99 |
+| **Enterprise** | $2.00/user | $19.99/user | - |
 
-### Tier 2 Markets (30% Discount)
-- **Brazil**: $1.33/$2.79
-- **Mexico**: $1.33/$2.79
-- **Eastern Europe**: €1.33/€2.79
-- **South Korea**: $1.33/$2.79
+### Africa Region (USD)
+| Tier | Monthly | Annual | Lifetime |
+|------|---------|--------|----------|
+| **Premium** | $0.99 | $9.99 | $37.99 |
+| **Pro** | $1.99 | $19.99 | $74.99 |
+| **Enterprise** | $1.00/user | $9.99/user | - |
 
-### Tier 3 Markets (Special Pricing)
-- **India**: $0.95/$1.99
-- **Southeast Asia**: $0.95/$1.99
-- **South America**: $0.95/$1.99
-- **Africa**: $1.00/$1.99
+### Pricing Notes
+- **Annual Discount**: 20% savings on all annual plans
+- **Lifetime**: One-time purchase available for Premium and Pro only
+- **Enterprise**: Per-user pricing for team accounts
+- **Regional Pricing**: Africa region offers significant discounts to improve accessibility
 
 ### Currency Considerations
 - Local payment methods support
@@ -193,11 +205,15 @@ class EntitlementService {
   static bool canUseFeature(String feature, UserTier tier) {
     switch (feature) {
       case 'voice_transcription':
-        return tier.isPro || tier.isPremium;
-      case 'unlimited_cloud_storage':
-        return tier.isPremium;
+        return tier.isPremium || tier.isPro || tier.isEnterprise;
+      case 'cloud_sync':
+        return tier.isPremium || tier.isPro || tier.isEnterprise;
+      case 'advanced_export':
+        return tier.isPro || tier.isEnterprise;
       case 'collaboration':
-        return tier.isPremium || tier.isEnterprise;
+        return tier.isPro || tier.isEnterprise;
+      case 'enterprise_features':
+        return tier.isEnterprise;
       default:
         return true; // Free features
     }

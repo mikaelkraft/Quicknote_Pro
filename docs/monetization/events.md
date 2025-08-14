@@ -78,6 +78,12 @@ Fired when user initiates upgrade process.
   - `upgrade_context` (string): Where upgrade was initiated
   - `product_id` (string): Selected product ID
   - `price_tier` (string): Selected pricing tier
+  - `plan_term` (string): monthly|annual|lifetime
+  - `region` (string): base|africa
+  - `per_user` (boolean): Whether pricing is per-user (enterprise)
+  - `seats` (number): Number of seats for enterprise purchases
+  - `base_price` (number): Base price before regional adjustment
+  - `localized_price` (number): Final localized price
 
 #### `upgrade_completed`
 Fired when upgrade is successfully completed.
@@ -86,6 +92,30 @@ Fired when upgrade is successfully completed.
   - `price_tier` (string): Purchased pricing tier
   - `payment_method` (string): Payment method used
   - `transaction_id` (string): Transaction identifier
+  - `plan_term` (string): monthly|annual|lifetime
+  - `region` (string): base|africa
+  - `per_user` (boolean): Whether pricing is per-user (enterprise)
+  - `seats` (number): Number of seats for enterprise purchases
+  - `base_price` (number): Base price before regional adjustment
+  - `localized_price` (number): Final price paid
+
+**Example:**
+```json
+{
+  "event": "upgrade_completed",
+  "parameters": {
+    "product_id": "premium_annual_africa",
+    "price_tier": "premium",
+    "payment_method": "credit_card",
+    "transaction_id": "txn_abc123",
+    "plan_term": "annual",
+    "region": "africa",
+    "per_user": false,
+    "base_price": 19.99,
+    "localized_price": 9.99
+  }
+}
+```
 
 #### `upgrade_cancelled`
 Fired when user cancels upgrade process.
