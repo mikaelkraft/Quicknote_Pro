@@ -255,7 +255,7 @@ class ReferralService extends ChangeNotifier {
     _pendingRewards = rewardsJson.map<ReferralReward>((json) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.encodeComponent(json) as Map
+          jsonDecode(json) as Map
         );
         return ReferralReward(
           type: ReferralRewardType.values.firstWhere(
