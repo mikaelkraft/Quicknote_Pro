@@ -470,7 +470,13 @@ class ReferralService extends ChangeNotifier {
           'description': reward.description,
           'config': reward.config,
           'expires_at': reward.expiresAt?.toIso8601String(),
-        }.toString());
+        return Uri.encodeComponent(jsonEncode({
+          'type': reward.type.name,
+          'display_name': reward.displayName,
+          'description': reward.description,
+          'config': reward.config,
+          'expires_at': reward.expiresAt?.toIso8601String(),
+        }));
       }).toList();
       
       await _prefs!.setStringList(_pendingRewardsKey, rewardsJson);
