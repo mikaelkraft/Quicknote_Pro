@@ -322,3 +322,107 @@ All events are designed to be GDPR and privacy-compliant:
 - User IDs are anonymized
 - Analytics can be disabled by users
 - Events use Firebase's built-in privacy features
+
+## Planned Enhancements
+
+### User Locale Tracking (Future Phase)
+
+**Status**: Planned for implementation after initial localization infrastructure is deployed.
+
+**Objective**: Track user locale preferences to analyze monetization performance across different languages and regions.
+
+#### Planned Parameters
+
+All monetization events will be enhanced with the following locale-related parameters:
+
+```dart
+Map<String, dynamic> localeParams = {
+  'user_locale': 'es',           // User's current app locale (en, es, fr, de)
+  'device_locale': 'es_MX',      // Device system locale
+  'detected_region': 'latin_america',  // Auto-detected pricing region
+  'currency_preference': 'USD',   // User's preferred currency (future)
+};
+```
+
+#### Enhanced Event Examples
+
+**upgrade_completed with locale tracking**:
+```dart
+{
+  "event": "upgrade_completed",
+  "parameters": {
+    // Existing parameters
+    "product_id": "premium_monthly",
+    "plan_term": "monthly",
+    "region": "latin_america",
+    "base_price": 1.29,
+    "localized_price": 1.29,
+    
+    // NEW: Locale parameters
+    "user_locale": "es",
+    "device_locale": "es_MX", 
+    "detected_region": "latin_america",
+    "locale_changed_recently": false  // Whether user changed locale in last 24h
+  }
+}
+```
+
+**feature_limit_reached with locale tracking**:
+```dart
+{
+  "event": "feature_limit_reached", 
+  "parameters": {
+    // Existing parameters
+    "feature_name": "voice_notes",
+    "current_usage": 5,
+    "max_usage": 5,
+    
+    // NEW: Locale parameters  
+    "user_locale": "fr",
+    "prompt_language": "fr",  // Language of the upgrade prompt shown
+    "localized_feature_name": "Transcription vocale"
+  }
+}
+```
+
+#### Analytics Use Cases
+
+1. **Localization ROI**: Measure monetization lift from localized vs English-only users
+2. **Regional Performance**: Compare conversion rates across regions and languages  
+3. **Feature Adoption**: Track which features drive upgrades in different locales
+4. **Pricing Optimization**: Analyze regional pricing effectiveness by actual user locale
+5. **Localization Quality**: Identify locales with lower conversion rates (potential translation issues)
+
+#### Implementation Plan
+
+**Phase 1**: Infrastructure (Current)
+- Deploy localization system with ARB files
+- Implement LocalizationService
+- Update pricing strings to use localized keys
+
+**Phase 2**: Locale Tracking (Next Release)
+- Add user_locale parameter to all monetization events
+- Implement locale detection and tracking
+- Update analytics dashboards for locale segmentation
+
+**Phase 3**: Advanced Locale Analytics (Future)
+- A/B testing for different translations
+- Dynamic locale switching tracking
+- Currency preference analysis
+- Regional pricing optimization based on locale data
+
+#### Privacy Considerations
+
+- Locale data is not personally identifiable
+- Users can opt out of analytics tracking entirely
+- Locale preferences stored locally, not linked to user accounts
+- Aggregate data only used for product optimization
+
+#### Success Metrics
+
+- Conversion rate improvement in localized markets
+- Feature adoption rates by locale
+- Regional pricing performance validation
+- User engagement metrics across languages
+
+**Note**: Implementation of user locale tracking is dependent on successful deployment and validation of the base localization infrastructure.

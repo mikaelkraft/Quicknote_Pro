@@ -1,0 +1,44 @@
+{
+  "@@locale": "de",
+  "@@last_modified": "2024-01-01T00:00:00.000Z",
+  
+  "@_TODO": "German translations are placeholders - need proper localization",
+  
+  "@_PRICING_TIERS": {},
+  "pricing_free": "Kostenlos",
+  "pricing_premium": "Premium",
+  "pricing_pro": "Pro",
+  "pricing_enterprise": "Unternehmen",
+
+  "@_PLAN_TERMS": {},
+  "planTerm_monthly": "Monatlich",
+  "planTerm_annual": "Jährlich", 
+  "planTerm_lifetime": "Lebenslang",
+  "planTerm_perUser": "Pro Benutzer",
+  "planTerm_save20": "20% sparen",
+
+  "@_ACTION_TERMS": {},
+  "action_upgradeNow": "Jetzt upgraden",
+  "action_startFreeTrial": "Kostenlose Testversion starten",
+  "action_restorePurchase": "Kauf wiederherstellen",
+  "action_continue": "Fortfahren",
+  "action_cancel": "Abbrechen",
+  "pricing_pricePerUser": "Preis pro Benutzer",
+  "pricing_teamPlan": "Team-Plan",
+
+  "@_FEATURE_HIGHLIGHTS": {},
+  "feature_unlimitedNotes": "Unbegrenzte Notizen",
+  "feature_advancedDrawingTools": "Erweiterte Zeichenwerkzeuge",
+  "feature_voiceTranscription": "Sprachtranskription",
+  "feature_collaboration": "Zusammenarbeit",
+  "feature_adminControls": "Administrator-Kontrollen",
+  "feature_noAds": "Keine Werbung",
+  "feature_prioritySupport": "Prioritätssupport",
+
+  "@_BASIC_APP_STRINGS": {},
+  "app_notes": "Notizen",
+  "app_newNote": "Neue Notiz",
+  "app_delete": "Löschen",
+  "app_edit": "Bearbeiten",
+  "app_settings": "Einstellungen"
+}

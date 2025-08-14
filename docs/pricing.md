@@ -2,6 +2,8 @@
 
 This document defines the pricing structure, feature limitations, and upgrade paths for Quicknote Pro.
 
+> **📝 Note on Localization**: As of version 1.1.0, all pricing tier names, billing periods, and key feature descriptions are now localized. See [docs/localization.md](localization.md) for details on supported languages and localization keys.
+
 ## Overview
 
 Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Enterprise. Each tier provides increasing value through expanded feature access and higher usage limits.
@@ -540,3 +542,34 @@ All monetization and retention events are tracked:
 - Advanced collaboration tools
 - Integration marketplace
 - White-label licensing
+
+## Localization Key Mapping
+
+The following localization keys are used for pricing-related text:
+
+### Tier Names
+- `pricing_free` → "Free" / "Gratis" / "Gratuit" / "Kostenlos"
+- `pricing_premium` → "Premium" 
+- `pricing_pro` → "Pro"
+- `pricing_enterprise` → "Enterprise" / "Empresa" / "Entreprise" / "Unternehmen"
+
+### Billing Terms
+- `planTerm_monthly` → "Monthly" / "Mensual" / "Mensuel" / "Monatlich"
+- `planTerm_annual` → "Annual" / "Anual" / "Annuel" / "Jährlich"  
+- `planTerm_lifetime` → "Lifetime" / "De por vida" / "À vie" / "Lebenslang"
+- `planTerm_perUser` → "Per User" / "Por usuario" / "Par utilisateur" / "Pro Benutzer"
+- `planTerm_save20` → "Save 20%" / "Ahorrar 20%" / "Économiser 20%" / "20% sparen"
+
+### Action Labels
+- `action_upgradeNow` → "Upgrade Now" / "Actualizar ahora" / "Mettre à niveau maintenant" / "Jetzt upgraden"
+- `action_startFreeTrial` → "Start Free Trial" / "Iniciar prueba gratuita" / "Commencer l'essai gratuit" / "Kostenlose Testversion starten"
+- `action_restorePurchase` → "Restore Purchase" / "Restaurar compra" / "Restaurer l'achat" / "Kauf wiederherstellen"
+
+### Feature Highlights
+- `feature_unlimitedNotes` → "Unlimited notes" / "Notas ilimitadas" / "Notes illimitées" / "Unbegrenzte Notizen"
+- `feature_voiceTranscription` → "Voice transcription" / "Transcripción de voz" / "Transcription vocale" / "Sprachtranskription"
+- `feature_advancedDrawingTools` → "Advanced drawing tools" / "Herramientas de dibujo avanzadas" / "Outils de dessin avancés" / "Erweiterte Zeichenwerkzeuge"
+- `feature_noAds` → "No ads" / "Sin anuncios" / "Sans publicité" / "Keine Werbung"
+- `feature_prioritySupport` → "Priority support" / "Soporte prioritario" / "Support prioritaire" / "Prioritätssupport"
+
+See [docs/localization.md](localization.md) for complete localization documentation and implementation details.

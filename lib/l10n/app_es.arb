@@ -1,0 +1,44 @@
+{
+  "@@locale": "es",
+  "@@last_modified": "2024-01-01T00:00:00.000Z",
+  
+  "@_TODO": "Spanish translations are placeholders - need proper localization",
+  
+  "@_PRICING_TIERS": {},
+  "pricing_free": "Gratis",
+  "pricing_premium": "Premium", 
+  "pricing_pro": "Pro",
+  "pricing_enterprise": "Empresa",
+
+  "@_PLAN_TERMS": {},
+  "planTerm_monthly": "Mensual",
+  "planTerm_annual": "Anual", 
+  "planTerm_lifetime": "De por vida",
+  "planTerm_perUser": "Por usuario",
+  "planTerm_save20": "Ahorrar 20%",
+
+  "@_ACTION_TERMS": {},
+  "action_upgradeNow": "Actualizar ahora",
+  "action_startFreeTrial": "Iniciar prueba gratuita",
+  "action_restorePurchase": "Restaurar compra",
+  "action_continue": "Continuar",
+  "action_cancel": "Cancelar",
+  "pricing_pricePerUser": "Precio por usuario",
+  "pricing_teamPlan": "Plan de equipo",
+
+  "@_FEATURE_HIGHLIGHTS": {},
+  "feature_unlimitedNotes": "Notas ilimitadas",
+  "feature_advancedDrawingTools": "Herramientas de dibujo avanzadas",
+  "feature_voiceTranscription": "Transcripción de voz",
+  "feature_collaboration": "Colaboración",
+  "feature_adminControls": "Controles de administrador",
+  "feature_noAds": "Sin anuncios",
+  "feature_prioritySupport": "Soporte prioritario",
+
+  "@_BASIC_APP_STRINGS": {},
+  "app_notes": "Notas",
+  "app_newNote": "Nueva nota",
+  "app_delete": "Eliminar",
+  "app_edit": "Editar",
+  "app_settings": "Configuración"
+}
