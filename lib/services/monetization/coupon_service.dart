@@ -600,7 +600,7 @@ class CouponService extends ChangeNotifier {
     for (final json in couponsJson) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.decodeComponent(json) as Map
+          jsonDecode(Uri.decodeComponent(json)) as Map
         );
         final coupon = CouponConfig.fromJson(data);
         _availableCoupons[coupon.code] = coupon;
