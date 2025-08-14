@@ -248,7 +248,7 @@ class TrialService extends ChangeNotifier {
     if (trialJson != null) {
       try {
         final data = Map<String, dynamic>.from(
-          Uri.decodeComponent(trialJson) as Map
+          jsonDecode(Uri.decodeComponent(trialJson)) as Map
         );
         _currentTrial = TrialInfo.fromJson(data);
       } catch (e) {
