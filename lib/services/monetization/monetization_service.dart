@@ -295,7 +295,6 @@ class MonetizationService extends ChangeNotifier {
     final monthlyFeatures = [
       FeatureType.noteCreation,
       FeatureType.voiceNoteRecording,
-      FeatureType.cloudSync,
       FeatureType.attachments,
       FeatureType.imageAttachments,
       FeatureType.fileAttachments,
@@ -413,8 +412,6 @@ class FeatureLimits {
             FeatureType.voiceNoteRecording: 5,    // 5 recordings per month (2min each)
             FeatureType.folders: 3,               // 3 folders maximum
             FeatureType.attachments: 10,          // 10 attachments per month
-            FeatureType.cloudSync: 10,            // 10 syncs per month
-            FeatureType.cloudStorage: 100,        // 100MB cloud storage (in MB)
             
             // Available basic features
             FeatureType.localBackup: -1,          // Unlimited local backup
@@ -430,6 +427,8 @@ class FeatureLimits {
             FeatureType.ocrTextExtraction,
             FeatureType.advancedExport,
             FeatureType.cloudExportImport,
+            FeatureType.cloudSync,
+            FeatureType.cloudStorage,
             FeatureType.customThemes,
             FeatureType.adRemoval,
             FeatureType.analyticsInsights,
@@ -462,7 +461,6 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
-            FeatureType.cloudStorage: 1024,       // 1GB cloud storage (in MB)
             
             // Voice features with premium limits
             FeatureType.voiceNoteRecording: 100,  // 100 recordings per month (10min each)
@@ -519,7 +517,6 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
-            FeatureType.cloudStorage: 10240,      // 10GB cloud storage (in MB)
             
             // Voice features - Pro gets unlimited with longer recordings
             FeatureType.voiceNoteRecording: -1,   // Unlimited (30min each)
@@ -576,7 +573,6 @@ class FeatureLimits {
             FeatureType.folders: -1,
             FeatureType.attachments: -1,
             FeatureType.cloudSync: -1,
-            FeatureType.cloudStorage: -1,         // Unlimited cloud storage
             
             // Voice features
             FeatureType.voiceNoteRecording: -1,
@@ -670,9 +666,7 @@ class PricingInfo {
           '3 folders maximum',
           '10 attachments per month',
           'Basic doodling and canvas',
-          'Local export/import',
-          '100MB cloud storage',
-          '10 cloud syncs per month',
+          'Local export/import only',
         ],
       ),
       const PricingInfo(
@@ -689,8 +683,7 @@ class PricingInfo {
           'Advanced drawing tools & layers',
           'OCR text extraction',
           'All export formats (PDF, DOCX)',
-          'Cloud export/import',
-          '1GB cloud storage',
+          'Cloud sync capabilities',
           'Custom themes',
           'No ads',
         ],
@@ -711,7 +704,7 @@ class PricingInfo {
           'Custom export templates',
           'Advanced encryption options',
           'API access for integrations',
-          '10GB cloud storage',
+          'Enhanced cloud sync capabilities',
           'Priority support',
         ],
       ),
@@ -729,7 +722,7 @@ class PricingInfo {
           'SSO integration',
           'Audit logs & compliance features',
           'Custom branding options',
-          'Unlimited cloud storage',
+          'Enterprise cloud sync capabilities',
           'Dedicated account manager',
           'SLA guarantees',
         ],

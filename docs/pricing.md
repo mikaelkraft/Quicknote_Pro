@@ -79,11 +79,9 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **Voice Recordings**: 5 recordings per month (max 2 minutes each)
 - **Folders**: 3 folders maximum
 - **Attachments**: 10 attachments per month (images and files)
-- **Cloud Sync**: 10 syncs per month
-- **Cloud Storage**: 100MB storage
 - **Drawing**: Basic doodling and canvas tools
 - **Export**: Basic text export only
-- **Import/Export**: Local file system only
+- **Storage & Sync**: Local storage and file system access only
 - **Ads**: Yes (with frequency caps)
 
 #### Restrictions
@@ -91,9 +89,9 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - No voice note transcription
 - No OCR text extraction from images
 - No premium export formats (PDF, DOCX, Markdown)
-- No cloud export/import capabilities
+- No cloud sync or storage capabilities
 - No custom themes
-- Limited cloud storage and sync
+- Local storage and export/import only
 
 ### Premium Tier
 **Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
@@ -106,12 +104,10 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - **Voice Transcription**: Automatic transcription of all voice notes
 - **Folders**: Unlimited
 - **Attachments**: Unlimited (images and files)
-- **Cloud Sync**: Unlimited
-- **Cloud Storage**: 1GB storage
 - **Drawing**: Advanced drawing tools, layers, premium brushes, shapes
 - **OCR**: Text extraction from images and scanned documents
 - **Export**: All formats (PDF, DOCX, Markdown, HTML)
-- **Import/Export**: Both local and cloud export/import
+- **Storage & Sync**: Cloud sync capabilities (storage managed by your cloud provider)
 - **Themes**: Custom themes and dark mode
 - **Ads**: Completely removed
 
@@ -131,13 +127,13 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 #### Features & Limits
 - **Everything in Premium**
 - **Voice Recordings**: Unlimited (max 30 minutes each)
-- **Cloud Storage**: 10GB cloud storage
 - **Analytics**: Advanced usage insights and productivity metrics
 - **Search**: Advanced search with OCR integration
 - **Backup**: Automated backup scheduling and versioning
 - **Templates**: Custom export templates and formatting
 - **Encryption**: Advanced encryption options for sensitive notes
 - **API Access**: Integration capabilities with third-party apps
+- **Storage & Sync**: Enhanced cloud sync capabilities (storage managed by your cloud provider)
 - **Support**: Phone and email priority support
 
 #### Exclusive Features
@@ -160,7 +156,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - ✅ **SSO Integration**: Single sign-on with popular identity providers
 - ✅ **Compliance**: Audit logs, data residency, and compliance features
 - ✅ **Branding**: Custom branding options and white-label capabilities
-- ✅ **Storage**: Unlimited cloud storage for teams
+- ✅ **Storage & Sync**: Enterprise cloud sync capabilities (storage managed by your organization's cloud provider)
 - ✅ **Support**: Dedicated account manager and priority support
 - ✅ **SLA**: Service level agreements and uptime guarantees
 - ✅ **Integrations**: Custom integrations and enterprise connectors
@@ -172,7 +168,7 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - Enterprise SSO integration (SAML, OAuth, LDAP)
 - Audit logs and compliance reporting
 - Custom branding and white-label options
-- Unlimited storage and bandwidth
+- Enterprise cloud sync capabilities (storage managed by organization's cloud provider)
 - Dedicated account management
 - Custom deployment options (cloud, on-premise, hybrid)
 
@@ -182,7 +178,6 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 Features that become unavailable when limits are reached:
 - Note creation after monthly limit
 - Voice recording after count/duration limits
-- Cloud sync after monthly quota
 - Attachment uploads after limit
 
 ### Hard Restrictions
@@ -190,6 +185,7 @@ Features completely unavailable to free users:
 - Advanced drawing tools (premium brushes, shapes, layers)
 - Premium export formats
 - Voice note transcription
+- Cloud sync and storage capabilities
 - Advanced themes
 
 ### Progressive Disclosure
@@ -300,8 +296,7 @@ Upgrade prompts appear when users encounter limits:
 | Premium Export | ❌ | ✅ | ✅ | ✅ |
 | Local Export/Import | ✅ | ✅ | ✅ | ✅ |
 | Cloud Export/Import | ❌ | ✅ | ✅ | ✅ |
-| Cloud Storage | 100MB | 1GB | 10GB | Unlimited |
-| Cloud Sync | 10/month | Unlimited | Unlimited | Unlimited |
+| Cloud Sync | ❌ | ✅ | ✅ | ✅ |
 | Custom Themes | ❌ | ✅ | ✅ | ✅ |
 | Ads | ✅ | ❌ | ❌ | ❌ |
 | Analytics | ❌ | ❌ | ✅ | ✅ |
@@ -325,11 +320,12 @@ Upgrade prompts appear when users encounter limits:
 - "Advanced drawing tools for visual note-taking"
 - "Voice note transcription saves time"
 - "Export to professional formats"
+- "Cloud sync capabilities enabled"
 - "Ad-free focused experience"
 
 #### Pro vs Premium
 - "Unlimited voice recordings for lectures and meetings"
-- "10GB storage for extensive media collections"
+- "Enhanced cloud sync capabilities"
 - "Usage analytics to optimize productivity"
 - "Priority support when you need help"
 
