@@ -785,4 +785,208 @@ class AppTheme {
   static Color getWarningColor(bool isLight) {
     return isLight ? warningLight : warningDark;
   }
+
+  // Additional Theme Variants - Futuristic, Neon, Floral
+
+  // Futuristic Theme Colors
+  static const Color futuristicPrimary = Color(0xFF00E5FF); // Cyan
+  static const Color futuristicSecondary = Color(0xFF6C63FF); // Electric purple
+  static const Color futuristicAccent = Color(0xFF00FFA3); // Neon green
+  static const Color futuristicBackground = Color(0xFF0A0A0A); // Near black
+  static const Color futuristicSurface = Color(0xFF1A1A1A); // Dark gray
+
+  // Neon Theme Colors
+  static const Color neonPrimary = Color(0xFFFF0080); // Hot pink
+  static const Color neonSecondary = Color(0xFF00FFFF); // Cyan
+  static const Color neonAccent = Color(0xFFFFFF00); // Yellow
+  static const Color neonBackground = Color(0xFF000000); // Pure black
+  static const Color neonSurface = Color(0xFF1A0A1A); // Dark purple
+
+  // Floral Theme Colors
+  static const Color floralPrimary = Color(0xFFE91E63); // Rose
+  static const Color floralSecondary = Color(0xFF4CAF50); // Green
+  static const Color floralAccent = Color(0xFFFF9800); // Orange
+  static const Color floralBackground = Color(0xFFFFF8E1); // Cream
+  static const Color floralSurface = Color(0xFFFFFFFF); // White
+
+  /// Futuristic theme with enhanced contrasts and neon accents
+  static ThemeData futuristicTheme = ThemeData(
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.dark(
+      primary: futuristicPrimary,
+      secondary: futuristicSecondary,
+      tertiary: futuristicAccent,
+      surface: futuristicSurface,
+      onSurface: Colors.white,
+      background: futuristicBackground,
+    ),
+    textTheme: _buildFuturisticTextTheme(),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: futuristicPrimary,
+        foregroundColor: Colors.black,
+        elevation: 8,
+        shadowColor: futuristicPrimary.withOpacity(0.3),
+      ),
+    ),
+  );
+
+  /// Neon theme with high contrast and vibrant colors
+  static ThemeData neonTheme = ThemeData(
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.dark(
+      primary: neonPrimary,
+      secondary: neonSecondary,
+      tertiary: neonAccent,
+      surface: neonSurface,
+      onSurface: Colors.white,
+      background: neonBackground,
+    ),
+    textTheme: _buildNeonTextTheme(),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: neonPrimary,
+        foregroundColor: Colors.white,
+        elevation: 12,
+        shadowColor: neonPrimary.withOpacity(0.5),
+      ),
+    ),
+  );
+
+  /// Floral theme with warm, natural colors
+  static ThemeData floralTheme = ThemeData(
+    brightness: Brightness.light,
+    colorScheme: ColorScheme.light(
+      primary: floralPrimary,
+      secondary: floralSecondary,
+      tertiary: floralAccent,
+      surface: floralSurface,
+      onSurface: Colors.black87,
+      background: floralBackground,
+    ),
+    textTheme: _buildFloralTextTheme(),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: floralPrimary,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shadowColor: floralPrimary.withOpacity(0.2),
+      ),
+    ),
+  );
+
+  /// Build futuristic text theme with enhanced contrast
+  static TextTheme _buildFuturisticTextTheme() {
+    return TextTheme(
+      headlineSmall: GoogleFonts.orbitron(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: futuristicPrimary,
+        shadows: [
+          Shadow(
+            color: futuristicPrimary.withOpacity(0.3),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      titleLarge: GoogleFonts.orbitron(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: Colors.white.withOpacity(0.9),
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.white.withOpacity(0.8),
+      ),
+    );
+  }
+
+  /// Build neon text theme with glowing effects
+  static TextTheme _buildNeonTextTheme() {
+    return TextTheme(
+      headlineSmall: GoogleFonts.orbitron(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: neonPrimary,
+        shadows: [
+          Shadow(
+            color: neonPrimary,
+            blurRadius: 12,
+          ),
+          Shadow(
+            color: neonPrimary.withOpacity(0.5),
+            blurRadius: 20,
+          ),
+        ],
+      ),
+      titleLarge: GoogleFonts.orbitron(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: neonSecondary,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: Colors.white,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.white.withOpacity(0.9),
+      ),
+    );
+  }
+
+  /// Build floral text theme with natural warmth
+  static TextTheme _buildFloralTextTheme() {
+    return TextTheme(
+      headlineSmall: GoogleFonts.playfairDisplay(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: floralPrimary,
+      ),
+      titleLarge: GoogleFonts.playfairDisplay(
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+        color: floralSecondary,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: Colors.black87,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.black54,
+      ),
+    );
+  }
+
+  /// Get theme by name for theme switching
+  static ThemeData getThemeByName(String themeName) {
+    switch (themeName.toLowerCase()) {
+      case 'futuristic':
+        return futuristicTheme;
+      case 'neon':
+        return neonTheme;
+      case 'floral':
+        return floralTheme;
+      case 'dark':
+        return darkTheme;
+      default:
+        return lightTheme;
+    }
+  }
+
+  /// Get available theme names
+  static List<String> getAvailableThemes() {
+    return ['Light', 'Dark', 'Futuristic', 'Neon', 'Floral'];
+  }
 }
