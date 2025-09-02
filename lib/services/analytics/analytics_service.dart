@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -315,6 +316,15 @@ class AnalyticsEvent {
   };
 }
 
+/// Helper function to get the current user locale
+String _getUserLocale() {
+  try {
+    return WidgetsBinding.instance.platformDispatcher.locale.toLanguageTag();
+  } catch (e) {
+    return 'en'; // fallback to English
+  }
+}
+
 /// Monetization-specific event types
 class MonetizationEvent {
   final String action;
@@ -341,6 +351,7 @@ class MonetizationEvent {
       'context': context,
       'feature_blocked': featureBlocked,
       'user_tier': userTier,
+      'user_locale': _getUserLocale(),
     });
   
   static MonetizationEvent upgradeStarted({
@@ -364,6 +375,7 @@ class MonetizationEvent {
       'seats': seats,
       'base_price': basePrice,
       'localized_price': localizedPrice,
+      'user_locale': _getUserLocale(),
     });
   
   static MonetizationEvent upgradeCompleted({
@@ -387,6 +399,7 @@ class MonetizationEvent {
       'seats': seats,
       'base_price': basePrice,
       'localized_price': localizedPrice,
+      'user_locale': _getUserLocale(),
     });
   
   static MonetizationEvent upgradeCancelled({String? tier, String? stage, String? reason}) => 
@@ -406,12 +419,14 @@ class MonetizationEvent {
       'current_usage': currentUsage,
       'limit': limit,
       'user_tier': userTier,
+      'user_locale': _getUserLocale(),
     });
 
   static MonetizationEvent premiumFeatureUsed({String? feature, String? userTier}) => 
     MonetizationEvent('premium_feature_used', {
       'feature': feature,
       'user_tier': userTier,
+      'user_locale': _getUserLocale(),
     });
 }
 

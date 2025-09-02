@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../analytics/analytics_service.dart';
 import 'referral_service.dart';
 import 'coupon_service.dart';
 import 'trial_service.dart';
-import '../../l10n/localization.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 /// 
@@ -739,13 +739,11 @@ class PricingInfo {
 
   /// Get pricing info for all tiers with localized strings
   /// This version uses localized display names and feature descriptions
-  static List<PricingInfo> getAllTiersLocalized() {
-    final l10n = LocalizationService.instance;
-    
+  static List<PricingInfo> getAllTiersLocalized(AppLocalizations l10n) {
     return [
       PricingInfo(
         tier: UserTier.free,
-        displayName: l10n.pricingFree,
+        displayName: l10n.pricing_free,
         price: '\$0',
         billingPeriod: 'forever',
         hasTrial: false,
@@ -760,32 +758,32 @@ class PricingInfo {
       ),
       PricingInfo(
         tier: UserTier.premium,
-        displayName: l10n.pricingPremium,
+        displayName: l10n.pricing_premium,
         price: '\$1.99',
-        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         hasTrial: true,
         trialDays: 7,
         features: [
-          l10n.featureUnlimitedNotes,
+          l10n.feature_unlimitedNotes,
           '100 voice recordings (10min each)',
-          l10n.featureVoiceTranscription,
-          l10n.featureAdvancedDrawingTools,
+          l10n.feature_voiceTranscription,
+          l10n.feature_advancedDrawingTools,
           'OCR text extraction',
           'All export formats (PDF, DOCX)',
           'Cloud sync capabilities',
           'Custom themes',
-          l10n.featureNoAds,
+          l10n.feature_noAds,
         ],
       ),
       PricingInfo(
         tier: UserTier.pro,
-        displayName: l10n.pricingPro,
+        displayName: l10n.pricing_pro,
         price: '\$2.99',
-        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         hasTrial: true,
         trialDays: 14,
         features: [
-          'Everything in ${l10n.pricingPremium}',
+          'Everything in ${l10n.pricing_premium}',
           'Unlimited voice recordings (30min each)',
           'Advanced search with OCR',
           'Usage analytics & insights',
@@ -794,19 +792,19 @@ class PricingInfo {
           'Advanced encryption options',
           'API access for integrations',
           'Enhanced cloud sync capabilities',
-          l10n.featurePrioritySupport,
+          l10n.feature_prioritySupport,
         ],
       ),
       PricingInfo(
         tier: UserTier.enterprise,
-        displayName: l10n.pricingEnterprise,
+        displayName: l10n.pricing_enterprise,
         price: '\$2.00',
-        billingPeriod: '${l10n.planTermPerUser.toLowerCase()}/${l10n.planTermMonthly.toLowerCase()}',
+        billingPeriod: '${l10n.planTerm_perUser.toLowerCase()}/${l10n.planTerm_monthly.toLowerCase()}',
         hasTrial: false,
         features: [
-          'Everything in ${l10n.pricingPro}',
+          'Everything in ${l10n.pricing_pro}',
           'Team workspace management',
-          l10n.featureAdminControls,
+          l10n.feature_adminControls,
           'Advanced sharing & permissions',
           'SSO integration',
           'Audit logs & compliance features',
@@ -824,5 +822,4 @@ class PricingInfo {
     if (!hasTrial || trialDays == null) return '';
     return '$trialDays-day free trial';
   }
-}
 }

@@ -3,8 +3,8 @@
 /// Provides comprehensive pricing support for multiple regions, plan terms,
 /// and tiers according to the finalized pricing strategy.
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'monetization_service.dart';
-import '../../l10n/localization.dart';
 
 /// Regions for pricing localization
 enum Region {
@@ -395,13 +395,11 @@ class LegacyPricingInfo {
 
   /// Get pricing info for all tiers with localized strings
   /// This version uses localized display names and feature descriptions
-  static List<LegacyPricingInfo> getAllTiersLocalized(LocalizationService localization) {
-    final l10n = localization;
-    
+  static List<LegacyPricingInfo> getAllTiersLocalized(AppLocalizations l10n) {
     return [
       LegacyPricingInfo(
         tier: UserTier.free,
-        displayName: l10n.pricingFree,
+        displayName: l10n.pricing_free,
         price: '\$0',
         billingPeriod: 'forever',
         features: [
@@ -415,27 +413,27 @@ class LegacyPricingInfo {
       ),
       LegacyPricingInfo(
         tier: UserTier.premium,
-        displayName: l10n.pricingPremium,
+        displayName: l10n.pricing_premium,
         price: '\$1.99',
-        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         features: [
-          l10n.featureUnlimitedNotes,
+          l10n.feature_unlimitedNotes,
           '100 voice recordings (10min each)',
-          l10n.featureVoiceTranscription,
-          l10n.featureAdvancedDrawingTools,
+          l10n.feature_voiceTranscription,
+          l10n.feature_advancedDrawingTools,
           'OCR text extraction',
           'All export formats (PDF, DOCX)',
           'Cloud sync capabilities',
-          l10n.featureNoAds,
+          l10n.feature_noAds,
         ],
       ),
       LegacyPricingInfo(
         tier: UserTier.pro,
-        displayName: l10n.pricingPro,
+        displayName: l10n.pricing_pro,
         price: '\$2.99',
-        billingPeriod: l10n.planTermMonthly.toLowerCase(),
+        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         features: [
-          'Everything in ${l10n.pricingPremium}',
+          'Everything in ${l10n.pricing_premium}',
           'Unlimited voice recordings (30min each)',
           'Advanced search with OCR',
           'Usage analytics & insights',
@@ -444,18 +442,18 @@ class LegacyPricingInfo {
           'Advanced encryption options',
           'API access for integrations',
           'Enhanced cloud sync capabilities',
-          l10n.featurePrioritySupport,
+          l10n.feature_prioritySupport,
         ],
       ),
       LegacyPricingInfo(
         tier: UserTier.enterprise,
-        displayName: l10n.pricingEnterprise,
+        displayName: l10n.pricing_enterprise,
         price: '\$2.00',
-        billingPeriod: '${l10n.planTermPerUser.toLowerCase()}/${l10n.planTermMonthly.toLowerCase()}',
+        billingPeriod: '${l10n.planTerm_perUser.toLowerCase()}/${l10n.planTerm_monthly.toLowerCase()}',
         features: [
-          'Everything in ${l10n.pricingPro}',
+          'Everything in ${l10n.pricing_pro}',
           'Team workspace management',
-          l10n.featureAdminControls,
+          l10n.feature_adminControls,
           'Advanced sharing & permissions',
           'SSO integration',
           'Audit logs & compliance features',
