@@ -144,8 +144,7 @@ class FeatureGate extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 1.h),
-          Text(
-            'You\'ve used all $limit ${_getFeatureDisplayName().toLowerCase()} this month.',
+            'You\'ve reached your monthly limit of $limit ${_getFeatureDisplayName().toLowerCase()}.',
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
