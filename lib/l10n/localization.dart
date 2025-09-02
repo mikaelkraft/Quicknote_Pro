@@ -31,13 +31,11 @@ class LocalizationService {
       String jsonString = await rootBundle.loadString('lib/l10n/app_$_currentLocale.arb');
       Map<String, dynamic> jsonMap = json.decode(jsonString);
       
-      _localizedStrings = {};
-      jsonMap.forEach((key, value) {
-        // Skip metadata keys (those starting with @)
-        if (!key.startsWith('@') && value is String) {
-          _localizedStrings[key] = value;
-        }
-      });
+      _localizedStrings = Map.fromEntries(
+        jsonMap.entries
+          .where((entry) => !entry.key.startsWith('@') && entry.value is String)
+          .map((entry) => MapEntry(entry.key, entry.value as String)),
+      );
     } catch (e) {
       // Fallback to English if locale not found
       if (_currentLocale != 'en') {
