@@ -395,8 +395,8 @@ class LegacyPricingInfo {
 
   /// Get pricing info for all tiers with localized strings
   /// This version uses localized display names and feature descriptions
-  static List<LegacyPricingInfo> getAllTiersLocalized([LocalizationService? localization]) {
-    final l10n = localization ?? LocalizationService.instance;
+  static List<LegacyPricingInfo> getAllTiersLocalized(LocalizationService localization) {
+    final l10n = localization;
     
     return [
       LegacyPricingInfo(
