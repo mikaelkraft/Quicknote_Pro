@@ -2,7 +2,7 @@
   "@@locale": "fr",
   "@@last_modified": "2024-01-01T00:00:00.000Z",
   
-  "@_TODO": "French translations are placeholders - need proper localization",
+  "@_TODO": "French translations are placeholders - need proper localization. Priority: High. Deadline: 2024-07-15.",
   
   "@_PRICING_TIERS": {},
   "pricing_free": "Gratuit",
