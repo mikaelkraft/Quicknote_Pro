@@ -29,7 +29,7 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - Limited cloud storage (100MB)
 
 ### Premium Tier
-**Price**: $4.99/month or $49.99/year
+**Price**: $0.99/month or $9.99/year
 **Target**: Regular users and productivity enthusiasts
 **Value Proposition**: Unlimited core features with advanced tools
 
@@ -51,7 +51,7 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - Dark mode themes
 
 ### Pro Tier
-**Price**: $9.99/month or $99.99/year
+**Price**: $1.99/month or $19.99/year
 **Target**: Power users and professionals
 **Value Proposition**: All features plus advanced capabilities
 

@@ -131,7 +131,7 @@ class _PaywallDialogState extends State<PaywallDialog> {
                       index: 1,
                       tier: UserTier.premium,
                       title: 'Premium',
-                      price: '\$4.99',
+                      price: '\$0.99',
                       period: 'month',
                       description: 'Most popular',
                       features: const [
@@ -149,7 +149,7 @@ class _PaywallDialogState extends State<PaywallDialog> {
                       index: 2,
                       tier: UserTier.pro,
                       title: 'Pro',
-                      price: '\$9.99',
+                      price: '\$1.99',
                       period: 'month',
                       description: 'Best value',
                       features: const [
@@ -177,7 +177,7 @@ class _PaywallDialogState extends State<PaywallDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '💡 Lifetime options available: Save 75% with one-time purchases!',
+                '💡 Lifetime options available: Premium $9.99, Pro $19.99 one-time!',
                 style: theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -355,9 +355,9 @@ class _PaywallDialogState extends State<PaywallDialog> {
   String _getUpgradeButtonText() {
     switch (_selectedIndex) {
       case 1:
-        return 'Start Premium - \$4.99/month';
+        return 'Start Premium - \$0.99/month';
       case 2:
-        return 'Start Pro - \$9.99/month';
+        return 'Start Pro - \$1.99/month';
       default:
         return 'Upgrade Now';
     }

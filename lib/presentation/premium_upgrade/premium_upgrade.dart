@@ -415,7 +415,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                     Expanded(
                                       child: PricingOptionWidget(
                                         title: 'Monthly',
-                                        price: '\$2.99',
+                                        price: '\$0.99',
                                         period: '/month',
                                         savings: null,
                                         isSelected: _selectedPlan == 'monthly',
@@ -427,9 +427,9 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                     Expanded(
                                       child: PricingOptionWidget(
                                         title: 'Lifetime',
-                                        price: '\$14.99',
+                                        price: '\$9.99',
                                         period: 'one-time',
-                                        savings: 'Save 75%',
+                                        savings: 'Save 90%',
                                         isSelected: _selectedPlan == 'lifetime',
                                         isRecommended: true,
                                         onTap: () =>
