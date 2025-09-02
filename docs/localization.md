@@ -2,16 +2,15 @@
 
 ## Overview
 
-Quicknote Pro uses Flutter's built-in localization system with ARB (Application Resource Bundle) files to support multiple languages. This document explains the architecture, key naming conventions, and workflows for adding new locales.
+Quicknote Pro uses Flutter's built-in localization system with ARB (Application Resource Bundle) files to support multiple languages. The app now uses generated localizations with ARB files (en, es, fr, de) and the manual LocalizationService has been removed.
 
 ## Architecture
 
 ### Core Components
 
 1. **ARB Files** (`lib/l10n/`): JSON-based translation files containing localized strings
-2. **LocalizationService** (`lib/l10n/localization.dart`): Fallback service for accessing localized strings
-3. **Generated Localizations**: Auto-generated `AppLocalizations` class from ARB files
-4. **Configuration**: `l10n.yaml` defines generation settings
+2. **Generated Localizations**: Auto-generated `AppLocalizations` class from ARB files  
+3. **Configuration**: `l10n.yaml` defines generation settings
 
 ### File Structure
 
@@ -20,8 +19,7 @@ lib/l10n/
 ├── app_en.arb          # English (source locale)
 ├── app_es.arb          # Spanish translations
 ├── app_fr.arb          # French translations
-├── app_de.arb          # German translations
-└── localization.dart   # Manual localization service
+└── app_de.arb          # German translations
 ```
 
 ## ARB Structure
@@ -99,47 +97,45 @@ Create a new file `lib/l10n/app_{locale}.arb` (e.g., `app_ja.arb` for Japanese):
 }
 ```
 
-### 2. Update LocalizationService
+### 2. Regenerate Localizations
 
-Add the new locale to the supported locales list in `lib/l10n/localization.dart`:
+After adding the new ARB file, regenerate the localizations:
 
-```dart
-static const List<String> supportedLocales = ['en', 'es', 'fr', 'de', 'ja'];
+```bash
+flutter gen-l10n
 ```
 
 ### 3. Test the Integration
 
-1. Initialize the service with the new locale:
-   ```dart
-   await LocalizationService.instance.setLocale('ja');
-   ```
+The new locale will be automatically available through AppLocalizations. Test by changing the device locale or using:
 
-2. Verify strings are loaded correctly:
-   ```dart
-   print(LocalizationService.instance.pricingFree); // Should print "無料"
-   ```
+```dart
+// In a widget context
+final l10n = AppLocalizations.of(context)!;
+print(l10n.pricing_free); // Should print localized text
+```
 
 ## Usage in Code
 
-### Using LocalizationService
+### Using AppLocalizations
 
 ```dart
-import 'package:quicknote_pro/l10n/localization.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-// Get service instance
-final l10n = LocalizationService.instance;
+// In a widget context
+final l10n = AppLocalizations.of(context)!;
 
-// Use convenience getters
-String title = l10n.pricingPremium;
-String action = l10n.actionUpgradeNow;
+// Use generated getters
+String title = l10n.pricing_premium;
+String action = l10n.action_upgradeNow;
 
-// Or use generic getString method
-String custom = l10n.getString('pricing_free', 'Free');
+// All strings are available as getters
+String custom = l10n.pricing_free;
 ```
 
-### Using Generated AppLocalizations (Future)
+### Current Implementation
 
-Once Flutter's code generation is enabled:
+The app now uses Flutter's generated localizations:
 
 ```dart
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -200,7 +196,7 @@ Both `MonetizationService` and `PricingService` classes use the localized string
 
 ### Testing New Locale
 
-- [ ] LocalizationService loads ARB file without errors
+- [ ] AppLocalizations generates without errors  
 - [ ] All pricing tier names display correctly
 - [ ] Feature descriptions are properly localized
 - [ ] App builds and runs without localization errors
@@ -255,11 +251,12 @@ Both `MonetizationService` and `PricingService` classes use the localized string
 
 ```dart
 // Check current locale
-print(LocalizationService.instance.currentLocale);
+print(WidgetsBinding.instance.platformDispatcher.locale);
 
-// Test specific key
-print(LocalizationService.instance.getString('pricing_free'));
+// Test specific key (in widget context)
+final l10n = AppLocalizations.of(context)!;
+print(l10n.pricing_free);
 
-// List all loaded strings
-print(LocalizationService.instance._localizedStrings);
+// Check supported locales
+print(AppLocalizations.supportedLocales);
 ```
