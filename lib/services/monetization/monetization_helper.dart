@@ -329,12 +329,21 @@ extension MonetizationWidgetExtensions on Widget {
 
 /// Extension methods for BuildContext to access monetization features
 extension MonetizationContextExtensions on BuildContext {
+  /// Cache for MonetizationHelper instances per BuildContext
+  static final Expando<MonetizationHelper> _monetizationHelperExpando = Expando<MonetizationHelper>();
+
   /// Get monetization helper instance
-  MonetizationHelper get monetization => MonetizationHelper(
-    monetizationService: read<MonetizationService>(),
-    analyticsService: read<AnalyticsService>(),
-    adsService: read<AdsService>(),
-  );
+  MonetizationHelper get monetization {
+    final cached = _monetizationHelperExpando[this];
+    if (cached != null) return cached;
+    final helper = MonetizationHelper(
+      monetizationService: read<MonetizationService>(),
+      analyticsService: read<AnalyticsService>(),
+      adsService: read<AdsService>(),
+    );
+    _monetizationHelperExpando[this] = helper;
+    return helper;
+  }
   
   /// Quick access to monetization service
   MonetizationService get monetizationService => read<MonetizationService>();
