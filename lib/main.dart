@@ -12,6 +12,7 @@ import 'services/note_persistence_service.dart';
 import 'services/attachment_service.dart';
 import 'controllers/note_controller.dart';
 import 'repositories/notes_repository.dart';
+import 'l10n/localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,10 @@ void main() async {
   final notesRepository = NotesRepository();
   final notesService = NotesService(notesRepository);
   await notesService.initialize();
+
+  // Initialize localization service
+  final localizationService = LocalizationService.instance;
+  await localizationService.initialize();
 
   // Initialize monetization services
   final analyticsService = AnalyticsService();

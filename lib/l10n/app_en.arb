@@ -1,0 +1,126 @@
+{
+  "@@locale": "en",
+  "@@last_modified": "2024-01-01T00:00:00.000Z",
+  
+  "@_PRICING_TIERS": {},
+  "pricing_free": "Free",
+  "@pricing_free": {
+    "description": "Free tier display name"
+  },
+  "pricing_premium": "Premium",
+  "@pricing_premium": {
+    "description": "Premium tier display name"
+  },
+  "pricing_pro": "Pro", 
+  "@pricing_pro": {
+    "description": "Pro tier display name"
+  },
+  "pricing_enterprise": "Enterprise",
+  "@pricing_enterprise": {
+    "description": "Enterprise tier display name"
+  },
+
+  "@_PLAN_TERMS": {},
+  "planTerm_monthly": "Monthly",
+  "@planTerm_monthly": {
+    "description": "Monthly billing period"
+  },
+  "planTerm_annual": "Annual",
+  "@planTerm_annual": {
+    "description": "Annual billing period"
+  },
+  "planTerm_lifetime": "Lifetime",
+  "@planTerm_lifetime": {
+    "description": "Lifetime purchase option"
+  },
+  "planTerm_perUser": "Per User",
+  "@planTerm_perUser": {
+    "description": "Per user pricing model"
+  },
+  "planTerm_save20": "Save 20%",
+  "@planTerm_save20": {
+    "description": "Annual discount message"
+  },
+
+  "@_ACTION_TERMS": {},
+  "action_upgradeNow": "Upgrade Now",
+  "@action_upgradeNow": {
+    "description": "Call to action for upgrading subscription"
+  },
+  "action_startFreeTrial": "Start Free Trial",
+  "@action_startFreeTrial": {
+    "description": "Start trial call to action"
+  },
+  "action_restorePurchase": "Restore Purchase",
+  "@action_restorePurchase": {
+    "description": "Restore previous purchases"
+  },
+  "action_continue": "Continue",
+  "@action_continue": {
+    "description": "General continue action"
+  },
+  "action_cancel": "Cancel",
+  "@action_cancel": {
+    "description": "General cancel action"
+  },
+  "pricing_pricePerUser": "Price per user",
+  "@pricing_pricePerUser": {
+    "description": "Label for per-user pricing"
+  },
+  "pricing_teamPlan": "Team Plan",
+  "@pricing_teamPlan": {
+    "description": "Team/Enterprise plan label"
+  },
+
+  "@_FEATURE_HIGHLIGHTS": {},
+  "feature_unlimitedNotes": "Unlimited notes",
+  "@feature_unlimitedNotes": {
+    "description": "Unlimited notes feature"
+  },
+  "feature_advancedDrawingTools": "Advanced drawing tools",
+  "@feature_advancedDrawingTools": {
+    "description": "Advanced drawing tools feature"
+  },
+  "feature_voiceTranscription": "Voice transcription",
+  "@feature_voiceTranscription": {
+    "description": "Voice note transcription feature"
+  },
+  "feature_collaboration": "Collaboration",
+  "@feature_collaboration": {
+    "description": "Team collaboration features"
+  },
+  "feature_adminControls": "Admin controls",
+  "@feature_adminControls": {
+    "description": "Administrative control features"
+  },
+  "feature_noAds": "No ads",
+  "@feature_noAds": {
+    "description": "Ad-free experience"
+  },
+  "feature_prioritySupport": "Priority support",
+  "@feature_prioritySupport": {
+    "description": "Priority customer support"
+  },
+
+  "@_BASIC_APP_STRINGS": {},
+  "app_notes": "Notes",
+  "@app_notes": {
+    "description": "Main notes label"
+  },
+  "app_newNote": "New Note",
+  "@app_newNote": {
+    "description": "Create new note action"
+  },
+  "app_delete": "Delete",
+  "@app_delete": {
+    "description": "Delete action"
+  },
+  "app_edit": "Edit",
+  "@app_edit": {
+    "description": "Edit action"
+  },
+  "app_settings": "Settings",
+  "@app_settings": {
+    "description": "Settings screen title"
+  }
+}
