@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'core/app_export.dart';
 import 'widgets/custom_error_widget.dart';
@@ -12,7 +14,6 @@ import 'services/note_persistence_service.dart';
 import 'services/attachment_service.dart';
 import 'controllers/note_controller.dart';
 import 'repositories/notes_repository.dart';
-import 'l10n/localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +30,6 @@ void main() async {
   final notesRepository = NotesRepository();
   final notesService = NotesService(notesRepository);
   await notesService.initialize();
-
-  // Initialize localization service
-  final localizationService = LocalizationService.instance;
-  await localizationService.initialize();
 
   // Initialize monetization services
   final analyticsService = AnalyticsService();
@@ -123,6 +120,8 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: themeService.themeMode,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
               builder: (context, child) {
                 return MediaQuery(
