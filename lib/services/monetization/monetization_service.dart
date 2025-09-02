@@ -19,7 +19,7 @@ class MonetizationService extends ChangeNotifier {
   UserTier get currentTier => _currentTier;
 
   /// Whether user has premium access
-  bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro;
+  bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro || _currentTier == UserTier.enterprise;
 
   /// Current usage counts by feature
   Map<FeatureType, int> get usageCounts => Map.unmodifiable(_usageCounts);
@@ -144,6 +144,15 @@ class MonetizationService extends ChangeNotifier {
           'Priority support',
         ];
       case UserTier.pro:
+        return [
+          'All pro features',
+          'Team management',
+          'Admin controls',
+          'SSO integration',
+          'Compliance features',
+          'Bulk user management',
+        ];
+      case UserTier.enterprise:
         return [];
     }
   }
@@ -156,7 +165,9 @@ class MonetizationService extends ChangeNotifier {
       case UserTier.premium:
         return UserTier.pro;
       case UserTier.pro:
-        return UserTier.pro; // Already at highest tier
+        return UserTier.enterprise;
+      case UserTier.enterprise:
+        return UserTier.enterprise; // Already at highest tier
     }
   }
 
@@ -192,6 +203,7 @@ enum UserTier {
   free,
   premium,
   pro,
+  enterprise,
 }
 
 /// Feature types with usage limits
@@ -258,6 +270,19 @@ class FeatureLimits {
             FeatureType.attachments: -1,
           },
         );
+      
+      case UserTier.enterprise:
+        return const FeatureLimits(
+          limits: {
+            FeatureType.noteCreation: -1,
+            FeatureType.voiceNoteRecording: -1,
+            FeatureType.advancedDrawing: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.advancedExport: -1,
+            FeatureType.folders: -1,
+            FeatureType.attachments: -1,
+          },
+        );
     }
   }
 
@@ -306,7 +331,7 @@ class PricingInfo {
       const PricingInfo(
         tier: UserTier.premium,
         displayName: 'Premium',
-        price: '\$4.99',
+        price: '\$0.99',
         billingPeriod: 'month',
         features: [
           'Unlimited notes',
@@ -319,7 +344,7 @@ class PricingInfo {
       const PricingInfo(
         tier: UserTier.pro,
         displayName: 'Pro',
-        price: '\$9.99',
+        price: '\$1.99',
         billingPeriod: 'month',
         features: [
           'Everything in Premium',
@@ -327,6 +352,22 @@ class PricingInfo {
           'Priority support',
           'Advanced analytics',
           'Extended storage',
+          'API access',
+        ],
+      ),
+      const PricingInfo(
+        tier: UserTier.enterprise,
+        displayName: 'Enterprise',
+        price: '\$4.99',
+        billingPeriod: 'user/month',
+        features: [
+          'Everything in Pro',
+          'Team management',
+          'Admin controls',
+          'SSO integration',
+          'Compliance features',
+          'Bulk user management',
+          'Dedicated support',
         ],
       ),
     ];

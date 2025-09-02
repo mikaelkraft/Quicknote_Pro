@@ -382,6 +382,8 @@ class _UsageDashboardState extends State<UsageDashboard> {
         return 'Premium Plan';
       case UserTier.pro:
         return 'Pro Plan';
+      case UserTier.enterprise:
+        return 'Enterprise Plan';
     }
   }
 
@@ -393,6 +395,8 @@ class _UsageDashboardState extends State<UsageDashboard> {
         return 'Unlimited core features + premium tools';
       case UserTier.pro:
         return 'Everything + advanced capabilities';
+      case UserTier.enterprise:
+        return 'Team management + enterprise features';
     }
   }
 
@@ -479,6 +483,8 @@ class TierStatusBadge extends StatelessWidget {
         return 'Premium';
       case UserTier.pro:
         return 'Pro';
+      case UserTier.enterprise:
+        return 'Enterprise';
     }
   }
 

@@ -14,11 +14,14 @@ void main() {
       expect(monetizationService.isPremium, false);
     });
 
-    test('should recognize premium status for premium and pro tiers', () {
+    test('should recognize premium status for premium, pro, and enterprise tiers', () {
       monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isPremium, true);
 
       monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.isPremium, true);
+
+      monetizationService.setUserTier(UserTier.enterprise);
       expect(monetizationService.isPremium, true);
 
       monetizationService.setUserTier(UserTier.free);
@@ -31,9 +34,16 @@ void main() {
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
-    test('should allow all features for premium tier', () {
+    test('should allow all features for premium, pro, and enterprise tiers', () {
       monetizationService.setUserTier(UserTier.premium);
-      
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
+
+      monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
+      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
+
+      monetizationService.setUserTier(UserTier.enterprise);
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
     });
@@ -65,8 +75,26 @@ void main() {
 
     test('should not show upgrade prompt for premium users', () {
       monetizationService.setUserTier(UserTier.premium);
-      
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+
+      monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+
+      monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+    });
+
+    test('should provide correct upgrade recommendations', () {
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.premium);
+
+      monetizationService.setUserTier(UserTier.premium);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.pro);
+
+      monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
+
+      monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
     });
   });
 }

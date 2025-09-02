@@ -70,6 +70,28 @@ Quicknote Pro uses a freemium model with three tiers: Free, Premium, and Pro. Ea
 - Custom export templates
 - Advanced encryption options
 
+### Enterprise Tier
+**Price**: $4.99/user/month or $49.99/user/year (17% savings)
+**Target**: Teams and organizations
+**Value Proposition**: Everything in Pro plus team management and enterprise features
+
+#### Features & Limits
+- **Everything in Pro**
+- **Team Management**: Multi-user administration
+- **Admin Controls**: User provisioning and access control
+- **SSO Integration**: Single sign-on with SAML/OAuth
+- **Compliance Features**: Audit logs and data governance
+- **Bulk User Management**: CSV import/export for user management
+- **Dedicated Support**: Dedicated account manager
+- **Advanced Security**: End-to-end encryption, compliance certifications
+
+#### Enterprise Exclusive Features
+- Custom branding and white-label options
+- Advanced reporting and analytics dashboard
+- API access with higher rate limits
+- Custom integrations and workflows
+- Priority feature requests and development roadmap input
+
 ## Feature Gating Strategy
 
 ### Soft Limits
@@ -125,6 +147,7 @@ Upgrade prompts appear when users encounter limits:
 ### Trial Offerings
 - **Premium**: 7-day free trial
 - **Pro**: 14-day free trial
+- **Enterprise**: 30-day free trial
 - **Annual Plans**: 30-day money-back guarantee
 
 ### Trial Experience
@@ -144,18 +167,22 @@ Upgrade prompts appear when users encounter limits:
 
 ### Benefits Matrix
 
-| Feature | Free | Premium | Pro |
-|---------|------|---------|-----|
-| Monthly Notes | 50 | Unlimited | Unlimited |
-| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) |
-| Folders | 3 | Unlimited | Unlimited |
-| Advanced Drawing | ❌ | ✅ | ✅ |
-| Voice Transcription | ❌ | ✅ | ✅ |
-| Premium Export | ❌ | ✅ | ✅ |
-| Cloud Storage | 100MB | 1GB | 10GB |
-| Ads | ✅ | ❌ | ❌ |
-| Analytics | ❌ | ❌ | ✅ |
-| Priority Support | ❌ | ✅ | ✅ |
+| Feature | Free | Premium | Pro | Enterprise |
+|---------|------|---------|-----|------------|
+| Monthly Notes | 50 | Unlimited | Unlimited | Unlimited |
+| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) | Unlimited (60min) |
+| Folders | 3 | Unlimited | Unlimited | Unlimited |
+| Advanced Drawing | ❌ | ✅ | ✅ | ✅ |
+| Voice Transcription | ❌ | ✅ | ✅ | ✅ |
+| Premium Export | ❌ | ✅ | ✅ | ✅ |
+| Cloud Storage | 100MB | 1GB | 10GB | 100GB |
+| Ads | ✅ | ❌ | ❌ | ❌ |
+| Analytics | ❌ | ❌ | ✅ | ✅ |
+| Priority Support | ❌ | ✅ | ✅ | ✅ |
+| Team Management | ❌ | ❌ | ❌ | ✅ |
+| SSO Integration | ❌ | ❌ | ❌ | ✅ |
+| Admin Controls | ❌ | ❌ | ❌ | ✅ |
+| Compliance Features | ❌ | ❌ | ❌ | ✅ |
 
 ### Key Selling Points
 
@@ -171,6 +198,14 @@ Upgrade prompts appear when users encounter limits:
 - "10GB storage for extensive media collections"
 - "Usage analytics to optimize productivity"
 - "Priority support when you need help"
+
+#### Enterprise vs Pro
+- "Team management for organizations"
+- "SSO integration for secure access"
+- "Admin controls for user management"
+- "Compliance features for regulated industries"
+- "100GB storage for large teams"
+- "Dedicated support and account management"
 
 ## Implementation Guidelines
 
@@ -308,9 +343,9 @@ All monetization events are tracked:
 ### Potential Adjustments
 - Regional pricing optimization
 - Student discounts
-- Family plans
+- Family plans  
 - Lifetime purchase options
-- Enterprise/team pricing tiers
+- Volume discounts for large enterprise deployments
 
 ### Feature Expansion
 - AI-powered features (separate tier or add-on)

@@ -164,6 +164,25 @@ class _PaywallDialogState extends State<PaywallDialog> {
                       ],
                       isRecommended: false,
                     ),
+                    SizedBox(height: 2.h),
+                    _buildPricingOption(
+                      index: 3,
+                      tier: UserTier.enterprise,
+                      title: 'Enterprise',
+                      price: '\$4.99',
+                      period: 'user/month',
+                      description: 'For teams',
+                      features: const [
+                        'Everything in Pro',
+                        'Team management',
+                        'Admin controls',
+                        'SSO integration',
+                        'Compliance features',
+                        'Bulk user management',
+                        'Dedicated support',
+                      ],
+                      isRecommended: false,
+                    ),
                   ],
                 ),
               ),
@@ -179,7 +198,7 @@ class _PaywallDialogState extends State<PaywallDialog> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '💡 Lifetime options available: Premium $9.99, Pro $19.99 one-time!',
+                '💡 Lifetime options: Premium \$9.99, Pro \$19.99 one-time! Enterprise teams get 17% savings with annual billing.',
                 style: theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -360,6 +379,8 @@ class _PaywallDialogState extends State<PaywallDialog> {
         return 'Start Premium - \$0.99/month';
       case 2:
         return 'Start Pro - \$1.99/month';
+      case 3:
+        return 'Contact Sales - Enterprise';
       default:
         return 'Upgrade Now';
     }
@@ -436,6 +457,8 @@ class _PaywallDialogState extends State<PaywallDialog> {
         return UserTier.premium;
       case 2:
         return UserTier.pro;
+      case 3:
+        return UserTier.enterprise;
       default:
         return UserTier.free;
     }

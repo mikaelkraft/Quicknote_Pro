@@ -23,12 +23,22 @@ class ProductIds {
   /// Price: $19.99 one-time
   static const String proLifetime = 'quicknote_pro_lifetime';
 
+  /// Monthly enterprise subscription product ID
+  /// Price: $4.99/user/month
+  static const String enterpriseMonthly = 'quicknote_enterprise_monthly';
+
+  /// Annual enterprise subscription product ID  
+  /// Price: $49.99/user/year (17% savings)
+  static const String enterpriseAnnual = 'quicknote_enterprise_annual';
+
   /// List of all premium product IDs for easy iteration
   static const List<String> allProductIds = [
     premiumMonthly,
     premiumLifetime,
     proMonthly,
     proLifetime,
+    enterpriseMonthly,
+    enterpriseAnnual,
   ];
 
   /// Map of product IDs to their display names
@@ -37,6 +47,8 @@ class ProductIds {
     premiumLifetime: 'Premium Lifetime',
     proMonthly: 'Pro Monthly',
     proLifetime: 'Pro Lifetime',
+    enterpriseMonthly: 'Enterprise Monthly',
+    enterpriseAnnual: 'Enterprise Annual',
   };
 
   /// Map of product IDs to their prices (for display when store data unavailable)
@@ -45,6 +57,8 @@ class ProductIds {
     premiumLifetime: '\$9.99',
     proMonthly: '\$1.99',
     proLifetime: '\$19.99',
+    enterpriseMonthly: '\$4.99',
+    enterpriseAnnual: '\$49.99',
   };
 
   /// Feature flags for premium functionality
