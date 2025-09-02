@@ -146,14 +146,15 @@ class MonetizationService extends ChangeNotifier {
       case UserTier.pro:
         return [
           'All pro features',
+        ];
+      case UserTier.enterprise:
+        return [
           'Team management',
           'Admin controls',
           'SSO integration',
           'Compliance features',
           'Bulk user management',
         ];
-      case UserTier.enterprise:
-        return [];
     }
   }
 
