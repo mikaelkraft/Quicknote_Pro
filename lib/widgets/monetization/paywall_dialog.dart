@@ -68,8 +68,10 @@ class _PaywallDialogState extends State<PaywallDialog> {
     final theme = Theme.of(context);
     final monetizationService = context.read<MonetizationService>();
 
-    return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      semanticLabel: widget.title != null
+          ? '${widget.title} dialog'
+          : 'Upgrade to premium subscription dialog',
       child: Container(
         constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 80.h),
         padding: EdgeInsets.all(4.w),
