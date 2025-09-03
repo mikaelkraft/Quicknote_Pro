@@ -1,6 +1,13 @@
 # Pricing Tiers and Paywall
 
+<<<<<<< copilot/fix-78bc4ac8-0e66-4ec5-8426-4f6181bb6f96
+Tiers (updated)
+- Free: core note creation, sync limits, ads enabled.
+- Premium: $0.99/month - unlimited notes, advanced features, no ads.
+- Pro: $1.99/month - everything in Premium plus advanced analytics and priority support.
+=======
 ## Finalized Pricing Tiers
+>>>>>>> main
 
 ### Subscription Tiers
 - **Free**: Core note creation, limited sync, ads enabled
@@ -19,6 +26,23 @@
 - Simple, distraction-free page with primary CTA
 - Clear pricing display with annual discount highlighted (20% savings)
 - Secondary CTA: restore purchase
+<<<<<<< copilot/fix-78bc4ac8-0e66-4ec5-8426-4f6181bb6f96
+- Trust elements: brief feature/value bullets
+- Regional pricing optimized for maximum engagement
+
+Experiment plan (post-v1 candidates)
+- A/B headlines
+- Annual vs monthly emphasis
+- Trial duration variants
+- Regional pricing variations
+
+Checklist
+- [x] Define feature matrix for Free vs Premium vs Pro
+- [x] Establish price points optimized for engagement
+- [x] Implement paywall screen and restore flow
+- [ ] Wire analytics for view, dismiss, start, complete
+- [ ] Draft copy and visuals with brand alignment
+=======
 - Trust elements: feature/value bullets by tier
 - Regional pricing detection and display
 
@@ -42,3 +66,4 @@ New analytics parameters to track:
 - [ ] Test regional pricing detection
 - [ ] Draft copy and visuals with brand alignment
 - [ ] A/B test annual vs monthly emphasis
+>>>>>>> main
