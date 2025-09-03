@@ -2,7 +2,7 @@
 
 This document defines the pricing structure, feature limitations, and upgrade paths for Quicknote Pro.
 
-> **📝 Note on Localization**: As of version 1.1.0, all pricing tier names, billing periods, and key feature descriptions are now localized. See [docs/localization.md](localization.md) for details on supported languages and localization keys.
+> 📝 Note on Localization: As of version 1.1.0, all pricing tier names, billing periods, and key feature descriptions are now localized. See [docs/localization.md](localization.md) for details on supported languages and localization keys.
 
 ## Overview
 
@@ -12,80 +12,42 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 
 ### Base Market Pricing (USD)
 
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $1.99 | $19.99 | $74.99 |
-| **Pro** | $2.99 | $29.99 | $114.99 |
-| **Enterprise** | $2.00/user | $19.99/user | - |
+| Tier        | Monthly         | Annual (status) | Lifetime |
+|-------------|-----------------|-----------------|----------|
+| Free        | $0              | -               | -        |
+| Premium     | $0.99           | — (hidden)      | $9.99    |
+| Pro         | $1.99           | — (hidden)      | $19.99   |
+| Enterprise  | $4.99/user      | — (hidden)      | -        |
 
-### Regional Pricing (USD)
+Notes
+- Annual plans are currently hidden (reserved for future experimentation with an expected ~20% savings framing).
+- Lifetime is available for Premium and Pro only.
+- Enterprise is priced per user/month and includes advanced team/security features.
+- Prices shown in-app use localized currency symbols; amounts are anchored to USD.
 
-#### Africa Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $0.99 | $9.99 | $37.99 |
-| **Pro** | $1.99 | $19.99 | $74.99 |
-| **Enterprise** | $1.00/user | $9.99/user | - |
+### Regional Pricing
 
-#### Asia Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $1.49 | $11.99 | $59.99 |
-| **Pro** | $2.49 | $23.99 | $94.99 |
-| **Enterprise** | $1.50/user | $11.99/user | - |
-
-#### Europe Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $2.49 | $19.99 | $94.99 |
-| **Pro** | $3.49 | $33.99 | $134.99 |
-| **Enterprise** | $2.50/user | $19.99/user | - |
-
-#### Latin America Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $1.29 | $11.99 | $49.99 |
-| **Pro** | $2.29 | $19.99 | $87.99 |
-| **Enterprise** | $1.30/user | $11.99/user | - |
-
-#### India Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $0.79 | $7.99 | $29.99 |
-| **Pro** | $1.49 | $11.99 | $59.99 |
-| **Enterprise** | $0.80/user | $7.99/user | - |
-
-#### Eastern Europe Region
-| Tier | Monthly | Annual (20% savings) | Lifetime |
-|------|---------|---------------------|----------|
-| **Free** | $0 | - | - |
-| **Premium** | $1.19 | $11.99 | $45.99 |
-| **Pro** | $1.99 | $19.99 | $74.99 |
-| **Enterprise** | $1.20/user | $11.99/user | - |
+- Paused for now. Current base pricing ($0.99–$1.99) reduces the need for regional adjustments.
+- Keep analytics support for region to inform potential future rollouts.
+- The app defaults to base pricing with localized currency formatting where supported.
 
 ## Pricing Tiers
 
 ### Free Tier
-**Price**: $0
-**Target**: New users and light note-takers
-**Value Proposition**: Core note-taking with basic features
+Price: $0  
+Target: New users and light note-takers  
+Value Proposition: Core note-taking with basic features
 
 #### Features & Limits
-- **Notes**: 50 notes per month
-- **Voice Recordings**: 5 recordings per month (max 2 minutes each)
-- **Folders**: 3 folders maximum
-- **Attachments**: 10 attachments per month (images and files)
-- **Drawing**: Basic doodling and canvas tools
-- **Export**: Basic text export only
-- **Storage & Sync**: Local storage and file system access only
-- **Device Sync**: Manual import/export between devices (local files only)
-- **Ads**: Yes (with frequency caps)
+- Notes: 50 notes per month
+- Voice Recordings: 5 recordings per month (max 2 minutes each)
+- Folders: 3 folders maximum
+- Attachments: 10 attachments per month (images and files)
+- Drawing: Basic doodling and canvas tools
+- Export: Basic text export only
+- Storage & Sync: Local storage and file system access only
+- Device Sync: Manual import/export between devices (local files only)
+- Ads: Yes (with frequency caps)
 
 #### Restrictions
 - No advanced drawing tools (layers, premium brushes, shapes)
@@ -95,26 +57,25 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - No cloud sync or storage capabilities
 - No automatic device sync (manual import/export only)
 - No custom themes
-- Local storage and export/import only
 
 ### Premium Tier
-**Price**: $1.99/month, $19.99/year (20% savings), or $74.99 lifetime
-**Target**: Regular users and productivity enthusiasts
-**Value Proposition**: Unlimited core features with advanced tools
+Price: $0.99/month or $9.99 lifetime  
+Target: Regular users and productivity enthusiasts  
+Value Proposition: Unlimited core features with advanced tools
 
 #### Features & Limits
-- **Notes**: Unlimited
-- **Voice Recordings**: 100 recordings per month (max 10 minutes each)
-- **Voice Transcription**: Automatic transcription of all voice notes
-- **Folders**: Unlimited
-- **Attachments**: Unlimited (images and files)
-- **Drawing**: Advanced drawing tools, layers, premium brushes, shapes
-- **OCR**: Text extraction from images and scanned documents
-- **Export**: All formats (PDF, DOCX, Markdown, HTML)
-- **Storage & Sync**: Cloud sync capabilities (storage managed by your cloud provider)
-- **Device Sync**: Automatic sync across up to 3 devices
-- **Themes**: Custom themes and dark mode
-- **Ads**: Completely removed
+- Notes: Unlimited
+- Voice Recordings: 100 recordings per month (max 10 minutes each)
+- Voice Transcription: Automatic transcription of all voice notes
+- Folders: Unlimited
+- Attachments: Unlimited (images and files)
+- Drawing: Advanced drawing tools, layers, premium brushes, shapes
+- OCR: Text extraction from images and scanned documents
+- Export: All formats (PDF, DOCX, Markdown, HTML)
+- Storage & Sync: Cloud sync capabilities (storage managed by your cloud provider)
+- Device Sync: Automatic sync across up to 3 devices
+- Themes: Custom themes and dark mode
+- Ads: Completely removed
 
 #### Additional Benefits
 - Priority cloud sync with automatic device synchronization
@@ -125,22 +86,22 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - Professional export templates
 
 ### Pro Tier
-**Price**: $2.99/month, $29.99/year (20% savings), or $114.99 lifetime
-**Target**: Power users and professionals
-**Value Proposition**: All features plus advanced capabilities
+Price: $1.99/month or $19.99 lifetime  
+Target: Power users and professionals  
+Value Proposition: All features plus advanced capabilities
 
 #### Features & Limits
-- **Everything in Premium**
-- **Voice Recordings**: Unlimited (max 30 minutes each)
-- **Analytics**: Advanced usage insights and productivity metrics
-- **Search**: Advanced search with OCR integration
-- **Backup**: Automated backup scheduling and versioning
-- **Templates**: Custom export templates and formatting
-- **Encryption**: Advanced encryption options for sensitive notes
-- **API Access**: Integration capabilities with third-party apps
-- **Storage & Sync**: Enhanced cloud sync capabilities (storage managed by your cloud provider)
-- **Device Sync**: Automatic sync across up to 10 devices
-- **Support**: Phone and email priority support
+- Everything in Premium
+- Voice Recordings: Unlimited (max 30 minutes each)
+- Analytics: Advanced usage insights and productivity metrics
+- Search: Advanced search with OCR integration
+- Backup: Automated backup scheduling and versioning
+- Templates: Custom export templates and formatting
+- Encryption: Advanced encryption options for sensitive notes
+- API Access: Integration capabilities with third-party apps
+- Storage & Sync: Enhanced cloud sync capabilities (storage managed by your cloud provider)
+- Device Sync: Automatic sync across up to 10 devices
+- Support: Phone and email priority support
 
 #### Exclusive Features
 - Usage analytics and productivity insights
@@ -151,34 +112,25 @@ Quicknote Pro uses a freemium model with four tiers: Free, Premium, Pro, and Ent
 - Priority support with dedicated channels
 
 ### Enterprise Tier
-**Price**: $2.00/user/month or $19.99/user/year (20% savings)
-**Target**: Teams, organizations, educational institutions
-**Value Proposition**: Team collaboration and administrative controls
+Price: $4.99/user/month  
+Target: Teams, organizations, educational institutions  
+Value Proposition: Team collaboration and administrative controls
 
-#### Everything in Pro, Plus:
-- ✅ **Team Features**: Team workspace management and collaboration
-- ✅ **Admin Controls**: Admin dashboard and comprehensive user management
-- ✅ **Advanced Sharing**: Advanced sharing and permissions system
-- ✅ **SSO Integration**: Single sign-on with popular identity providers
-- ✅ **Compliance**: Audit logs, data residency, and compliance features
-- ✅ **Branding**: Custom branding options and white-label capabilities
-- ✅ **Storage & Sync**: Enterprise cloud sync capabilities (storage managed by your organization's cloud provider)
-- ✅ **Device Sync**: Unlimited device sync across your organization
-- ✅ **Support**: Dedicated account manager and priority support
-- ✅ **SLA**: Service level agreements and uptime guarantees
-- ✅ **Integrations**: Custom integrations and enterprise connectors
+#### Everything in Pro, Plus
+- Team workspace management and collaboration
+- Admin dashboard and comprehensive user management
+- Advanced sharing and permissions
+- SSO integration (SAML, OAuth, LDAP)
+- Audit logs, data residency, and compliance features
+- Custom branding options and white-label capabilities
+- Enterprise cloud sync capabilities (storage managed by your organization's cloud provider)
+- Unlimited device sync across your organization
+- Dedicated account manager and priority support
+- SLA guarantees and uptime targets
+- Custom integrations and enterprise connectors
 
-#### Enterprise Features
-- Team workspace with advanced collaboration tools
-- Comprehensive admin dashboard with user analytics
-- Granular permissions and sharing controls
-- Enterprise SSO integration (SAML, OAuth, LDAP)
-- Audit logs and compliance reporting
-- Custom branding and white-label options
-- Enterprise cloud sync capabilities (storage managed by organization's cloud provider)
-- Unlimited device synchronization across organization
-- Dedicated account management
-- Custom deployment options (cloud, on-premise, hybrid)
+#### Deployment Options
+- Cloud, on-premise, or hybrid (subject to enterprise agreement)
 
 ## Feature Gating Strategy
 
@@ -207,42 +159,42 @@ Features shown but locked with upgrade prompts:
 ### Contextual Prompts
 Upgrade prompts appear when users encounter limits:
 
-1. **Note Limit Reached**
+1. Note Limit Reached
    - Message: "You've reached your monthly note limit. Upgrade to Premium for unlimited notes."
    - CTA: "Upgrade Now" / "Learn More"
    - Context: After 50th note creation attempt
 
-2. **Voice Recording Limit**
+2. Voice Recording Limit
    - Message: "Monthly voice recording limit reached. Premium gives you 100 recordings per month."
    - CTA: "Upgrade to Premium"
    - Context: When attempting 6th recording
 
-3. **Advanced Feature Access**
+3. Advanced Feature Access
    - Message: "Advanced drawing tools are available with Premium. Try risk-free for 7 days."
    - CTA: "Start Free Trial"
    - Context: When tapping locked drawing tool
 
 ### Upgrade Flow
-1. **Feature Context**: User encounters limitation
-2. **Value Proposition**: Clear benefit explanation
-3. **Pricing Display**: Transparent pricing with annual discount
-4. **Trial Offer**: 7-day free trial for Premium/Pro
-5. **Purchase Flow**: Platform-native purchase process
-6. **Onboarding**: Guide to new features after upgrade
+1. Feature Context: User encounters limitation
+2. Value Proposition: Clear benefit explanation
+3. Pricing Display: Transparent pricing with lifetime options
+4. Trial Offer: 7-day free trial for Premium, 14-day for Pro
+5. Purchase Flow: Platform-native purchase process
+6. Onboarding: Guide to new features after upgrade
 
 ## Free Trial Strategy
 
 ### Trial Offerings
-- **Premium**: 7-day free trial (Standard trial for all new users)
-- **Pro**: 14-day free trial (Extended trial for power users)
-- **Annual Plans**: 30-day money-back guarantee
+- Premium: 7-day free trial
+- Pro: 14-day free trial
+- Annual Plans: If/when enabled, 30-day money-back guarantee
 
 ### Enhanced Trial Types
-- **Standard Trials**: Default offerings for new users
-- **Promotional Trials**: Extended trials (14 days for Premium) after 2+ conversion attempts
-- **Win-Back Trials**: 10-day trials for users with expired trials
-- **Referral Trials**: 14-day Premium trials as referral rewards
-- **Retention Trials**: Special extensions for user retention campaigns
+- Standard Trials: Default offerings for new users
+- Promotional Trials: Extended trials (e.g., 14 days for Premium) after 2+ conversion attempts
+- Win-Back Trials: 10-day trials for users with expired trials
+- Referral Trials: 14-day Premium trials as referral rewards
+- Retention Trials: Special extensions for user retention campaigns
 
 ### Trial Experience
 - Full feature access during trial
@@ -263,79 +215,80 @@ Upgrade prompts appear when users encounter limits:
 ## Referral and Coupon System
 
 ### Referral Program
-- **Referral Codes**: Unique 8-character codes (QN + 6 alphanumeric)
-- **Referrer Rewards**: Free month of service when referral converts
-- **Referee Rewards**: 14-day Premium trial upon signup
-- **Tracking**: Comprehensive analytics on referral performance
-- **Eligibility**: All users can generate referral codes
+- Referral Codes: Unique 8-character codes (QN + 6 alphanumeric)
+- Referrer Rewards: Free month of service when referral converts
+- Referee Rewards: 14-day Premium trial upon signup
+- Tracking: Comprehensive analytics on referral performance
+- Eligibility: All users can generate referral codes
 
 ### Coupon System
-- **Welcome Coupons**: 25% off first month for new users (WELCOME25)
-- **Student Discounts**: 20% off annual plans (STUDENT20)
-- **Holiday Promotions**: $5 off annual subscriptions (HOLIDAY50)
-- **Win-Back Campaigns**: 30% off for churned users (COMEBACK30)
-- **Annual Incentives**: 2 extra months free with annual plans (ANNUALBONUS)
-- **Flash Sales**: 40% off limited-time promotions (FLASH48HR)
+- Welcome Coupons: 25% off first month for new users (WELCOME25)
+- Student Discounts: 20% off (applied to eligible plan types)
+- Holiday Promotions: Fixed-amount or percentage discounts
+- Win-Back Campaigns: 30% off for churned users (COMEBACK30)
+- Annual Incentives: If/when annual is enabled, extra months free
+- Flash Sales: Time-limited promotions (e.g., 48 hours)
 
 ### Coupon Features
-- **Multiple Discount Types**: Percentage, fixed amount, free months, trial extensions
-- **Smart Eligibility**: New users only, existing users, upgrade-only, renewal-only
-- **Usage Limits**: Maximum uses per coupon and per user
-- **Minimum Purchase**: Requirements for certain high-value coupons
-- **Expiration Management**: Automatic validation of coupon validity
-- **Analytics Integration**: Comprehensive tracking of coupon usage and effectiveness
+- Multiple Discount Types: Percentage, fixed amount, free months, trial extensions
+- Smart Eligibility: New users only, existing users, upgrade-only, renewal-only
+- Usage Limits: Maximum uses per coupon and per user
+- Minimum Purchase: Requirements for certain high-value coupons
+- Expiration Management: Automatic validation of coupon validity
+- Analytics Integration: Comprehensive tracking of coupon usage and effectiveness
 
 ## Value Communication
 
 ### Benefits Matrix
 
-| Feature | Free | Premium | Pro | Enterprise |
-|---------|------|---------|-----|------------|
-| Monthly Notes | 50 | Unlimited | Unlimited | Unlimited |
-| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) | Unlimited (30min) |
-| Voice Transcription | ❌ | ✅ | ✅ | ✅ |
-| Folders | 3 | Unlimited | Unlimited | Unlimited |
-| Attachments | 10/month | Unlimited | Unlimited | Unlimited |
-| Basic Drawing | ✅ | ✅ | ✅ | ✅ |
-| Advanced Drawing | ❌ | ✅ | ✅ | ✅ |
-| Canvas Layers | ❌ | ✅ | ✅ | ✅ |
-| OCR Text Extraction | ❌ | ✅ | ✅ | ✅ |
-| Basic Export | ✅ | ✅ | ✅ | ✅ |
-| Premium Export | ❌ | ✅ | ✅ | ✅ |
-| Local Export/Import | ✅ | ✅ | ✅ | ✅ |
-| Cloud Export/Import | ❌ | ✅ | ✅ | ✅ |
-| Cloud Sync | ❌ | ✅ | ✅ | ✅ |
-| Custom Themes | ❌ | ✅ | ✅ | ✅ |
-| Ads | ✅ | ❌ | ❌ | ❌ |
-| Analytics | ❌ | ❌ | ✅ | ✅ |
-| Priority Support | ❌ | ✅ | ✅ | ✅ |
-| API Access | ❌ | ❌ | ✅ | ✅ |
-| Advanced Search | ❌ | ❌ | ✅ | ✅ |
-| Automated Backup | ❌ | ❌ | ✅ | ✅ |
-| Custom Templates | ❌ | ❌ | ✅ | ✅ |
-| Advanced Encryption | ❌ | ❌ | ✅ | ✅ |
-| Team Workspace | ❌ | ❌ | ❌ | ✅ |
-| Admin Dashboard | ❌ | ❌ | ❌ | ✅ |
-| SSO Integration | ❌ | ❌ | ❌ | ✅ |
-| Audit Logs | ❌ | ❌ | ❌ | ✅ |
-| Custom Branding | ❌ | ❌ | ❌ | ✅ |
-| Dedicated Support | ❌ | ❌ | ❌ | ✅ |
+| Feature                 | Free           | Premium               | Pro                        | Enterprise                      |
+|-------------------------|----------------|-----------------------|----------------------------|----------------------------------|
+| Monthly Notes           | 50             | Unlimited             | Unlimited                  | Unlimited                        |
+| Voice Recordings        | 5 (2min)       | 100 (10min)           | Unlimited (30min)          | Unlimited (60min)                |
+| Voice Transcription     | ❌             | ✅                    | ✅                         | ✅                               |
+| Folders                 | 3              | Unlimited             | Unlimited                  | Unlimited                        |
+| Attachments             | 10/month       | Unlimited             | Unlimited                  | Unlimited                        |
+| Advanced Drawing Tools  | ❌             | ✅                    | ✅                         | ✅                               |
+| OCR Text Extraction     | ❌             | ✅                    | ✅                         | ✅                               |
+| Premium Export Formats  | ❌             | ✅                    | ✅                         | ✅                               |
+| Cloud Sync              | ❌             | ✅                    | ✅                         | ✅                               |
+| Custom Themes           | ❌             | ✅                    | ✅                         | ✅                               |
+| Analytics & Insights    | ❌             | ❌                   | ✅                         | ✅                               |
+| Priority Support        | ❌             | ✅                    | ✅                         | ✅                               |
+| API Access              | ❌             | ❌                   | ✅                         | ✅                               |
+| Advanced Search         | ❌             | ❌                   | ✅                         | ✅                               |
+| Automated Backups       | ❌             | ❌                   | ✅                         | ✅                               |
+| Custom Templates        | ❌             | ❌                   | ✅                         | ✅                               |
+| Advanced Encryption     | ❌             | ❌                   | ✅                         | ✅                               |
+| Team Management         | ❌             | ❌                   | ❌                        | ✅                               |
+| Admin Controls          | ❌             | ❌                   | ❌                        | ✅                               |
+| SSO Integration         | ❌             | ❌                   | ❌                        | ✅                               |
+| Compliance/Audit Logs   | ❌             | ❌                   | ❌                        | ✅                               |
+| Custom Branding         | ❌             | ❌                   | ❌                        | ✅                               |
+| Dedicated Support       | ❌             | ❌                   | ❌                        | ✅                               |
 
 ### Key Selling Points
 
 #### Premium vs Free
-- "Remove the 50-note monthly limit"
-- "Advanced drawing tools for visual note-taking"
-- "Voice note transcription saves time"
-- "Export to professional formats"
-- "Cloud sync capabilities enabled"
-- "Ad-free focused experience"
+- Remove the 50-note monthly limit
+- Advanced drawing tools for visual note-taking
+- Voice note transcription saves time
+- Export to professional formats
+- Cloud sync capabilities enabled
+- Ad-free focused experience
 
 #### Pro vs Premium
-- "Unlimited voice recordings for lectures and meetings"
-- "Enhanced cloud sync capabilities"
-- "Usage analytics to optimize productivity"
-- "Priority support when you need help"
+- Unlimited voice recordings for lectures and meetings
+- Enhanced cloud sync capabilities
+- Usage analytics to optimize productivity
+- Priority support when you need help
+
+#### Enterprise vs Pro
+- Team management for organizations
+- SSO integration for secure access
+- Admin controls for user management
+- Compliance features for regulated industries
+- Dedicated support and account management
 
 ## Implementation Guidelines
 
@@ -430,10 +383,10 @@ void showUpgradeOrTrialPrompt() {
 ## Revenue Optimization
 
 ### Pricing Psychology
-- Annual plans offer 20% discount
-- Premium tier positioned as "popular choice"
-- Pro tier highlights "best value" for power users
-- Clear monthly vs annual savings display
+- If/when annual plans are enabled, display clear “20% savings” vs monthly
+- Premium tier positioned as “popular choice”
+- Pro tier highlights “best value” for power users
+- Clear monthly vs lifetime value framing
 
 ### Conversion Optimization
 - A/B testing on upgrade prompt copy
@@ -446,27 +399,27 @@ void showUpgradeOrTrialPrompt() {
 - Regular feature announcements
 - Usage analytics sharing (Pro tier)
 - Exclusive preview access to new features
-- **Referral Program**: Generate codes, track conversions, earn rewards
-- **Smart Coupon System**: Contextual discounts based on user behavior
-- **Enhanced Trial Management**: Multiple trial types for different user segments
-- **Win-Back Campaigns**: Targeted offers for churned users
-- **Conversion Optimization**: Smart timing and personalized promotions
+- Referral Program: Generate codes, track conversions, earn rewards
+- Smart Coupon System: Contextual discounts based on user behavior
+- Enhanced Trial Management: Multiple trial types for different user segments
+- Win-Back Campaigns: Targeted offers for churned users
+- Conversion Optimization: Smart timing and personalized promotions
 
 ## Analytics and Monitoring
 
 ### Key Metrics
 
 #### Conversion Funnel
-1. **Feature Limit Encounters**: Users hitting limits
-2. **Trial Offers Shown**: Trial prompts displayed to eligible users
-3. **Trial Starts**: Users beginning free trials
-4. **Trial Engagement**: Active usage during trial period
-5. **Upgrade Prompt Views**: Prompts shown to users (trial and non-trial)
-6. **Upgrade Intent**: Users starting upgrade flow
-7. **Coupon Applications**: Discount codes applied to purchases
-8. **Trial Conversions**: Trials converting to paid subscriptions
-9. **Subscription Retention**: Monthly retention rates
-10. **Referral Activations**: Successful referral code applications
+1. Feature Limit Encounters: Users hitting limits
+2. Trial Offers Shown: Trial prompts displayed to eligible users
+3. Trial Starts: Users beginning free trials
+4. Trial Engagement: Active usage during trial period
+5. Upgrade Prompt Views: Prompts shown to users (trial and non-trial)
+6. Upgrade Intent: Users starting upgrade flow
+7. Coupon Applications: Discount codes applied to purchases
+8. Trial Conversions: Trials converting to paid subscriptions
+9. Subscription Retention: Monthly retention rates
+10. Referral Activations: Successful referral code applications
 
 #### Revenue Metrics
 - Monthly Recurring Revenue (MRR)
@@ -517,10 +470,10 @@ All monetization and retention events are tracked:
 ## Competitive Analysis
 
 ### Market Positioning
-- **vs. Notion**: Simpler, mobile-first experience
-- **vs. Evernote**: Better multimedia integration
-- **vs. Apple Notes**: Cross-platform availability
-- **vs. OneNote**: Cleaner interface, better pricing
+- vs. Notion: Simpler, mobile-first experience
+- vs. Evernote: Better multimedia integration
+- vs. Apple Notes: Cross-platform availability
+- vs. OneNote: Cleaner interface, better pricing
 
 ### Pricing Comparison
 - Competitive with market leaders
@@ -531,11 +484,11 @@ All monetization and retention events are tracked:
 ## Future Pricing Considerations
 
 ### Potential Adjustments
-- Regional pricing optimization
+- Reintroduce regional pricing with data-driven discounts
 - Student discounts
 - Family plans
 - Lifetime purchase options
-- Enterprise/team pricing tiers
+- Volume discounts for large enterprise deployments
 
 ### Feature Expansion
 - AI-powered features (separate tier or add-on)
@@ -548,28 +501,28 @@ All monetization and retention events are tracked:
 The following localization keys are used for pricing-related text:
 
 ### Tier Names
-- `pricing_free` → "Free" / "Gratis" / "Gratuit" / "Kostenlos"
-- `pricing_premium` → "Premium" 
-- `pricing_pro` → "Pro"
-- `pricing_enterprise` → "Enterprise" / "Empresa" / "Entreprise" / "Unternehmen"
+- pricing_free → "Free" / "Gratis" / "Gratuit" / "Kostenlos"
+- pricing_premium → "Premium"
+- pricing_pro → "Pro"
+- pricing_enterprise → "Enterprise" / "Empresa" / "Entreprise" / "Unternehmen"
 
 ### Billing Terms
-- `planTerm_monthly` → "Monthly" / "Mensual" / "Mensuel" / "Monatlich"
-- `planTerm_annual` → "Annual" / "Anual" / "Annuel" / "Jährlich"  
-- `planTerm_lifetime` → "Lifetime" / "De por vida" / "À vie" / "Lebenslang"
-- `planTerm_perUser` → "Per User" / "Por usuario" / "Par utilisateur" / "Pro Benutzer"
-- `planTerm_save20` → "Save 20%" / "Ahorrar 20%" / "Économiser 20%" / "20% sparen"
+- planTerm_monthly → "Monthly" / "Mensual" / "Mensuel" / "Monatlich"
+- planTerm_annual → "Annual" / "Anual" / "Annuel" / "Jährlich"
+- planTerm_lifetime → "Lifetime" / "De por vida" / "À vie" / "Lebenslang"
+- planTerm_perUser → "Per User" / "Por usuario" / "Par utilisateur" / "Pro Benutzer"
+- planTerm_save20 → "Save 20%" / "Ahorrar 20%" / "Économiser 20%" / "20% sparen"
 
 ### Action Labels
-- `action_upgradeNow` → "Upgrade Now" / "Actualizar ahora" / "Mettre à niveau maintenant" / "Jetzt upgraden"
-- `action_startFreeTrial` → "Start Free Trial" / "Iniciar prueba gratuita" / "Commencer l'essai gratuit" / "Kostenlose Testversion starten"
-- `action_restorePurchase` → "Restore Purchase" / "Restaurar compra" / "Restaurer l'achat" / "Kauf wiederherstellen"
+- action_upgradeNow → "Upgrade Now" / "Actualizar ahora" / "Mettre à niveau maintenant" / "Jetzt upgraden"
+- action_startFreeTrial → "Start Free Trial" / "Iniciar prueba gratuita" / "Commencer l'essai gratuit" / "Kostenlose Testversion starten"
+- action_restorePurchase → "Restore Purchase" / "Restaurar compra" / "Restaurer l'achat" / "Kauf wiederherstellen"
 
 ### Feature Highlights
-- `feature_unlimitedNotes` → "Unlimited notes" / "Notas ilimitadas" / "Notes illimitées" / "Unbegrenzte Notizen"
-- `feature_voiceTranscription` → "Voice transcription" / "Transcripción de voz" / "Transcription vocale" / "Sprachtranskription"
-- `feature_advancedDrawingTools` → "Advanced drawing tools" / "Herramientas de dibujo avanzadas" / "Outils de dessin avancés" / "Erweiterte Zeichenwerkzeuge"
-- `feature_noAds` → "No ads" / "Sin anuncios" / "Sans publicité" / "Keine Werbung"
-- `feature_prioritySupport` → "Priority support" / "Soporte prioritario" / "Support prioritaire" / "Prioritätssupport"
+- feature_unlimitedNotes → "Unlimited notes" / "Notas ilimitadas" / "Notes illimitées" / "Unbegrenzte Notizen"
+- feature_voiceTranscription → "Voice transcription" / "Transcripción de voz" / "Transcription vocale" / "Sprachtranskription"
+- feature_advancedDrawingTools → "Advanced drawing tools" / "Herramientas de dibujo avanzadas" / "Outils de dessin avancés" / "Erweiterte Zeichenwerkzeuge"
+- feature_noAds → "No ads" / "Sin anuncios" / "Sans publicité" / "Keine Werbung"
+- feature_prioritySupport → "Priority support" / "Soporte prioritario" / "Support prioritaire" / "Prioritätssupport"
 
 See [docs/localization.md](localization.md) for complete localization documentation and implementation details.
