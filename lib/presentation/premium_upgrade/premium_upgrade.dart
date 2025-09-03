@@ -77,7 +77,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
   void _trackScreenView() {
     // Log screen view
     _analyticsService.logScreenView('premium_upgrade');
-    
+
     // Log upgrade prompt shown (once per screen open)
     if (!_hasLoggedPromptShown) {
       _analyticsService.trackMonetizationEvent(
@@ -129,10 +129,13 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     setState(() {
       _selectedPlan = plan;
     });
-    
-    // Track upgrade started with the selected tier
+
+    // Track upgrade started with the selected plan (premium_monthly or premium_lifetime)
     _analyticsService.trackMonetizationEvent(
-      MonetizationEvent.upgradeStarted(tier: plan, context: 'plan_selection'),
+      MonetizationEvent.upgradeStarted(
+        tier: 'premium_$plan',
+        context: 'plan_selection',
+      ),
     );
   }
 
@@ -224,7 +227,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
     // Track free trial started
     _analyticsService.trackMonetizationEvent(
       MonetizationEvent.upgradeStarted(
-        tier: _selectedPlan,
+        tier: 'premium_$_selectedPlan',
         context: 'trial',
       ),
     );
@@ -450,7 +453,7 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                     Expanded(
                                       child: PricingOptionWidget(
                                         title: 'Monthly',
-                                        price: '\$2.99',
+                                        price: '\$0.99',
                                         period: '/month',
                                         savings: null,
                                         isSelected: _selectedPlan == 'monthly',
@@ -462,9 +465,9 @@ class _PremiumUpgradeState extends State<PremiumUpgrade>
                                     Expanded(
                                       child: PricingOptionWidget(
                                         title: 'Lifetime',
-                                        price: '\$74.99',
+                                        price: '\$9.99',
                                         period: 'one-time',
-                                        savings: 'Save 30%',
+                                        savings: 'Best value',
                                         isSelected: _selectedPlan == 'lifetime',
                                         isRecommended: true,
                                         onTap: () =>
