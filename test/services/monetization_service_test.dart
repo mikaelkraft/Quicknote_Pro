@@ -41,9 +41,10 @@ void main() {
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
-    test('should allow premium features for premium tier', () {
-      monetizationService.setUserTier(UserTier.premium);
-      
+    test('should allow premium features for premium tier', () async {
+      await monetizationService.setUserTier(UserTier.premium);
+
+      // Premium features available
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), true);
@@ -51,43 +52,64 @@ void main() {
       expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.customThemes), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.adRemoval), true);
-      
-      // Pro-only features should still be unavailable
+
+      // Pro-only features not available on Premium
       expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), false);
       expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), false);
-      
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedSearch), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.automatedBackup), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.customExportTemplates), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedEncryption), false);
+
+      // Enterprise-only features not available on Premium
+      expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), false);
+
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
     });
 
-    test('should allow all pro features for pro tier', () {
-      monetizationService.setUserTier(UserTier.pro);
-      
+    test('should allow all pro features for pro tier', () async {
+      await monetizationService.setUserTier(UserTier.pro);
+
+      // Premium and Pro features available
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedSearch), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.automatedBackup), true);
-      
+      expect(monetizationService.isFeatureAvailable(FeatureType.customExportTemplates), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.advancedEncryption), true);
+
       // Enterprise-only features should still be unavailable
       expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), false);
       expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), false);
-      
+      expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), false);
+      expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), false);
+
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
-    test('should allow all enterprise features for enterprise tier', () {
-      monetizationService.setUserTier(UserTier.enterprise);
-      
+    test('should allow all enterprise features for enterprise tier', () async {
+      await monetizationService.setUserTier(UserTier.enterprise);
+
+      // Premium + Pro + Enterprise features available
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
+      expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), true);
-      
+
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
       expect(monetizationService.canUseFeature(FeatureType.teamWorkspace), true);
@@ -96,14 +118,14 @@ void main() {
     test('should track feature usage correctly', () async {
       await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      
+
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 2);
     });
 
     test('should track feature usage and emit analytics events', () async {
       // Record usage for a feature within limits
       await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      
+
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 1);
     });
 
@@ -112,10 +134,10 @@ void main() {
       for (int i = 0; i < 50; i++) {
         await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
-      
+
       // Next attempt should be blocked and emit analytics event
       await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      
+
       // Usage count should not increment beyond limit
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 50);
     });
@@ -125,7 +147,7 @@ void main() {
         context: 'voice_limit_reached',
         featureBlocked: 'voice_notes',
       );
-      
+
       expect(monetizationService.upgradePromptCount, 1);
     });
 
@@ -134,23 +156,23 @@ void main() {
       for (int i = 0; i < 45; i++) {
         await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
-      
+
       expect(monetizationService.getRemainingUsage(FeatureType.noteCreation), 5);
     });
 
     test('should handle device sync limits correctly', () async {
       // Free tier: device sync not available
       expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), false);
-      
+
       // Premium tier: 3 device sync limit
       await monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isFeatureAvailable(FeatureType.deviceSync), true);
       expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), 3);
-      
+
       // Pro tier: 10 device sync limit
       await monetizationService.setUserTier(UserTier.pro);
       expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), 10);
-      
+
       // Enterprise tier: unlimited device sync
       await monetizationService.setUserTier(UserTier.enterprise);
       expect(monetizationService.getRemainingUsage(FeatureType.deviceSync), -1);
@@ -161,14 +183,32 @@ void main() {
       for (int i = 0; i < 50; i++) {
         await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
-      
+
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), true);
     });
 
     test('should not show upgrade prompt for premium users', () async {
       await monetizationService.setUserTier(UserTier.premium);
-      
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+
+      await monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+
+      await monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
+    });
+
+    test('should provide correct upgrade recommendations', () async {
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.premium);
+
+      await monetizationService.setUserTier(UserTier.premium);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.pro);
+
+      await monetizationService.setUserTier(UserTier.pro);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
+
+      await monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
     });
   });
 }
