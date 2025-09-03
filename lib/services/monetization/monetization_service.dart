@@ -29,7 +29,7 @@ class MonetizationService extends ChangeNotifier {
   /// Current user tier
   UserTier get currentTier => _currentTier;
 
-  /// Whether user has premium access
+  /// Whether user has premium access (paid tiers)
   bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro || _currentTier == UserTier.enterprise;
 
   /// Whether user has active trial
@@ -85,7 +85,7 @@ class MonetizationService extends ChangeNotifier {
     if (_prefs == null) return;
 
     for (final feature in FeatureType.values) {
-      _usageCounts[feature] = _prefs!.getInt('${_usageCountKey}${feature.name}') ?? 0;
+      _usageCounts[feature] = _prefs!.getInt('$_usageCountKey${feature.name}') ?? 0;
     }
   }
 
@@ -175,7 +175,7 @@ class MonetizationService extends ChangeNotifier {
 
     // Record feature usage
     _usageCounts[feature] = (_usageCounts[feature] ?? 0) + 1;
-    await _prefs?.setInt('${_usageCountKey}${feature.name}', _usageCounts[feature]!);
+    await _prefs?.setInt('$_usageCountKey${feature.name}', _usageCounts[feature]!);
     
     // If this is a premium feature and user has premium access, track premium feature usage
     if (hasPremiumAccess && _isPremiumFeature(feature)) {
@@ -239,7 +239,7 @@ class MonetizationService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Get upgrade benefits for current tier
+  /// Get upgrade benefits for current tier (what you gain by upgrading to the next tier)
   List<String> getUpgradeBenefits() {
     // If user has trial, show conversion benefits
     if (hasActiveTrial) {
@@ -255,6 +255,7 @@ class MonetizationService extends ChangeNotifier {
     
     switch (_currentTier) {
       case UserTier.free:
+        // Upgrade to Premium
         return [
           'Unlimited notes and folders',
           'Advanced voice note features',
@@ -265,15 +266,29 @@ class MonetizationService extends ChangeNotifier {
           'No ads',
         ];
       case UserTier.premium:
+        // Upgrade to Pro
         return [
-          'All premium features',
-          'Advanced analytics',
-          'Extended device sync (10 devices)',
+          'Advanced analytics & insights',
+          'Automation & scheduled backups',
+          'Advanced search with OCR',
+          'API access and integrations',
+          'Enhanced cloud sync',
           'Priority support',
+          'Up to 10 devices',
         ];
       case UserTier.pro:
-        return [];
+        // Upgrade to Enterprise
+        return [
+          'Team management and workspaces',
+          'Admin controls and user management',
+          'SSO integration (SAML/OAuth/LDAP)',
+          'Audit logs & compliance features',
+          'Custom branding and white-label options',
+          'Dedicated account manager and SLAs',
+          'Unlimited device sync across your organization',
+        ];
       case UserTier.enterprise:
+        // Already top tier
         return [];
     }
   }
@@ -307,7 +322,7 @@ class MonetizationService extends ChangeNotifier {
 
     for (final feature in monthlyFeatures) {
       _usageCounts[feature] = 0;
-      await _prefs?.setInt('${_usageCountKey}${feature.name}', 0);
+      await _prefs?.setInt('$_usageCountKey${feature.name}', 0);
     }
     
     notifyListeners();
@@ -627,7 +642,7 @@ class FeatureLimits {
     }
   }
 
-  /// Check if a feature is available
+  /// Check if a feature is available for this tier (based on unavailable set)
   bool isFeatureAvailable(FeatureType feature) {
     return !unavailableFeatures.contains(feature);
   }
@@ -679,7 +694,7 @@ class PricingInfo {
       const PricingInfo(
         tier: UserTier.premium,
         displayName: 'Premium',
-        price: '\$1.99',
+        price: '\$0.99',
         billingPeriod: 'month',
         hasTrial: true,
         trialDays: 7,
@@ -698,7 +713,7 @@ class PricingInfo {
       const PricingInfo(
         tier: UserTier.pro,
         displayName: 'Pro',
-        price: '\$2.99',
+        price: '\$1.99',
         billingPeriod: 'month',
         hasTrial: true,
         trialDays: 14,
@@ -718,7 +733,7 @@ class PricingInfo {
       const PricingInfo(
         tier: UserTier.enterprise,
         displayName: 'Enterprise',
-        price: '\$2.00',
+        price: '\$4.99',
         billingPeriod: 'per user/month',
         hasTrial: false,
         features: [
@@ -759,7 +774,7 @@ class PricingInfo {
       PricingInfo(
         tier: UserTier.premium,
         displayName: l10n.pricing_premium,
-        price: '\$1.99',
+        price: '\$0.99',
         billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         hasTrial: true,
         trialDays: 7,
@@ -778,7 +793,7 @@ class PricingInfo {
       PricingInfo(
         tier: UserTier.pro,
         displayName: l10n.pricing_pro,
-        price: '\$2.99',
+        price: '\$1.99',
         billingPeriod: l10n.planTerm_monthly.toLowerCase(),
         hasTrial: true,
         trialDays: 14,
@@ -798,7 +813,7 @@ class PricingInfo {
       PricingInfo(
         tier: UserTier.enterprise,
         displayName: l10n.pricing_enterprise,
-        price: '\$2.00',
+        price: '\$4.99',
         billingPeriod: '${l10n.planTerm_perUser.toLowerCase()}/${l10n.planTerm_monthly.toLowerCase()}',
         hasTrial: false,
         features: [
@@ -817,7 +832,7 @@ class PricingInfo {
     ];
   }
 
-  /// Get trial info text
+  /// Get trial info text (for displaying under price)
   String get trialText {
     if (!hasTrial || trialDays == null) return '';
     return '$trialDays-day free trial';
