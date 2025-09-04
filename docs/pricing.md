@@ -232,7 +232,7 @@ final shouldShow = monetizationService.shouldShowUpgradePrompt(
 if (shouldShow) {
   // Show contextual upgrade prompt
   showUpgradePrompt(FeatureType.advancedDrawing);
-  
+
   // Record prompt shown
   await monetizationService.recordUpgradePromptShown();
 }
@@ -245,7 +245,7 @@ Widget buildDrawingTool(DrawingTool tool) {
   final isAvailable = monetizationService.isFeatureAvailable(
     FeatureType.advancedDrawing
   );
-  
+
   return GestureDetector(
     onTap: isAvailable ? () => selectTool(tool) : () => showUpgradePrompt(),
     child: Opacity(
@@ -343,7 +343,7 @@ All monetization events are tracked:
 ### Potential Adjustments
 - Regional pricing optimization
 - Student discounts
-- Family plans  
+- Family plans
 - Lifetime purchase options
 - Volume discounts for large enterprise deployments
 

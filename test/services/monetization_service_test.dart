@@ -51,7 +51,7 @@ void main() {
     test('should track feature usage correctly', () {
       monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      
+
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 2);
     });
 
@@ -60,7 +60,7 @@ void main() {
       for (int i = 0; i < 45; i++) {
         monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
-      
+
       expect(monetizationService.getRemainingUsage(FeatureType.noteCreation), 5);
     });
 
@@ -69,7 +69,7 @@ void main() {
       for (int i = 0; i < 50; i++) {
         monetizationService.recordFeatureUsage(FeatureType.noteCreation);
       }
-      
+
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), true);
     });
 

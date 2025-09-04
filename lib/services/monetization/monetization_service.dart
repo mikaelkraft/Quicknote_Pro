@@ -2,14 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
-/// 
+///
 /// Provides centralized management of premium features, usage limits,
 /// and upgrade paths for the monetization system.
 class MonetizationService extends ChangeNotifier {
   static const String _userTierKey = 'user_tier';
   static const String _usageCountKey = 'usage_count_';
   static const String _upgradePromptCountKey = 'upgrade_prompt_count';
-  
+
   SharedPreferences? _prefs;
   UserTier _currentTier = UserTier.free;
   final Map<FeatureType, int> _usageCounts = {};
@@ -38,7 +38,7 @@ class MonetizationService extends ChangeNotifier {
   /// Load user tier from storage
   Future<void> _loadUserTier() async {
     if (_prefs == null) return;
-    
+
     final tierName = _prefs!.getString(_userTierKey);
     if (tierName != null) {
       _currentTier = UserTier.values.firstWhere(
@@ -61,7 +61,7 @@ class MonetizationService extends ChangeNotifier {
   /// Load upgrade prompt count
   Future<void> _loadUpgradePromptCount() async {
     if (_prefs == null) return;
-    
+
     _upgradePromptCount = _prefs!.getInt(_upgradePromptCountKey) ?? 0;
   }
 
@@ -109,7 +109,7 @@ class MonetizationService extends ChangeNotifier {
   /// Check if upgrade prompt should be shown
   bool shouldShowUpgradePrompt(FeatureType feature, {String? context}) {
     if (isPremium) return false;
-    
+
     // Don't show if already shown too many times
     if (_upgradePromptCount >= 10) return false;
 
@@ -184,7 +184,7 @@ class MonetizationService extends ChangeNotifier {
       _usageCounts[feature] = 0;
       await _prefs?.setInt('${_usageCountKey}${feature.name}', 0);
     }
-    
+
     notifyListeners();
   }
 
@@ -245,7 +245,7 @@ class FeatureLimits {
             FeatureType.advancedExport,
           },
         );
-      
+
       case UserTier.premium:
         return const FeatureLimits(
           limits: {
@@ -258,7 +258,7 @@ class FeatureLimits {
             FeatureType.attachments: -1,
           },
         );
-      
+
       case UserTier.pro:
         return const FeatureLimits(
           limits: {
@@ -271,7 +271,7 @@ class FeatureLimits {
             FeatureType.attachments: -1,
           },
         );
-      
+
       case UserTier.enterprise:
         return const FeatureLimits(
           limits: {
