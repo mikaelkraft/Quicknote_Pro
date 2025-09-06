@@ -59,9 +59,9 @@ Value Proposition: Core note-taking with basic features
 - No custom themes
 
 ### Premium Tier
-Price: $0.99/month or $9.99 lifetime  
-Target: Regular users and productivity enthusiasts  
-Value Proposition: Unlimited core features with advanced tools
+**Price**: $0.99/month or $9.99 lifetime  
+**Target**: Regular users and productivity enthusiasts  
+**Value Proposition**: Unlimited core features with advanced tools
 
 #### Features & Limits
 - Notes: Unlimited
@@ -86,9 +86,9 @@ Value Proposition: Unlimited core features with advanced tools
 - Professional export templates
 
 ### Pro Tier
-Price: $1.99/month or $19.99 lifetime  
-Target: Power users and professionals  
-Value Proposition: All features plus advanced capabilities
+**Price**: $1.99/month or $19.99/year
+**Target**: Power users and professionals
+**Value Proposition**: All features plus advanced capabilities
 
 #### Features & Limits
 - Everything in Premium
@@ -104,33 +104,10 @@ Value Proposition: All features plus advanced capabilities
 - Support: Phone and email priority support
 
 #### Exclusive Features
-- Usage analytics and productivity insights
-- Automated backup with version history
-- Custom export templates with branding
-- Advanced encryption and security options
-- API access for integrations and workflows
-- Priority support with dedicated channels
-
-### Enterprise Tier
-Price: $4.99/user/month  
-Target: Teams, organizations, educational institutions  
-Value Proposition: Team collaboration and administrative controls
-
-#### Everything in Pro, Plus
-- Team workspace management and collaboration
-- Admin dashboard and comprehensive user management
-- Advanced sharing and permissions
-- SSO integration (SAML, OAuth, LDAP)
-- Audit logs, data residency, and compliance features
-- Custom branding options and white-label capabilities
-- Enterprise cloud sync capabilities (storage managed by your organization's cloud provider)
-- Unlimited device sync across your organization
-- Dedicated account manager and priority support
-- SLA guarantees and uptime targets
-- Custom integrations and enterprise connectors
-
-#### Deployment Options
-- Cloud, on-premise, or hybrid (subject to enterprise agreement)
+- Advanced search with OCR
+- Automated backup scheduling
+- Custom export templates
+- Advanced encryption options
 
 ## Feature Gating Strategy
 
@@ -185,16 +162,9 @@ Upgrade prompts appear when users encounter limits:
 ## Free Trial Strategy
 
 ### Trial Offerings
-- Premium: 7-day free trial
-- Pro: 14-day free trial
-- Annual Plans: If/when enabled, 30-day money-back guarantee
-
-### Enhanced Trial Types
-- Standard Trials: Default offerings for new users
-- Promotional Trials: Extended trials (e.g., 14 days for Premium) after 2+ conversion attempts
-- Win-Back Trials: 10-day trials for users with expired trials
-- Referral Trials: 14-day Premium trials as referral rewards
-- Retention Trials: Special extensions for user retention campaigns
+- **Premium**: 7-day free trial
+- **Pro**: 14-day free trial
+- **Annual Plans**: 30-day money-back guarantee
 
 ### Trial Experience
 - Full feature access during trial
@@ -241,31 +211,18 @@ Upgrade prompts appear when users encounter limits:
 
 ### Benefits Matrix
 
-| Feature                 | Free           | Premium               | Pro                        | Enterprise                      |
-|-------------------------|----------------|-----------------------|----------------------------|----------------------------------|
-| Monthly Notes           | 50             | Unlimited             | Unlimited                  | Unlimited                        |
-| Voice Recordings        | 5 (2min)       | 100 (10min)           | Unlimited (30min)          | Unlimited (60min)                |
-| Voice Transcription     | ❌             | ✅                    | ✅                         | ✅                               |
-| Folders                 | 3              | Unlimited             | Unlimited                  | Unlimited                        |
-| Attachments             | 10/month       | Unlimited             | Unlimited                  | Unlimited                        |
-| Advanced Drawing Tools  | ❌             | ✅                    | ✅                         | ✅                               |
-| OCR Text Extraction     | ❌             | ✅                    | ✅                         | ✅                               |
-| Premium Export Formats  | ❌             | ✅                    | ✅                         | ✅                               |
-| Cloud Sync              | ❌             | ✅                    | ✅                         | ✅                               |
-| Custom Themes           | ❌             | ✅                    | ✅                         | ✅                               |
-| Analytics & Insights    | ❌             | ❌                   | ✅                         | ✅                               |
-| Priority Support        | ❌             | ✅                    | ✅                         | ✅                               |
-| API Access              | ❌             | ❌                   | ✅                         | ✅                               |
-| Advanced Search         | ❌             | ❌                   | ✅                         | ✅                               |
-| Automated Backups       | ❌             | ❌                   | ✅                         | ✅                               |
-| Custom Templates        | ❌             | ❌                   | ✅                         | ✅                               |
-| Advanced Encryption     | ❌             | ❌                   | ✅                         | ✅                               |
-| Team Management         | ❌             | ❌                   | ❌                        | ✅                               |
-| Admin Controls          | ❌             | ❌                   | ❌                        | ✅                               |
-| SSO Integration         | ❌             | ❌                   | ❌                        | ✅                               |
-| Compliance/Audit Logs   | ❌             | ❌                   | ❌                        | ✅                               |
-| Custom Branding         | ❌             | ❌                   | ❌                        | ✅                               |
-| Dedicated Support       | ❌             | ❌                   | ❌                        | ✅                               |
+| Feature | Free | Premium | Pro |
+|---------|------|---------|-----|
+| Monthly Notes | 50 | Unlimited | Unlimited |
+| Voice Recordings | 5 (2min) | 100 (10min) | Unlimited (30min) |
+| Folders | 3 | Unlimited | Unlimited |
+| Advanced Drawing | ❌ | ✅ | ✅ |
+| Voice Transcription | ❌ | ✅ | ✅ |
+| Premium Export | ❌ | ✅ | ✅ |
+| Cloud Storage | 100MB | 1GB | 10GB |
+| Ads | ✅ | ❌ | ❌ |
+| Analytics | ❌ | ❌ | ✅ |
+| Priority Support | ❌ | ✅ | ✅ |
 
 ### Key Selling Points
 
@@ -278,17 +235,10 @@ Upgrade prompts appear when users encounter limits:
 - Ad-free focused experience
 
 #### Pro vs Premium
-- Unlimited voice recordings for lectures and meetings
-- Enhanced cloud sync capabilities
-- Usage analytics to optimize productivity
-- Priority support when you need help
-
-#### Enterprise vs Pro
-- Team management for organizations
-- SSO integration for secure access
-- Admin controls for user management
-- Compliance features for regulated industries
-- Dedicated support and account management
+- "Unlimited voice recordings for lectures and meetings"
+- "10GB storage for extensive media collections"
+- "Usage analytics to optimize productivity"
+- "Priority support when you need help"
 
 ## Implementation Guidelines
 
@@ -327,7 +277,7 @@ final shouldShow = monetizationService.shouldShowUpgradePrompt(
 if (shouldShow) {
   // Show contextual upgrade prompt with trial offer
   showUpgradePrompt(FeatureType.advancedDrawing);
-  
+
   // Record prompt shown
   await monetizationService.recordUpgradePromptShown();
 }
@@ -348,7 +298,7 @@ Widget buildDrawingTool(DrawingTool tool) {
   final isAvailable = monetizationService.isFeatureAvailable(
     FeatureType.advancedDrawing
   );
-  
+
   return GestureDetector(
     onTap: isAvailable ? () => selectTool(tool) : () => showUpgradeOrTrialPrompt(),
     child: Opacity(

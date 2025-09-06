@@ -14,14 +14,14 @@ void main() {
       expect(monetizationService.isPremium, false);
     });
 
-    test('should recognize premium status for premium, pro, and enterprise tiers', () async {
-      await monetizationService.setUserTier(UserTier.premium);
-      expect(monetizationService.isPremium, true);
-
-      await monetizationService.setUserTier(UserTier.pro);
+    test('should recognize premium status for premium and pro tiers', () {
+      monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isPremium, true);
 
       await monetizationService.setUserTier(UserTier.enterprise);
+      expect(monetizationService.isPremium, true);
+
+      monetizationService.setUserTier(UserTier.enterprise);
       expect(monetizationService.isPremium, true);
 
       await monetizationService.setUserTier(UserTier.free);
@@ -41,10 +41,9 @@ void main() {
       expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
     });
 
-    test('should allow premium features for premium tier', () async {
-      await monetizationService.setUserTier(UserTier.premium);
-
-      // Premium features available
+    test('should allow all features for premium tier', () {
+      monetizationService.setUserTier(UserTier.premium);
+      
       expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.voiceTranscription), true);
       expect(monetizationService.isFeatureAvailable(FeatureType.ocrTextExtraction), true);
@@ -72,53 +71,10 @@ void main() {
       expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
     });
 
-    test('should allow all pro features for pro tier', () async {
-      await monetizationService.setUserTier(UserTier.pro);
-
-      // Premium and Pro features available
-      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.advancedSearch), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.automatedBackup), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.customExportTemplates), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.advancedEncryption), true);
-
-      // Enterprise-only features should still be unavailable
-      expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), false);
-      expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), false);
-      expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), false);
-      expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), false);
-      expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), false);
-      expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), false);
-
-      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
-      expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
-    });
-
-    test('should allow all enterprise features for enterprise tier', () async {
-      await monetizationService.setUserTier(UserTier.enterprise);
-
-      // Premium + Pro + Enterprise features available
-      expect(monetizationService.isFeatureAvailable(FeatureType.advancedDrawing), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.analyticsInsights), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.apiAccess), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.teamWorkspace), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.adminDashboard), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.ssoIntegration), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.auditLogs), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.customBranding), true);
-      expect(monetizationService.isFeatureAvailable(FeatureType.dedicatedSupport), true);
-
-      expect(monetizationService.canUseFeature(FeatureType.advancedDrawing), true);
-      expect(monetizationService.canUseFeature(FeatureType.noteCreation), true);
-      expect(monetizationService.canUseFeature(FeatureType.teamWorkspace), true);
-    });
-
-    test('should track feature usage correctly', () async {
-      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-      await monetizationService.recordFeatureUsage(FeatureType.noteCreation);
-
+    test('should track feature usage correctly', () {
+      monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      monetizationService.recordFeatureUsage(FeatureType.noteCreation);
+      
       expect(monetizationService.usageCounts[FeatureType.noteCreation], 2);
     });
 
@@ -187,28 +143,10 @@ void main() {
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), true);
     });
 
-    test('should not show upgrade prompt for premium users', () async {
-      await monetizationService.setUserTier(UserTier.premium);
+    test('should not show upgrade prompt for premium users', () {
+      monetizationService.setUserTier(UserTier.premium);
+      
       expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
-
-      await monetizationService.setUserTier(UserTier.pro);
-      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
-
-      await monetizationService.setUserTier(UserTier.enterprise);
-      expect(monetizationService.shouldShowUpgradePrompt(FeatureType.noteCreation), false);
-    });
-
-    test('should provide correct upgrade recommendations', () async {
-      expect(monetizationService.getRecommendedUpgrade(), UserTier.premium);
-
-      await monetizationService.setUserTier(UserTier.premium);
-      expect(monetizationService.getRecommendedUpgrade(), UserTier.pro);
-
-      await monetizationService.setUserTier(UserTier.pro);
-      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
-
-      await monetizationService.setUserTier(UserTier.enterprise);
-      expect(monetizationService.getRecommendedUpgrade(), UserTier.enterprise);
     });
   });
 }

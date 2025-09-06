@@ -41,6 +41,14 @@ void main() async {
   final monetizationService = MonetizationService();
   await monetizationService.initialize();
 
+  // Connect ads service to monetization status
+  adsService.setPremiumStatus(monetizationService.isPremium);
+  
+  // Listen for tier changes to update ads status
+  monetizationService.addListener(() {
+    adsService.setPremiumStatus(monetizationService.isPremium);
+  });
+
   // Initialize new attachment and persistence services
   final persistenceService = NotePersistenceService(notesRepository);
   final attachmentService = AttachmentService();

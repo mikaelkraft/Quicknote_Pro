@@ -9,12 +9,14 @@ import 'trial_service.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 ///
+///
 /// Provides centralized management of premium features, usage limits,
 /// and upgrade paths for the monetization system.
 class MonetizationService extends ChangeNotifier {
   static const String _userTierKey = 'user_tier';
   static const String _usageCountKey = 'usage_count_';
   static const String _upgradePromptCountKey = 'upgrade_prompt_count';
+
 
   SharedPreferences? _prefs;
   UserTier _currentTier = UserTier.free;
@@ -30,17 +32,8 @@ class MonetizationService extends ChangeNotifier {
   /// Current user tier
   UserTier get currentTier => _currentTier;
 
-  /// Whether user has premium/pro/enterprise access (paid)
-  bool get isPremium =>
-      _currentTier == UserTier.premium ||
-      _currentTier == UserTier.pro ||
-      _currentTier == UserTier.enterprise;
-
-  /// Whether user has active trial
-  bool get hasActiveTrial => _trialService.hasActiveTrial;
-
-  /// Whether user has access to premium features (paid or trial)
-  bool get hasPremiumAccess => isPremium || hasActiveTrial;
+  /// Whether user has premium access
+  bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro || _currentTier == UserTier.enterprise;
 
   /// Current usage counts by feature
   Map<FeatureType, int> get usageCounts => Map.unmodifiable(_usageCounts);
@@ -74,6 +67,7 @@ class MonetizationService extends ChangeNotifier {
   Future<void> _loadUserTier() async {
     if (_prefs == null) return;
 
+
     final tierName = _prefs!.getString(_userTierKey);
     if (tierName != null) {
       _currentTier = UserTier.values.firstWhere(
@@ -97,6 +91,7 @@ class MonetizationService extends ChangeNotifier {
   /// Load upgrade prompt count
   Future<void> _loadUpgradePromptCount() async {
     if (_prefs == null) return;
+
 
     _upgradePromptCount = _prefs!.getInt(_upgradePromptCountKey) ?? 0;
   }
@@ -218,7 +213,7 @@ class MonetizationService extends ChangeNotifier {
 
   /// Check if upgrade prompt should be shown
   bool shouldShowUpgradePrompt(FeatureType feature, {String? context}) {
-    if (hasPremiumAccess) return false;
+    if (isPremium) return false;
 
     // Don't show if already shown too many times
     if (_upgradePromptCount >= 10) return false;
@@ -282,19 +277,17 @@ class MonetizationService extends ChangeNotifier {
           'Priority support',
         ];
       case UserTier.pro:
-        // Benefits for upgrading to Enterprise
         return [
-          'Team workspace management',
-          'Admin controls & user management',
-          'Advanced sharing & permissions',
-          'SSO integration (SAML/OAuth/LDAP)',
-          'Audit logs & compliance',
-          'Custom branding & white-label options',
-          'Dedicated account manager & SLA',
+          'All pro features',
         ];
       case UserTier.enterprise:
-        // Already at highest tier
-        return [];
+        return [
+          'Team management',
+          'Admin controls',
+          'SSO integration',
+          'Compliance features',
+          'Bulk user management',
+        ];
     }
   }
 
@@ -306,6 +299,9 @@ class MonetizationService extends ChangeNotifier {
       case UserTier.premium:
         return UserTier.pro;
       case UserTier.pro:
+        return UserTier.enterprise;
+      case UserTier.enterprise:
+        return UserTier.enterprise; // Already at highest tier
         return UserTier.enterprise;
       case UserTier.enterprise:
         return UserTier.enterprise; // Already at highest tier
@@ -329,6 +325,7 @@ class MonetizationService extends ChangeNotifier {
       _usageCounts[feature] = 0;
       await _prefs?.setInt('$_usageCountKey${feature.name}', 0);
     }
+
 
     notifyListeners();
   }
@@ -355,6 +352,7 @@ enum UserTier {
   free,
   premium,
   pro,
+  enterprise,
   enterprise,
 }
 
@@ -478,6 +476,7 @@ class FeatureLimits {
           },
         );
 
+
       case UserTier.premium:
         return const FeatureLimits(
           limits: {
@@ -534,6 +533,7 @@ class FeatureLimits {
             FeatureType.dedicatedSupport,
           },
         );
+
 
       case UserTier.pro:
         return const FeatureLimits(
@@ -645,6 +645,32 @@ class FeatureLimits {
             FeatureType.dedicatedSupport: -1,
           },
         );
+
+      case UserTier.enterprise:
+        return const FeatureLimits(
+          limits: {
+            FeatureType.noteCreation: -1,
+            FeatureType.voiceNoteRecording: -1,
+            FeatureType.advancedDrawing: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.advancedExport: -1,
+            FeatureType.folders: -1,
+            FeatureType.attachments: -1,
+          },
+        );
+
+      case UserTier.enterprise:
+        return const FeatureLimits(
+          limits: {
+            FeatureType.noteCreation: -1,
+            FeatureType.voiceNoteRecording: -1,
+            FeatureType.advancedDrawing: -1,
+            FeatureType.cloudSync: -1,
+            FeatureType.advancedExport: -1,
+            FeatureType.folders: -1,
+            FeatureType.attachments: -1,
+          },
+        );
     }
   }
 
@@ -701,6 +727,7 @@ class PricingInfo {
         tier: UserTier.premium,
         displayName: 'Premium',
         price: '\$0.99',
+        price: '\$0.99',
         billingPeriod: 'month',
         hasTrial: true,
         trialDays: 7,
@@ -720,6 +747,7 @@ class PricingInfo {
         tier: UserTier.pro,
         displayName: 'Pro',
         price: '\$1.99',
+        price: '\$1.99',
         billingPeriod: 'month',
         hasTrial: true,
         trialDays: 14,
@@ -734,14 +762,16 @@ class PricingInfo {
           'API access for integrations',
           'Enhanced cloud sync capabilities',
           'Priority support',
+          'Advanced analytics',
+          'Extended storage',
+          'API access',
         ],
       ),
-      PricingInfo(
+      const PricingInfo(
         tier: UserTier.enterprise,
         displayName: 'Enterprise',
         price: '\$4.99',
-        billingPeriod: 'per user/month',
-        hasTrial: false,
+        billingPeriod: 'user/month',
         features: [
           'Everything in Pro',
           'Team management',
@@ -750,86 +780,6 @@ class PricingInfo {
           'Compliance features',
           'Bulk user management',
           'Dedicated support',
-        ],
-      ),
-    ];
-  }
-
-  /// Get pricing info for all tiers with localized strings
-  /// This version uses localized display names and feature descriptions
-  static List<PricingInfo> getAllTiersLocalized(AppLocalizations l10n) {
-    return [
-      PricingInfo(
-        tier: UserTier.free,
-        displayName: l10n.pricing_free,
-        price: '\$0',
-        billingPeriod: 'forever',
-        hasTrial: false,
-        features: [
-          '50 notes per month',
-          '5 voice recordings (2min each)',
-          '3 folders maximum',
-          '10 attachments per month',
-          'Basic doodling and canvas',
-          'Local export/import only',
-        ],
-      ),
-      PricingInfo(
-        tier: UserTier.premium,
-        displayName: l10n.pricing_premium,
-        price: '\$0.99',
-        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
-        hasTrial: true,
-        trialDays: 7,
-        features: [
-          l10n.feature_unlimitedNotes,
-          '100 voice recordings (10min each)',
-          l10n.feature_voiceTranscription,
-          l10n.feature_advancedDrawingTools,
-          'OCR text extraction',
-          'All export formats (PDF, DOCX)',
-          'Cloud sync capabilities',
-          'Custom themes',
-          l10n.feature_noAds,
-        ],
-      ),
-      PricingInfo(
-        tier: UserTier.pro,
-        displayName: l10n.pricing_pro,
-        price: '\$1.99',
-        billingPeriod: l10n.planTerm_monthly.toLowerCase(),
-        hasTrial: true,
-        trialDays: 14,
-        features: [
-          'Everything in ${l10n.pricing_premium}',
-          'Unlimited voice recordings (30min each)',
-          'Advanced search with OCR',
-          'Usage analytics & insights',
-          'Automated backup scheduling',
-          'Custom export templates',
-          'Advanced encryption options',
-          'API access for integrations',
-          'Enhanced cloud sync capabilities',
-          l10n.feature_prioritySupport,
-        ],
-      ),
-      PricingInfo(
-        tier: UserTier.enterprise,
-        displayName: l10n.pricing_enterprise,
-        price: '\$4.99',
-        billingPeriod:
-            '${l10n.planTerm_perUser.toLowerCase()}/${l10n.planTerm_monthly.toLowerCase()}',
-        hasTrial: false,
-        features: [
-          'Everything in ${l10n.pricing_pro}',
-          'Team workspace management',
-          l10n.feature_adminControls,
-          'Advanced sharing & permissions',
-          'SSO integration',
-          'Audit logs & compliance features',
-          'Custom branding options',
-          'Dedicated account manager',
-          'SLA guarantees',
         ],
       ),
     ];
