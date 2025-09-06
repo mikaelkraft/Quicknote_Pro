@@ -1,15 +1,16 @@
 name: quicknote_pro
-description: A comprehensive and advanced note-taking app
-with cloud sync, doodling, voice note and many more.
+description: A comprehensive and advanced note-taking app with cloud sync, doodling, voice note and many more.
 publish_to: none
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.5.0
 
 dependencies:
   flutter:       # 🚨 CRITICAL: Required for every Flutter project - DO NOT REMOVE
     sdk: flutter # 🚨 CRITICAL: Required for every Flutter project - DO NOT REMOVE
+  flutter_localizations:
+    sdk: flutter
   
   # 🚨 CRITICAL: Core UI and responsive design - DO NOT REMOVE OR MODIFY
   sizer: ^2.0.15              # Required for responsive design system
@@ -49,6 +50,10 @@ dependencies:
   
   # Home screen widgets
   home_widget: ^0.6.0
+  
+  # Firebase Analytics
+  firebase_core: ^3.6.0
+  firebase_analytics: ^11.3.3
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE
@@ -59,6 +64,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true # 🚨 CRITICAL: Required for Material icon font - DO NOT REMOVE
+  generate: true # Enable localization generation
   assets:
     - assets/
     - assets/images/

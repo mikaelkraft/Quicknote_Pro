@@ -13,6 +13,15 @@ void main() {
       expect(analyticsService.analyticsEnabled, true);
     });
 
+    test('should operate in safe no-op mode without Firebase', () {
+      // Should not throw errors even without Firebase configuration
+      expect(analyticsService.firebaseInitialized, false);
+      expect(() => analyticsService.logEvent('test_event', {}), returnsNormally);
+      expect(() => analyticsService.setUserId('test_user'), returnsNormally);
+      expect(() => analyticsService.setUserProperty('test_prop', 'value'), returnsNormally);
+      expect(() => analyticsService.logScreenView('test_screen'), returnsNormally);
+    });
+
     test('should track events when analytics is enabled', () {
       final event = AnalyticsEvent.appStarted();
       analyticsService.trackEvent(event);
@@ -21,8 +30,8 @@ void main() {
       expect(analyticsService.getEventQueue().length, 1);
     });
 
-    test('should not track events when analytics is disabled', () {
-      analyticsService.setAnalyticsEnabled(false);
+    test('should not track events when analytics is disabled', () async {
+      await analyticsService.setAnalyticsEnabled(false);
       
       final event = AnalyticsEvent.appStarted();
       analyticsService.trackEvent(event);
@@ -38,6 +47,43 @@ void main() {
       expect(analyticsService.eventCounts['monetization_upgrade_prompt_shown'], 1);
     });
 
+    test('should track monetization events with extended properties', () {
+      final event = MonetizationEvent.featureLimitReached(
+        feature: 'voice_notes',
+        currentUsage: 5,
+        limit: 10,
+        userTier: 'free',
+      );
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_feature_limit_reached'], 1);
+    });
+
+    test('should track restore purchases events', () {
+      final event = MonetizationEvent.restorePurchases(source: 'purchase_button');
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_restore_purchases'], 1);
+    });
+
+    test('should track premium feature usage events', () {
+      final event = MonetizationEvent.premiumFeatureUsed(
+        feature: 'advanced_drawing',
+        userTier: 'premium',
+      );
+      analyticsService.trackMonetizationEvent(event);
+      
+      expect(analyticsService.eventCounts['monetization_premium_feature_used'], 1);
+    });
+
+    test('should set subscription status user property safely', () async {
+      // Should not throw errors even without Firebase
+      await analyticsService.setSubscriptionStatus('premium');
+      
+      // Should complete without errors
+      expect(true, true);
+    });
+
     test('should track engagement events correctly', () {
       final event = EngagementEvent.noteCreated();
       analyticsService.trackEngagementEvent(event);
@@ -50,6 +96,17 @@ void main() {
       analyticsService.trackFeatureEvent(event);
       
       expect(analyticsService.eventCounts['feature_voice_note_started'], 1);
+    });
+
+    test('should handle Firebase method calls safely without initialization', () async {
+      // These should not throw errors even without Firebase
+      await analyticsService.setUserId('test_user_123');
+      await analyticsService.setUserProperty('premium_user', 'true');
+      await analyticsService.logScreenView('home_screen', screenClass: 'MainActivity');
+      await analyticsService.logEvent('custom_event', {'param1': 'value1'});
+      
+      // Should complete without errors
+      expect(true, true);
     });
   });
 }

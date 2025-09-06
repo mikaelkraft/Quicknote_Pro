@@ -609,7 +609,7 @@ class _NotesDashboardState extends State<NotesDashboard>
                             ? AppTheme.warningDark
                             : AppTheme.warningLight,
                       ),
-                      child: const Text('\$14.99 Lifetime'),
+                      child: const Text('\$74.99 Lifetime'),
                     ),
                   ),
                 ],

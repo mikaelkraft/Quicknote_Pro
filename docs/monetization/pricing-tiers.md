@@ -7,8 +7,10 @@ Tiers (updated)
 
 Paywall baseline
 - Simple, distraction-free page with primary CTA
+- Clear pricing display with annual discount highlighted (20% savings)
 - Secondary CTA: restore purchase
 - Trust elements: brief feature/value bullets
+- Regional pricing optimized for maximum engagement
 - Regional pricing optimized for maximum engagement
 
 Experiment plan (post-v1 candidates)
@@ -16,8 +18,12 @@ Experiment plan (post-v1 candidates)
 - Annual vs monthly emphasis
 - Trial duration variants
 - Regional pricing variations
+- Regional pricing variations
 
 Checklist
+- [x] Define feature matrix for Free vs Premium vs Pro
+- [x] Establish price points optimized for engagement
+- [x] Implement paywall screen and restore flow
 - [x] Define feature matrix for Free vs Premium vs Pro
 - [x] Establish price points optimized for engagement
 - [x] Implement paywall screen and restore flow

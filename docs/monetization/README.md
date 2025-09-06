@@ -1,35 +1,53 @@
-# Monetization v1
+# Monetization v1 Documentation
 
-This folder contains the planning and documentation for Monetization v1.
+This directory contains the complete documentation for Quicknote Pro's monetization strategy, covering analytics, advertising, and pricing models.
 
-Related work
-- Tracking issue: #50 (Documentation Scaffold)
-- Analytics foundation: #46
-- Ads integration: #48
-- Initial implementation PR: #45
+## Overview
 
-Goals
-- Establish analytics foundations to measure adoption and revenue-impacting events.
-- Integrate an ads solution with safe defaults, privacy controls, and feature flags.
-- Define pricing tiers, paywall UX, and rollout experiments.
+Quicknote Pro implements a freemium model with premium features gated behind subscription tiers. The monetization strategy focuses on providing value to users while generating sustainable revenue through subscriptions and contextual advertising.
 
-Out of scope (v1)
-- Multi-variant paywall UX experiments beyond the initial baseline.
-- Server-side purchase management.
+## Documentation Structure
 
-Deliverables (v1)
-- Event schema and instrumentation plan.
-- Ads integration plan and testing matrix.
-- Pricing tiers specification and paywall baseline.
-- Phase-by-phase release plan with risk controls.
+### 📊 [Analytics](./analytics.md)
+- Event tracking schema
+- User behavior analytics
+- Key Performance Indicators (KPIs)
+- Data governance and privacy
 
-Folder map
-- architecture.md — analytics and data flows
-- ads-integration.md — ad networks, placement, and testing
-- pricing-tiers.md — tiers, paywall, and experiments
-- metrics.md — KPIs, events, and dashboards
-- release-plan.md — phases, rollout, and risk plan
+### 📱 [Advertising](./ads.md)
+- Ad placement strategies
+- Supported ad formats
+- Frequency capping policies
+- User experience guidelines
 
-Next steps
-- Convert each section's checklists into implementation issues and link them back here.
-- Keep this documentation updated as PRs land.
+### 💰 [Pricing](./pricing.md)
+- Subscription tier definitions
+- Feature limitations and unlocks
+- Upgrade paths and incentives
+- Regional pricing strategies
+
+## Implementation Roadmap
+
+1. **Phase 1**: Core subscription infrastructure with premium feature gating
+2. **Phase 2**: Analytics implementation for user behavior tracking
+3. **Phase 3**: Contextual advertising integration with respect for user experience
+4. **Phase 4**: Advanced monetization features and optimization
+
+## Key Principles
+
+- **User-First**: Monetization should enhance, not hinder, the user experience
+- **Privacy-Conscious**: Transparent data collection with user consent
+- **Value-Driven**: Premium features must provide clear value to justify cost
+- **Sustainable**: Long-term revenue model supporting continued development
+
+## Related Documentation
+
+- [Premium/Pro Entitlements](../../issues/premium_pro_entitlements.md)
+- [App Architecture](../../README.md#-project-structure)
+- [Feature Documentation](../../lib/)
+
+## Quick Links
+
+- [Getting Started with Monetization](./pricing.md#getting-started)
+- [Analytics Events Reference](./analytics.md#event-schema)
+- [Ad Integration Guide](./ads.md#integration-guide)
