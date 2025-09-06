@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
 import '../../models/note_model.dart';
+import '../../models/attachment.dart';
 import '../../services/notes/notes_service.dart';
 import './widgets/drawing_canvas_widget.dart';
 import './widgets/formatting_toolbar_widget.dart';
@@ -12,6 +13,8 @@ import './widgets/image_insertion_widget.dart';
 import './widgets/file_attachment_widget.dart';
 import './widgets/save_status_indicator_widget.dart';
 import './widgets/voice_input_widget.dart';
+import './widgets/voice_note_widget.dart';
+import './widgets/audio_player_widget.dart';
 import './widgets/ocr_text_extraction_widget.dart';
 
 class NoteCreationEditor extends StatefulWidget {
@@ -36,6 +39,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   bool _showDrawingCanvas = false;
   bool _showImageInsertion = false;
   bool _showFileAttachment = false;
+  bool _showVoiceNote = false;
   bool _showOcrExtraction = false;
   bool _isSaving = false;
   bool _hasUnsavedChanges = false;
@@ -398,6 +402,33 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
       }
     }
   }
+
+  void _handleVoiceNote(String audioPath, int durationSeconds) async {
+    if (_notesService == null) return;
+    
+    setState(() => _showVoiceNote = false);
+
+    try {
+      await _notesService!.addAudioToCurrentNote(audioPath, durationSeconds);
+      
+      HapticFeedback.lightImpact();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Voice note added successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add voice note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
   void _handleOcrTextExtraction(String extractedText) async {
     setState(() => _showOcrExtraction = false);
 
@@ -438,6 +469,78 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     }
   }
 
+  void _removeAudioAttachment(String attachmentId) async {
+    if (_notesService == null || _currentNote == null) return;
+
+    try {
+      await _notesService!.removeAttachmentFromCurrentNote(attachmentId);
+      
+      // Refresh the current note to update the UI
+      _currentNote = await _notesService!.getNoteById(_currentNote!.id);
+      setState(() {});
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Voice note removed')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to remove voice note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildVoiceNotePlayer(String voicePath, int index) {
+    // Create a mock attachment for the AudioPlayerWidget
+    final fileName = voicePath.split('/').last;
+    final mockAttachment = Attachment(
+      id: 'voice_$index',
+      name: fileName,
+      relativePath: voicePath,
+      type: AttachmentType.audio,
+      createdAt: DateTime.now(),
+      mimeType: 'audio/aac',
+    );
+
+    return AudioPlayerWidget(
+      audioAttachment: mockAttachment,
+      onDelete: () => _removeVoiceNote(voicePath),
+    );
+  }
+
+  void _removeVoiceNote(String voicePath) async {
+    if (_notesService == null || _currentNote == null) return;
+
+    try {
+      await _notesService!.removeMediaFromCurrentNote(voicePath, 'voice');
+      
+      // Refresh the current note to update the UI
+      _currentNote = await _notesService!.getNoteById(_currentNote!.id);
+      setState(() {});
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Voice note removed')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to remove voice note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -453,6 +556,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
             if (_showDrawingCanvas) _buildDrawingCanvas(),
             if (_showImageInsertion) _buildImageInsertion(),
             if (_showFileAttachment) _buildFileAttachment(),
+            if (_showVoiceNote) _buildVoiceNote(),
             if (_showOcrExtraction) _buildOcrExtraction(),
           ],
         ),
@@ -590,6 +694,27 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
           indent: 4.w,
           endIndent: 4.w,
         ),
+
+        // Audio attachments (voice notes)
+        if (_currentNote?.voiceNotePaths.isNotEmpty == true) ...[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+            child: Column(
+              children: _currentNote!.voiceNotePaths.asMap().entries.map((entry) {
+                final index = entry.key;
+                final voicePath = entry.value;
+                return _buildVoiceNotePlayer(voicePath, index);
+              }).toList(),
+            ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).dividerColor,
+            indent: 4.w,
+            endIndent: 4.w,
+          ),
+        ],
 
         // Content input
         Expanded(
@@ -786,6 +911,54 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     );
   }
 
+  Widget _buildVoiceNote() {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.5),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(4.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Record Voice Note',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        onPressed: () =>
+                            setState(() => _showVoiceNote = false),
+                        icon: CustomIconWidget(
+                          iconName: 'close',
+                          size: 6.w,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                VoiceNoteWidget(
+                  onAudioRecorded: _handleVoiceNote,
+                  isPremiumUser: _isPremiumUser,
+                ),
+                SizedBox(height: 2.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFloatingActionButtons() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -797,6 +970,17 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
               Theme.of(context).brightness == Brightness.light),
           child: CustomIconWidget(
             iconName: 'brush',
+            size: 6.w,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        FloatingActionButton(
+          heroTag: 'voice_note',
+          onPressed: () => setState(() => _showVoiceNote = true),
+          backgroundColor: const Color(0xFFFF6B6B),
+          child: CustomIconWidget(
+            iconName: 'record_voice_over',
             size: 6.w,
             color: Colors.white,
           ),
