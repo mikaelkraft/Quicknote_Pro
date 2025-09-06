@@ -12,6 +12,7 @@ class Note {
   final List<String> imagePaths;
   final List<String> attachmentPaths;
   final List<String> voiceNotePaths;
+  final List<String> doodlePaths;
 
   Note({
     required this.id,
@@ -24,6 +25,7 @@ class Note {
     this.imagePaths = const [],
     this.attachmentPaths = const [],
     this.voiceNotePaths = const [],
+    this.doodlePaths = const [],
   });
 
   /// Create a copy of the note with updated fields
@@ -38,6 +40,7 @@ class Note {
     List<String>? imagePaths,
     List<String>? attachmentPaths,
     List<String>? voiceNotePaths,
+    List<String>? doodlePaths,
   }) {
     return Note(
       id: id ?? this.id,
@@ -50,6 +53,7 @@ class Note {
       imagePaths: imagePaths ?? List.from(this.imagePaths),
       attachmentPaths: attachmentPaths ?? List.from(this.attachmentPaths),
       voiceNotePaths: voiceNotePaths ?? List.from(this.voiceNotePaths),
+      doodlePaths: doodlePaths ?? List.from(this.doodlePaths),
     );
   }
 
@@ -66,6 +70,7 @@ class Note {
       'imagePaths': imagePaths,
       'attachmentPaths': attachmentPaths,
       'voiceNotePaths': voiceNotePaths,
+      'doodlePaths': doodlePaths,
     };
   }
 
@@ -82,6 +87,7 @@ class Note {
       imagePaths: List<String>.from(json['imagePaths'] as List? ?? []),
       attachmentPaths: List<String>.from(json['attachmentPaths'] as List? ?? []),
       voiceNotePaths: List<String>.from(json['voiceNotePaths'] as List? ?? []),
+      doodlePaths: List<String>.from(json['doodlePaths'] as List? ?? []),
     );
   }
 
@@ -112,7 +118,7 @@ class Note {
            'createdAt: $createdAt, updatedAt: $updatedAt, '
            'folder: $folder, tags: $tags, '
            'images: ${imagePaths.length}, attachments: ${attachmentPaths.length}, '
-           'voiceNotes: ${voiceNotePaths.length}}';
+           'voiceNotes: ${voiceNotePaths.length}, doodles: ${doodlePaths.length}}';
   }
 
   /// Check if note has any content
@@ -126,7 +132,8 @@ class Note {
            !_listEquals(tags, other.tags) ||
            !_listEquals(imagePaths, other.imagePaths) ||
            !_listEquals(attachmentPaths, other.attachmentPaths) ||
-           !_listEquals(voiceNotePaths, other.voiceNotePaths);
+           !_listEquals(voiceNotePaths, other.voiceNotePaths) ||
+           !_listEquals(doodlePaths, other.doodlePaths);
   }
 
   /// Helper method to compare lists
@@ -157,5 +164,9 @@ class Note {
   bool get hasAttachments => 
       imagePaths.isNotEmpty || 
       attachmentPaths.isNotEmpty || 
-      voiceNotePaths.isNotEmpty;
+      voiceNotePaths.isNotEmpty ||
+      doodlePaths.isNotEmpty;
+
+  /// Check if note has doodles
+  bool get hasDoodles => doodlePaths.isNotEmpty;
 }

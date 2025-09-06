@@ -247,6 +247,81 @@ class NotesRepository {
     await _prefs?.remove(_noteIdsKey);
   }
 
+  /// Save doodle data to app directory
+  Future<String?> saveDoodleData(String noteId, String doodleJsonData) async {
+    try {
+      await _initializeDirectories();
+      
+      // Create doodles subdirectory if it doesn't exist
+      final doodlesDirectory = Directory('${_mediaDirectory!.path}/doodles');
+      if (!await doodlesDirectory.exists()) {
+        await doodlesDirectory.create(recursive: true);
+      }
+      
+      // Generate unique filename
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '${noteId}_doodle_$timestamp.json';
+      final filePath = '${doodlesDirectory.path}/$fileName';
+      
+      // Write doodle data to file
+      final file = File(filePath);
+      await file.writeAsString(doodleJsonData);
+      
+      // Return relative path from app directory
+      return 'media/doodles/$fileName';
+    } catch (e) {
+      print('Error saving doodle data: $e');
+      return null;
+    }
+  }
+
+  /// Update existing doodle data
+  Future<void> updateDoodleData(String doodlePath, String doodleJsonData) async {
+    try {
+      final absolutePath = getAbsolutePath(doodlePath);
+      if (absolutePath == null) {
+        throw Exception('Invalid doodle path: $doodlePath');
+      }
+      
+      final file = File(absolutePath);
+      await file.writeAsString(doodleJsonData);
+    } catch (e) {
+      print('Error updating doodle data: $e');
+      rethrow;
+    }
+  }
+
+  /// Load doodle data from file
+  Future<String?> loadDoodleData(String doodlePath) async {
+    try {
+      final absolutePath = getAbsolutePath(doodlePath);
+      if (absolutePath == null) return null;
+      
+      final file = File(absolutePath);
+      if (!await file.exists()) return null;
+      
+      return await file.readAsString();
+    } catch (e) {
+      print('Error loading doodle data: $e');
+      return null;
+    }
+  }
+
+  /// Delete doodle data file
+  Future<void> deleteDoodleData(String doodlePath) async {
+    try {
+      final absolutePath = getAbsolutePath(doodlePath);
+      if (absolutePath == null) return;
+      
+      final file = File(absolutePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      print('Error deleting doodle data: $e');
+    }
+  }
+
   /// Get storage statistics
   Future<Map<String, dynamic>> getStorageStats() async {
     final allNotes = await getAllNotes();
@@ -256,12 +331,14 @@ class NotesRepository {
     int totalImages = 0;
     int totalAttachments = 0;
     int totalVoiceNotes = 0;
+    int totalDoodles = 0;
     int totalCharacters = 0;
     
     for (final note in allNotes) {
       totalImages += note.imagePaths.length;
       totalAttachments += note.attachmentPaths.length;
       totalVoiceNotes += note.voiceNotePaths.length;
+      totalDoodles += note.doodlePaths.length;
       totalCharacters += note.title.length + note.content.length;
     }
     
@@ -272,6 +349,7 @@ class NotesRepository {
       'total_images': totalImages,
       'total_attachments': totalAttachments,
       'total_voice_notes': totalVoiceNotes,
+      'total_doodles': totalDoodles,
       'total_characters': totalCharacters,
     };
   }
