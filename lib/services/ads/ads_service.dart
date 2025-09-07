@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../constants/feature_flags.dart';
+import 'analytics/analytics_service.dart';
+
 /// Service for managing ad placements, formats, and frequency caps.
 /// 
 /// Provides a centralized system for controlling ad display, tracking
@@ -15,9 +18,10 @@ class AdsService extends ChangeNotifier {
   bool _isPremiumUser = false;
   final Map<AdPlacement, DateTime?> _lastAdShown = {};
   final Map<AdPlacement, int> _adCounts = {};
+  final AnalyticsService _analytics = AnalyticsService();
 
   /// Whether ads are enabled for the current user
-  bool get adsEnabled => _adsEnabled && !_isPremiumUser;
+  bool get adsEnabled => FeatureFlags.adsEnabled && _adsEnabled && !_isPremiumUser;
 
   /// Current ad counts by placement
   Map<AdPlacement, int> get adCounts => Map.unmodifiable(_adCounts);
@@ -68,12 +72,16 @@ class AdsService extends ChangeNotifier {
   bool canShowAd(AdPlacement placement) {
     if (!adsEnabled) return false;
 
+    // Check placement-specific feature flags
+    if (!_isPlacementEnabled(placement)) return false;
+
     final config = AdConfig.forPlacement(placement);
     final lastShown = _lastAdShown[placement];
     final currentCount = _adCounts[placement] ?? 0;
 
-    // Check frequency cap
-    if (currentCount >= config.dailyLimit) {
+    // Use feature flag frequency cap
+    final dailyLimit = FeatureFlags.getAdFrequencyCap(placement);
+    if (currentCount >= dailyLimit) {
       return false;
     }
 
@@ -88,11 +96,30 @@ class AdsService extends ChangeNotifier {
     return true;
   }
 
+  /// Check if specific ad placement is enabled by feature flags
+  bool _isPlacementEnabled(AdPlacement placement) {
+    switch (placement) {
+      case AdPlacement.noteListBanner:
+      case AdPlacement.settingsBanner:
+        return FeatureFlags.bannerAdsEnabled;
+      case AdPlacement.noteCreationInterstitial:
+      case AdPlacement.premiumPromptInterstitial:
+        return FeatureFlags.interstitialAdsEnabled;
+      case AdPlacement.featureDiscoveryNative:
+        return FeatureFlags.nativeAdsEnabled;
+    }
+  }
+
   /// Request to show an ad at the specified placement
   Future<AdResult> requestAd(AdPlacement placement) async {
     if (!canShowAd(placement)) {
       return AdResult.blocked(placement, 'Frequency cap or interval restriction');
     }
+
+    // Track ad request
+    _analytics.trackMonetizationEvent(
+      MonetizationEvent.adRequested(placement: placement.name),
+    );
 
     // Simulate ad loading (replace with actual ad SDK integration)
     final config = AdConfig.forPlacement(placement);
@@ -103,6 +130,14 @@ class AdsService extends ChangeNotifier {
       
       // Record the ad request
       await _recordAdShown(placement);
+      
+      // Track successful ad show
+      _analytics.trackMonetizationEvent(
+        MonetizationEvent.adShown(
+          placement: placement.name,
+          format: config.format.name,
+        ),
+      );
       
       return AdResult.success(placement, config.format);
     } catch (e) {
@@ -125,6 +160,23 @@ class AdsService extends ChangeNotifier {
 
   /// Record ad interaction (click, dismiss, etc.)
   void recordAdInteraction(AdPlacement placement, AdInteraction interaction) {
+    // Track interaction analytics
+    switch (interaction) {
+      case AdInteraction.clicked:
+        _analytics.trackMonetizationEvent(
+          MonetizationEvent.adClicked(placement: placement.name),
+        );
+        break;
+      case AdInteraction.dismissed:
+      case AdInteraction.closed:
+        _analytics.trackMonetizationEvent(
+          MonetizationEvent.adDismissed(placement: placement.name),
+        );
+        break;
+      default:
+        break;
+    }
+
     if (kDebugMode) {
       print('Ad interaction: ${placement.name} - ${interaction.name}');
     }

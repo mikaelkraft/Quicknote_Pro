@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../analytics/analytics_service.dart';
+import '../ab_testing_service.dart';
+import '../../constants/feature_flags.dart';
 import 'referral_service.dart';
 import 'coupon_service.dart';
 import 'trial_service.dart';
@@ -23,6 +25,7 @@ class MonetizationService extends ChangeNotifier {
   final Map<FeatureType, int> _usageCounts = {};
   int _upgradePromptCount = 0;
   final AnalyticsService _analyticsService = AnalyticsService();
+  late final ABTestingService _abTestingService;
 
   // Retention services
   final ReferralService _referralService = ReferralService();
@@ -34,6 +37,12 @@ class MonetizationService extends ChangeNotifier {
 
   /// Whether user has premium access
   bool get isPremium => _currentTier == UserTier.premium || _currentTier == UserTier.pro || _currentTier == UserTier.enterprise;
+
+  /// Whether user has premium access (including trial)
+  bool get hasPremiumAccess => isPremium || hasActiveTrial;
+
+  /// Whether user has an active trial
+  bool get hasActiveTrial => _trialService.hasActiveTrial;
 
   /// Current usage counts by feature
   Map<FeatureType, int> get usageCounts => Map.unmodifiable(_usageCounts);
@@ -50,9 +59,25 @@ class MonetizationService extends ChangeNotifier {
   /// Access to trial service
   TrialService get trialService => _trialService;
 
+  /// Access to A/B testing service
+  ABTestingService get abTestingService => _abTestingService;
+
   /// Initialize the monetization service
   Future<void> initialize() async {
+    // Check kill switch first
+    if (FeatureFlags.shouldDisableMonetization) {
+      if (kDebugMode) {
+        print('Monetization: Disabled via feature flags or kill switch');
+      }
+      return;
+    }
+
     _prefs = await SharedPreferences.getInstance();
+    
+    // Initialize A/B testing first
+    _abTestingService = ABTestingService(_analyticsService);
+    await _abTestingService.initialize();
+    
     await _loadUserTier();
     await _loadUsageCounts();
     await _loadUpgradePromptCount();
@@ -139,6 +164,9 @@ class MonetizationService extends ChangeNotifier {
 
   /// Check if feature usage is within limits
   bool canUseFeature(FeatureType feature) {
+    // Check feature flags first
+    if (!_isFeatureEnabledByFlags(feature)) return false;
+    
     if (!isFeatureAvailable(feature)) return false;
 
     // Use trial limits if in trial
@@ -150,6 +178,40 @@ class MonetizationService extends ChangeNotifier {
     final featureLimit = limits.getFeatureLimit(feature);
 
     return featureLimit == -1 || currentUsage < featureLimit;
+  }
+
+  /// Check if feature is enabled by feature flags
+  bool _isFeatureEnabledByFlags(FeatureType feature) {
+    switch (feature) {
+      case FeatureType.customThemes:
+        return FeatureFlags.premiumThemesEnabled;
+      case FeatureType.advancedExport:
+        return FeatureFlags.advancedExportEnabled;
+      case FeatureType.cloudSync:
+      case FeatureType.cloudStorage:
+      case FeatureType.deviceSync:
+        return FeatureFlags.cloudSyncEnabled;
+      case FeatureType.voiceTranscription:
+        return FeatureFlags.voiceTranscriptionEnabled;
+      case FeatureType.ocrTextExtraction:
+        return FeatureFlags.ocrEnabled;
+      case FeatureType.analyticsInsights:
+        return FeatureFlags.analyticsInsightsEnabled;
+      case FeatureType.apiAccess:
+        return FeatureFlags.apiAccessEnabled;
+      case FeatureType.advancedSearch:
+        return FeatureFlags.advancedSearchEnabled;
+      case FeatureType.automatedBackup:
+        return FeatureFlags.automatedBackupEnabled;
+      case FeatureType.teamWorkspace:
+        return FeatureFlags.teamWorkspaceEnabled;
+      case FeatureType.ssoIntegration:
+        return FeatureFlags.ssoIntegrationEnabled;
+      case FeatureType.adminDashboard:
+        return FeatureFlags.adminDashboardEnabled;
+      default:
+        return true; // Basic features are always enabled
+    }
   }
 
   /// Record feature usage
@@ -213,10 +275,16 @@ class MonetizationService extends ChangeNotifier {
 
   /// Check if upgrade prompt should be shown
   bool shouldShowUpgradePrompt(FeatureType feature, {String? context}) {
+    // Check feature flags
+    if (!FeatureFlags.upgradePromptsEnabled || !FeatureFlags.paywallEnabled) {
+      return false;
+    }
+    
     if (isPremium) return false;
 
-    // Don't show if already shown too many times
-    if (_upgradePromptCount >= 10) return false;
+    // Check daily limit from feature flags
+    final maxDaily = FeatureFlags.upgradePromptMaxDaily;
+    if (_upgradePromptCount >= maxDaily) return false;
 
     // Show if feature is not available or limit reached
     return !canUseFeature(feature);
@@ -242,6 +310,10 @@ class MonetizationService extends ChangeNotifier {
 
   /// Get upgrade benefits for current tier
   List<String> getUpgradeBenefits() {
+    // Get A/B test variant for benefits display
+    final variant = _abTestingService.getVariant('paywall_headline');
+    final isTestVariant = variant == 'benefit_focused';
+    
     // If user has trial, show conversion benefits
     if (hasActiveTrial) {
       final trial = _trialService.currentTrial!;
@@ -257,7 +329,15 @@ class MonetizationService extends ChangeNotifier {
     switch (_currentTier) {
       case UserTier.free:
         // Benefits for upgrading to Premium
-        return [
+        return isTestVariant ? [
+          'Unlimited notes and voice recordings',
+          'Advanced drawing tools & layers',
+          'Cloud sync across all devices',
+          'Premium export formats (PDF, DOCX)',
+          'No ads - distraction-free experience',
+          'Voice note transcription',
+          'OCR text extraction',
+        ] : [
           'Unlimited notes and folders',
           'Advanced voice note features',
           'Extended drawing tools',
