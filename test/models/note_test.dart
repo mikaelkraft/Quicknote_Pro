@@ -7,6 +7,7 @@ void main() {
     late Note testNote;
     late Attachment testImageAttachment;
     late Attachment testFileAttachment;
+    late Attachment testAudioAttachment;
     late DateTime testCreatedAt;
     late DateTime testUpdatedAt;
     
@@ -33,12 +34,23 @@ void main() {
         type: AttachmentType.file,
         createdAt: testCreatedAt,
       );
+
+      testAudioAttachment = Attachment(
+        id: 'audio_1',
+        name: 'voice_note.m4a',
+        relativePath: 'attachments/voice_note.m4a',
+        mimeType: 'audio/aac',
+        sizeBytes: 512000,
+        type: AttachmentType.audio,
+        createdAt: testCreatedAt,
+        durationSeconds: 120,
+      );
       
       testNote = Note(
         id: 'test_note_id',
         title: 'Test Note',
         content: 'This is test content for the note',
-        attachments: [testImageAttachment, testFileAttachment],
+        attachments: [testImageAttachment, testFileAttachment, testAudioAttachment],
         createdAt: testCreatedAt,
         updatedAt: testUpdatedAt,
       );
@@ -223,13 +235,19 @@ void main() {
       expect(fileAttachments[0], testFileAttachment);
     });
 
+    test('should filter audio attachments', () {
+      final audioAttachments = testNote.audioAttachments;
+      expect(audioAttachments.length, 1);
+      expect(audioAttachments[0], testAudioAttachment);
+    });
+
     test('should calculate total attachment size', () {
       final totalSize = testNote.totalAttachmentSize;
-      expect(totalSize, 3072000); // 1024000 + 2048000
+      expect(totalSize, 3584000); // 1024000 + 2048000 + 512000
 
       final noSizeAttachment = testImageAttachment.copyWith(sizeBytes: null);
-      final noteWithNullSize = testNote.copyWith(attachments: [noSizeAttachment, testFileAttachment]);
-      expect(noteWithNullSize.totalAttachmentSize, 2048000); // Only counts non-null sizes
+      final noteWithNullSize = testNote.copyWith(attachments: [noSizeAttachment, testFileAttachment, testAudioAttachment]);
+      expect(noteWithNullSize.totalAttachmentSize, 2560000); // Only counts non-null sizes (2048000 + 512000)
     });
 
     test('should add attachment', () {
@@ -243,7 +261,7 @@ void main() {
 
       final updatedNote = testNote.addAttachment(newAttachment);
       
-      expect(updatedNote.attachments.length, 3);
+      expect(updatedNote.attachments.length, 4);
       expect(updatedNote.attachments.last, newAttachment);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
@@ -251,15 +269,15 @@ void main() {
     test('should remove attachment', () {
       final updatedNote = testNote.removeAttachment('img_1');
       
-      expect(updatedNote.attachments.length, 1);
-      expect(updatedNote.attachments[0], testFileAttachment);
+      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments, [testFileAttachment, testAudioAttachment]);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
 
     test('should not change note when removing non-existent attachment', () {
       final updatedNote = testNote.removeAttachment('non_existent');
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments, testNote.attachments);
     });
 
@@ -274,9 +292,10 @@ void main() {
 
       final updatedNote = testNote.replaceAttachment('img_1', newAttachment);
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments[0], newAttachment);
       expect(updatedNote.attachments[1], testFileAttachment);
+      expect(updatedNote.attachments[2], testAudioAttachment);
       expect(updatedNote.updatedAt.isAfter(testNote.updatedAt), isTrue);
     });
 
@@ -291,7 +310,7 @@ void main() {
 
       final updatedNote = testNote.replaceAttachment('non_existent', newAttachment);
       
-      expect(updatedNote.attachments.length, 2);
+      expect(updatedNote.attachments.length, 3);
       expect(updatedNote.attachments, testNote.attachments);
     });
 
@@ -313,7 +332,7 @@ void main() {
       expect(str, contains('test_note_id'));
       expect(str, contains('Test Note'));
       expect(str, contains('34 chars')); // content length
-      expect(str, contains('attachments: 2'));
+      expect(str, contains('attachments: 3'));
     });
   });
 }
