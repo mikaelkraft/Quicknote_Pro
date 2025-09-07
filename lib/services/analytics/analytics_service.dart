@@ -235,6 +235,104 @@ class AnalyticsService extends ChangeNotifier {
     ));
   }
 
+  /// Track revenue-specific events for KPI monitoring
+  Future<void> trackRevenueEvent({
+    required String eventName,
+    required double revenue,
+    required String currency,
+    String? transactionId,
+    String? productId,
+    String? subscriptionTier,
+    Map<String, dynamic>? additionalProperties,
+  }) async {
+    final properties = {
+      'revenue': revenue,
+      'currency': currency,
+      'transaction_id': transactionId,
+      'product_id': productId,
+      'subscription_tier': subscriptionTier,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?additionalProperties,
+    };
+
+    await logEvent(eventName, properties);
+    
+    // Also track as purchase event for Firebase
+    if (_firebaseInitialized && _analytics != null) {
+      try {
+        await _analytics!.logPurchase(
+          currency: currency,
+          value: revenue,
+          transactionId: transactionId,
+          items: productId != null ? [
+            AnalyticsEventItem(
+              itemId: productId,
+              itemName: subscriptionTier ?? productId,
+              itemCategory: 'subscription',
+              price: revenue,
+            ),
+          ] : null,
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          print('Analytics: Failed to log purchase event: $e');
+        }
+      }
+    }
+  }
+
+  /// Track conversion funnel events for KPI monitoring
+  Future<void> trackConversionFunnel({
+    required String stage,
+    required String context,
+    String? userId,
+    String? sessionId,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('conversion_funnel', {
+      'stage': stage,
+      'context': context,
+      'user_id': userId,
+      'session_id': sessionId,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
+  /// Track user engagement metrics for retention analysis
+  Future<void> trackEngagementMetric({
+    required String metricName,
+    required dynamic value,
+    String? context,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('engagement_metric', {
+      'metric_name': metricName,
+      'value': value,
+      'context': context,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
+  /// Track cohort-specific events for retention analysis
+  Future<void> trackCohortEvent({
+    required String cohortId,
+    required String eventName,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('cohort_event', {
+      'cohort_id': cohortId,
+      'event_name': eventName,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
   /// Get event queue for processing
   List<AnalyticsEvent> getEventQueue() {
     return List.unmodifiable(_eventQueue);

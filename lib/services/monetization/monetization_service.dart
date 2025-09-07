@@ -246,6 +246,114 @@ class MonetizationService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Track upgrade flow initiation with enhanced analytics
+  Future<void> trackUpgradeFlowStarted({
+    required String targetTier,
+    required String source,
+    FeatureType? triggerFeature,
+  }) async {
+    await _analyticsService.trackConversionFunnel(
+      stage: 'upgrade_flow_started',
+      context: source,
+      properties: {
+        'target_tier': targetTier,
+        'trigger_feature': triggerFeature?.name,
+        'current_tier': _currentTier.name,
+      },
+    );
+
+    await _analyticsService.logEvent('upgrade_flow_started', {
+      'target_tier': targetTier,
+      'current_tier': _currentTier.name,
+      'flow_source': source,
+      'trigger_feature': triggerFeature?.name,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
+
+  /// Track successful subscription with revenue analytics
+  Future<void> trackSubscriptionSuccess({
+    required String tier,
+    required double revenue,
+    required String currency,
+    required String transactionId,
+    String? paymentMethod,
+  }) async {
+    // Track revenue event for KPI monitoring
+    await _analyticsService.trackRevenueEvent(
+      eventName: 'subscription_purchase',
+      revenue: revenue,
+      currency: currency,
+      transactionId: transactionId,
+      productId: tier,
+      subscriptionTier: tier,
+      additionalProperties: {
+        'payment_method': paymentMethod,
+        'previous_tier': _currentTier.name,
+      },
+    );
+
+    // Track conversion funnel completion
+    await _analyticsService.trackConversionFunnel(
+      stage: 'purchase_completed',
+      context: 'subscription',
+      properties: {
+        'tier': tier,
+        'revenue': revenue,
+        'transaction_id': transactionId,
+      },
+    );
+  }
+
+  /// Enhanced feature usage tracking with KPIs
+  Future<void> trackEnhancedFeatureUsage(FeatureType feature, {
+    String? context,
+    bool? success,
+    String? errorCode,
+  }) async {
+    final currentUsage = _usageCounts[feature] ?? 0;
+    
+    // Track enhanced usage analytics
+    await _analyticsService.logEvent('feature_used', {
+      'feature_name': feature.name,
+      'feature_tier': _getFeatureTier(feature),
+      'current_usage': currentUsage,
+      'user_tier': _currentTier.name,
+      'has_trial': hasActiveTrial,
+      'success': success ?? true,
+      'error_code': errorCode,
+      'usage_context': context ?? 'standard_usage',
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
+    // Track engagement metric for retention analysis
+    await _analyticsService.trackEngagementMetric(
+      metricName: 'feature_usage',
+      value: currentUsage + 1,
+      context: feature.name,
+      properties: {
+        'user_tier': _currentTier.name,
+        'has_trial': hasActiveTrial,
+        'usage_context': context,
+      },
+    );
+  }
+
+  /// Get feature tier for analytics
+  String _getFeatureTier(FeatureType feature) {
+    final limits = FeatureLimits.forTier(UserTier.free);
+    if (limits.isFeatureAvailable(feature)) {
+      return 'free';
+    }
+    
+    final proLimits = FeatureLimits.forTier(UserTier.pro);
+    if (proLimits.isFeatureAvailable(feature)) {
+      return 'pro';
+    }
+    
+    return 'premium';
+  }
+
   /// Get upgrade benefits for current tier
   List<String> getUpgradeBenefits() {
     // If user has trial, show conversion benefits
