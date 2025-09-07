@@ -1,16 +1,27 @@
+import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../../core/app_export.dart';
+import '../../../core/app_export.dart';
+import '../../../models/doodle_data.dart';
+import '../../../services/notes/notes_service.dart';
 
 class DrawingCanvasWidget extends StatefulWidget {
   final bool isPremiumUser;
   final Function() onClose;
+  final Function(String doodlePath)? onDoodleSaved;
+  final String? existingDoodlePath; // For editing existing doodles
 
   const DrawingCanvasWidget({
     Key? key,
     required this.isPremiumUser,
     required this.onClose,
+    this.onDoodleSaved,
+    this.existingDoodlePath,
   }) : super(key: key);
 
   @override
@@ -18,10 +29,21 @@ class DrawingCanvasWidget extends StatefulWidget {
 }
 
 class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
-  List<DrawnLine> _lines = [];
+  final GlobalKey _canvasKey = GlobalKey();
+  
+  DoodleData? _doodleData;
+  List<DoodleStroke> _currentStrokes = [];
+  List<List<DoodleStroke>> _undoHistory = [];
+  int _currentLayer = 0;
+  
   Color _selectedColor = Colors.black;
   double _selectedWidth = 2.0;
   bool _isErasing = false;
+  String _currentTool = 'pen';
+  
+  NotesService? _notesService;
+  bool _isSaving = false;
+  bool _hasUnsavedChanges = false;
 
   final List<Color> _basicColors = [
     Colors.black,
@@ -43,66 +65,198 @@ class _DrawingCanvasWidgetState extends State<DrawingCanvasWidget> {
     Colors.lime,
   ];
 
+  final List<String> _tools = ['pen', 'eraser'];
+  final List<String> _premiumTools = ['highlighter', 'brush'];
+
+  @override
+  void initState() {
+    super.initState();
+    _notesService = Provider.of<NotesService>(context, listen: false);
+    _initializeDoodle();
+  }
+
+  /// Initialize doodle data - load existing or create new
+  Future<void> _initializeDoodle() async {
+    if (widget.existingDoodlePath != null) {
+      await _loadExistingDoodle();
+    } else {
+      _createNewDoodle();
+    }
+  }
+
+  /// Load existing doodle data
+  Future<void> _loadExistingDoodle() async {
+    try {
+      final jsonData = await _notesService!.loadDoodleData(widget.existingDoodlePath!);
+      if (jsonData != null) {
+        setState(() {
+          _doodleData = DoodleData.fromJsonString(jsonData);
+          _currentStrokes = _doodleData!.allStrokes;
+        });
+      } else {
+        _createNewDoodle();
+      }
+    } catch (e) {
+      _createNewDoodle();
+      _showErrorSnackBar('Failed to load doodle: $e');
+    }
+  }
+
+  /// Create new doodle with default settings
+  void _createNewDoodle() {
+    final canvasSize = Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height * 0.7);
+    setState(() {
+      _doodleData = DoodleData.createNew(canvasSize: canvasSize);
+      _currentStrokes = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    if (_doodleData == null) {
+      return Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: widget.onClose,
-          icon: CustomIconWidget(
-            iconName: 'close',
-            size: 6.w,
-            color: Colors.black,
-          ),
-        ),
-        title: Text(
-          'Drawing',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.black,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: _doodleData!.backgroundColor,
+        appBar: _buildAppBar(),
+        body: Column(
+          children: [
+            _buildToolPalette(),
+            Expanded(
+              child: Container(
+                key: _canvasKey,
+                width: double.infinity,
+                color: _doodleData!.backgroundColor,
+                child: CustomPaint(
+                  painter: DoodlePainter(_currentStrokes, _doodleData!),
+                  child: GestureDetector(
+                    onPanStart: _onPanStart,
+                    onPanUpdate: _onPanUpdate,
+                    onPanEnd: _onPanEnd,
+                    child: Container(),
+                  ),
+                ),
               ),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: _clearCanvas,
-            icon: CustomIconWidget(
-              iconName: 'clear',
-              size: 6.w,
-              color: Colors.black,
-            ),
-          ),
-          IconButton(
-            onPressed: _undoLastStroke,
-            icon: CustomIconWidget(
-              iconName: 'undo',
-              size: 6.w,
-              color: Colors.black,
-            ),
-          ),
-        ],
+        floatingActionButton: _buildFloatingActionButtons(),
       ),
-      body: Column(
-        children: [
-          _buildToolPalette(),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              color: Colors.white,
-              child: CustomPaint(
-                painter: DrawingPainter(_lines),
-                child: GestureDetector(
-                  onPanStart: _onPanStart,
-                  onPanUpdate: _onPanUpdate,
-                  onPanEnd: _onPanEnd,
-                  child: Container(),
+    );
+  }
+
+  /// Handle back button and unsaved changes
+  Future<bool> _onWillPop() async {
+    if (_hasUnsavedChanges) {
+      return await _showUnsavedChangesDialog();
+    }
+    return true;
+  }
+
+  /// Show unsaved changes dialog
+  Future<bool> _showUnsavedChangesDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Unsaved Changes'),
+            content: const Text('You have unsaved changes. Do you want to save before leaving?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Discard'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await _saveDoodle();
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  /// Build app bar with save and tools
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: _doodleData!.backgroundColor,
+      elevation: 0,
+      leading: IconButton(
+        onPressed: () async {
+          if (await _onWillPop()) {
+            widget.onClose();
+          }
+        },
+        icon: CustomIconWidget(
+          iconName: 'close',
+          size: 6.w,
+          color: Colors.black,
+        ),
+      ),
+      title: Text(
+        widget.existingDoodlePath != null ? 'Edit Doodle' : 'New Doodle',
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.black,
+            ),
+      ),
+      actions: [
+        if (_hasUnsavedChanges)
+          Container(
+            margin: EdgeInsets.only(right: 2.w),
+            child: Center(
+              child: Container(
+                width: 2.w,
+                height: 2.w,
+                decoration: const BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        IconButton(
+          onPressed: _clearCanvas,
+          icon: CustomIconWidget(
+            iconName: 'clear',
+            size: 6.w,
+            color: Colors.black,
+          ),
+        ),
+        IconButton(
+          onPressed: _undoLastStroke,
+          icon: CustomIconWidget(
+            iconName: 'undo',
+            size: 6.w,
+            color: _undoHistory.isNotEmpty ? Colors.black : Colors.grey,
+          ),
+        ),
+        IconButton(
+          onPressed: _isSaving ? null : _saveDoodle,
+          icon: _isSaving
+              ? SizedBox(
+                  width: 4.w,
+                  height: 4.w,
+                  child: const CircularProgressIndicator(strokeWidth: 2),
+                )
+              : CustomIconWidget(
+                  iconName: 'save',
+                  size: 6.w,
+                  color: Colors.blue,
+                ),
+        ),
+      ],
     );
   }
 
