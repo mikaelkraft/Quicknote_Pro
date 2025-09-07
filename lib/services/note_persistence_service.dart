@@ -63,6 +63,11 @@ class NotePersistenceService {
         .map((attachment) => attachment.relativePath)
         .toList();
 
+    final voiceNotePaths = note.attachments
+        .where((attachment) => attachment.isAudio)
+        .map((attachment) => attachment.relativePath)
+        .toList();
+
     return legacy.Note(
       id: note.id,
       title: note.title,
@@ -73,7 +78,7 @@ class NotePersistenceService {
       tags: [], // Tags not implemented in new model yet
       imagePaths: imagePaths,
       attachmentPaths: attachmentPaths,
-      voiceNotePaths: [], // Voice notes not implemented in new model yet
+      voiceNotePaths: voiceNotePaths,
     );
   }
 
@@ -109,6 +114,22 @@ class NotePersistenceService {
       ));
     }
 
+    // Convert voice note paths to audio attachments
+    for (int i = 0; i < legacyNote.voiceNotePaths.length; i++) {
+      final path = legacyNote.voiceNotePaths[i];
+      final fileName = path.split('/').last;
+      attachments.add(Attachment(
+        id: '${legacyNote.id}_audio_$i',
+        name: fileName,
+        relativePath: path,
+        mimeType: _getMimeTypeFromPath(path),
+        type: AttachmentType.audio,
+        createdAt: legacyNote.createdAt,
+        // Try to extract duration from file metadata if available
+        // For now, we'll leave it null and the player will determine it
+      ));
+    }
+
     return Note(
       id: legacyNote.id,
       title: legacyNote.title,
@@ -138,8 +159,47 @@ class NotePersistenceService {
         return 'application/msword';
       case 'docx':
         return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'm4a':
+        return 'audio/aac';
+      case 'wav':
+        return 'audio/wav';
+      case 'mp3':
+        return 'audio/mpeg';
+      case 'aac':
+        return 'audio/aac';
       default:
         return null;
     }
+  }
+
+  /// Add an audio attachment to a note
+  Future<Note> addAudioAttachment(
+    Note note, 
+    String audioPath, 
+    int durationSeconds, {
+    int? fileSizeBytes,
+  }) async {
+    final fileName = audioPath.split('/').last;
+    final audioAttachment = Attachment(
+      id: 'audio_${DateTime.now().millisecondsSinceEpoch}',
+      name: fileName,
+      relativePath: audioPath,
+      mimeType: _getMimeTypeFromPath(audioPath),
+      sizeBytes: fileSizeBytes,
+      type: AttachmentType.audio,
+      createdAt: DateTime.now(),
+      durationSeconds: durationSeconds,
+    );
+
+    final updatedNote = note.addAttachment(audioAttachment);
+    await upsertNote(updatedNote);
+    return updatedNote;
+  }
+
+  /// Remove an attachment from a note
+  Future<Note> removeAttachment(Note note, String attachmentId) async {
+    final updatedNote = note.removeAttachment(attachmentId);
+    await upsertNote(updatedNote);
+    return updatedNote;
   }
 }

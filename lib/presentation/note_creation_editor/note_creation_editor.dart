@@ -438,6 +438,43 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
     }
   }
 
+  void _handleDoodleSaved(String doodlePath) async {
+    setState(() => _showDrawingCanvas = false);
+
+    try {
+      // Insert doodle reference in content
+      final currentText = _contentController.text;
+      final cursorPosition = _contentController.selection.baseOffset;
+      final doodleRef = '\n🎨 [Doodle](${doodlePath})\n';
+
+      final newText = currentText.substring(0, cursorPosition) +
+          doodleRef +
+          currentText.substring(cursorPosition);
+
+      _contentController.text = newText;
+      _contentController.selection = TextSelection.collapsed(
+        offset: cursorPosition + doodleRef.length,
+      );
+
+      HapticFeedback.lightImpact();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Doodle saved and added to note')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add doodle reference: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -641,6 +678,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
       child: DrawingCanvasWidget(
         isPremiumUser: _isPremiumUser,
         onClose: () => setState(() => _showDrawingCanvas = false),
+        onDoodleSaved: _handleDoodleSaved,
       ),
     );
   }
@@ -648,7 +686,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildImageInsertion() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
             margin: EdgeInsets.all(4.w),
@@ -694,7 +732,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildFileAttachment() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
             margin: EdgeInsets.all(4.w),
@@ -741,7 +779,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildOcrExtraction() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
             margin: EdgeInsets.all(4.w),

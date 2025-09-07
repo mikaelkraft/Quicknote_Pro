@@ -155,6 +155,14 @@ class Note {
   List<Attachment> get fileAttachments => 
       attachments.where((attachment) => attachment.isFile).toList();
 
+  /// Get all doodle attachments
+  List<Attachment> get doodleAttachments => 
+      attachments.where((attachment) => attachment.isDoodle).toList();
+
+  /// Get all audio attachments
+  List<Attachment> get audioAttachments => 
+      attachments.where((attachment) => attachment.isAudio).toList();
+
   /// Get total size of all attachments
   int get totalAttachmentSize {
     return attachments

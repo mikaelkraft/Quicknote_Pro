@@ -25,13 +25,13 @@ class BrandGradientWidget extends StatelessWidget {
           colors: isDark
               ? [
                   AppTheme.backgroundDark,
-                  AppTheme.surfaceDark.withValues(alpha: 0.8),
-                  AppTheme.primaryDark.withValues(alpha: 0.1),
+                  AppTheme.surfaceDark.withOpacity(0.8),
+                  AppTheme.primaryDark.withOpacity(0.1),
                 ]
               : [
                   AppTheme.backgroundLight,
-                  AppTheme.primaryLight.withValues(alpha: 0.05),
-                  AppTheme.primaryLight.withValues(alpha: 0.1),
+                  AppTheme.primaryLight.withOpacity(0.05),
+                  AppTheme.primaryLight.withOpacity(0.1),
                 ],
           stops: const [0.0, 0.6, 1.0],
         ),
