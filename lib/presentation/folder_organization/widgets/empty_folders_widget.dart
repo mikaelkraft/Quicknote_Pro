@@ -27,7 +27,7 @@ class EmptyFoldersWidget extends StatelessWidget {
               height: 40.w,
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -93,11 +93,11 @@ class EmptyFoldersWidget extends StatelessWidget {
               padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                      .withValues(alpha: 0.3),
+                      .withOpacity(0.3),
                   width: 1,
                 ),
               ),

@@ -73,7 +73,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                   colors: [
                     isDark ? AppTheme.primaryDark : AppTheme.primaryLight,
                     (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                        .withValues(alpha: 0.8),
+                        .withOpacity(0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -82,7 +82,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
           color: widget.isSelected
               ? null
               : (isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight)
-                  .withValues(alpha: 0.5),
+                  .withOpacity(0.5),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: widget.isSelected
@@ -95,7 +95,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                   BoxShadow(
                     color:
                         (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                            .withValues(alpha: 0.3),
+                            .withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -109,7 +109,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                 padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
                 decoration: BoxDecoration(
                   color: (isDark ? AppTheme.successDark : AppTheme.successLight)
-                      .withValues(alpha: 0.2),
+                      .withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color:
@@ -159,7 +159,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                     text: ' ${widget.period}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: widget.isSelected
-                              ? Colors.white.withValues(alpha: 0.8)
+                              ? Colors.white.withOpacity(0.8)
                               : (isDark
                                   ? AppTheme.textSecondaryDark
                                   : AppTheme.textSecondaryLight),
@@ -207,7 +207,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                     colors: [
                       isDark ? AppTheme.warningDark : AppTheme.warningLight,
                       (isDark ? AppTheme.warningDark : AppTheme.warningLight)
-                          .withValues(alpha: 0.8),
+                          .withOpacity(0.8),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -216,7 +216,7 @@ class _PricingOptionWidgetState extends State<PricingOptionWidget>
                       color: (isDark
                               ? AppTheme.warningDark
                               : AppTheme.warningLight)
-                          .withValues(alpha: 0.3),
+                          .withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),

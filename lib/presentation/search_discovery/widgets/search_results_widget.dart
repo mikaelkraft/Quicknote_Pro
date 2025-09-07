@@ -82,7 +82,7 @@ class SearchResultsWidget extends StatelessWidget {
               color: Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withValues(alpha: 0.5),
+                  .withOpacity(0.5),
               size: 15.w,
             ),
             SizedBox(height: 3.h),
@@ -113,7 +113,7 @@ class SearchResultsWidget extends StatelessWidget {
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color:
-            Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -193,7 +193,7 @@ class SearchResultsWidget extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .primary
-                                    .withValues(alpha: 0.1),
+                                    .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -236,7 +236,7 @@ class SearchResultsWidget extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .surfaceContainerHighest
-                        .withValues(alpha: 0.5),
+                        .withOpacity(0.5),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -296,7 +296,7 @@ class SearchResultsWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
-        color: iconColor.withValues(alpha: 0.1),
+        color: iconColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: CustomIconWidget(
@@ -320,7 +320,7 @@ class SearchResultsWidget extends StatelessWidget {
               : Theme.of(context)
                   .colorScheme
                   .onSurfaceVariant
-                  .withValues(alpha: 0.3),
+                  .withOpacity(0.3),
           size: 3.w,
         );
       }),

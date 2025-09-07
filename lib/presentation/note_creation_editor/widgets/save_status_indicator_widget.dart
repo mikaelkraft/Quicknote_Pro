@@ -112,10 +112,10 @@ class _SaveStatusIndicatorWidgetState extends State<SaveStatusIndicatorWidget>
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
             decoration: BoxDecoration(
-              color: _getStatusColor().withValues(alpha: 0.1),
+              color: _getStatusColor().withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: _getStatusColor().withValues(alpha: 0.3),
+                color: _getStatusColor().withOpacity(0.3),
                 width: 1,
               ),
             ),

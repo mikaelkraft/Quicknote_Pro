@@ -140,8 +140,10 @@ class HomeScreenWidgetService {
 
 /// Background callback for widget interactions
 @pragma('vm:entry-point')
-void _backgroundCallback(Uri data) {
+void _backgroundCallback(Uri? data) {
   debugPrint('Widget background callback triggered: $data');
+  
+  if (data == null) return;
   
   final action = data.queryParameters['action'];
   HomeScreenWidgetService.handleWidgetInteraction(action);

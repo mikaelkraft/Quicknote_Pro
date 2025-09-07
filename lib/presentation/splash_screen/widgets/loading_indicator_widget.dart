@@ -65,7 +65,7 @@ class _LoadingIndicatorWidgetState extends State<LoadingIndicatorWidget>
                 ),
                 backgroundColor:
                     (isDark ? AppTheme.primaryDark : AppTheme.primaryLight)
-                        .withValues(alpha: 0.2),
+                        .withOpacity(0.2),
               );
             },
           ),
