@@ -3,6 +3,7 @@
 /// Manages referral codes, rewards, and tracking for both referrers and referees.
 /// Provides incentives for users to invite friends and grow the user base.
 
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -330,8 +331,8 @@ class ReferralService extends ChangeNotifier {
     // Track successful referral
     _analytics.trackMonetizationEvent(
       MonetizationEvent.referralApplied(
-        referralCode: code,
-        newUserId: newUserId,
+        referrerCode: code,
+        refereeId: newUserId,
       ),
     );
 
@@ -364,9 +365,9 @@ class ReferralService extends ChangeNotifier {
     // Track conversion
     _analytics.trackMonetizationEvent(
       MonetizationEvent.referralConverted(
-        referralCode: referralCode,
-        convertedUserId: convertedUserId,
-        subscribedTier: subscribedTier.name,
+        referrerCode: referralCode,
+        refereeId: convertedUserId,
+        rewardAmount: null, // Will be calculated later
       ),
     );
 
@@ -400,7 +401,8 @@ class ReferralService extends ChangeNotifier {
     _analytics.trackMonetizationEvent(
       MonetizationEvent.referralRewardClaimed(
         rewardType: reward.type.name,
-        rewardConfig: reward.config,
+        amount: null, // Will be calculated based on reward config
+        currency: 'USD',
       ),
     );
 
@@ -464,12 +466,6 @@ class ReferralService extends ChangeNotifier {
     
     try {
       final rewardsJson = _pendingRewards.map((reward) {
-        return Uri.encodeComponent({
-          'type': reward.type.name,
-          'display_name': reward.displayName,
-          'description': reward.description,
-          'config': reward.config,
-          'expires_at': reward.expiresAt?.toIso8601String(),
         return Uri.encodeComponent(jsonEncode({
           'type': reward.type.name,
           'display_name': reward.displayName,
@@ -500,66 +496,3 @@ class ReferralService extends ChangeNotifier {
 }
 
 /// Extension for MonetizationEvent to add referral events
-extension ReferralMonetizationEvents on MonetizationEvent {
-  /// Referral code generated
-  static MonetizationEvent referralCodeGenerated({
-    required String referralCode,
-    required String userId,
-  }) {
-    return MonetizationEvent(
-      eventName: 'referral_code_generated',
-      parameters: {
-        'referral_code': referralCode,
-        'user_id': userId,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Referral code applied by new user
-  static MonetizationEvent referralApplied({
-    required String referralCode,
-    required String newUserId,
-  }) {
-    return MonetizationEvent(
-      eventName: 'referral_applied',
-      parameters: {
-        'referral_code': referralCode,
-        'new_user_id': newUserId,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Referral converted to paid subscription
-  static MonetizationEvent referralConverted({
-    required String referralCode,
-    required String convertedUserId,
-    required String subscribedTier,
-  }) {
-    return MonetizationEvent(
-      eventName: 'referral_converted',
-      parameters: {
-        'referral_code': referralCode,
-        'converted_user_id': convertedUserId,
-        'subscribed_tier': subscribedTier,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Referral reward claimed
-  static MonetizationEvent referralRewardClaimed({
-    required String rewardType,
-    required Map<String, dynamic> rewardConfig,
-  }) {
-    return MonetizationEvent(
-      eventName: 'referral_reward_claimed',
-      parameters: {
-        'reward_type': rewardType,
-        'reward_config': rewardConfig,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-}

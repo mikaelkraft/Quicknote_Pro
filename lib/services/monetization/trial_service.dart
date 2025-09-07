@@ -3,6 +3,7 @@
 /// Manages trial periods, extensions, conversions, and win-back campaigns
 /// to maximize user retention and subscription conversions.
 
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../analytics/analytics_service.dart';
@@ -596,111 +597,3 @@ class TrialService extends ChangeNotifier {
   }
 }
 
-/// Extension for MonetizationEvent to add trial events
-extension TrialMonetizationEvents on MonetizationEvent {
-  /// Trial started
-  static MonetizationEvent trialStarted({
-    required String tier,
-    required String trialType,
-    required int durationDays,
-    String? promoCode,
-  }) {
-    return MonetizationEvent(
-      eventName: 'trial_started',
-      parameters: {
-        'tier': tier,
-        'trial_type': trialType,
-        'duration_days': durationDays,
-        'promo_code': promoCode,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Trial extended
-  static MonetizationEvent trialExtended({
-    required String tier,
-    required int additionalDays,
-    required String reason,
-  }) {
-    return MonetizationEvent(
-      eventName: 'trial_extended',
-      parameters: {
-        'tier': tier,
-        'additional_days': additionalDays,
-        'reason': reason,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Trial expired
-  static MonetizationEvent trialExpired({
-    required String tier,
-    required String trialType,
-    required int durationDays,
-  }) {
-    return MonetizationEvent(
-      eventName: 'trial_expired',
-      parameters: {
-        'tier': tier,
-        'trial_type': trialType,
-        'duration_days': durationDays,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Trial converted to paid subscription
-  static MonetizationEvent trialConverted({
-    required String trialTier,
-    required String subscribedTier,
-    required int trialDurationDays,
-    required int conversionDay,
-  }) {
-    return MonetizationEvent(
-      eventName: 'trial_converted',
-      parameters: {
-        'trial_tier': trialTier,
-        'subscribed_tier': subscribedTier,
-        'trial_duration_days': trialDurationDays,
-        'conversion_day': conversionDay,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Trial cancelled
-  static MonetizationEvent trialCancelled({
-    required String tier,
-    required String reason,
-    required int daysUsed,
-  }) {
-    return MonetizationEvent(
-      eventName: 'trial_cancelled',
-      parameters: {
-        'tier': tier,
-        'reason': reason,
-        'days_used': daysUsed,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Conversion attempted (viewed pricing but didn't convert)
-  static MonetizationEvent conversionAttempted({
-    required String context,
-    required int attemptNumber,
-    required bool hasActiveTrial,
-  }) {
-    return MonetizationEvent(
-      eventName: 'conversion_attempted',
-      parameters: {
-        'context': context,
-        'attempt_number': attemptNumber,
-        'has_active_trial': hasActiveTrial,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-}

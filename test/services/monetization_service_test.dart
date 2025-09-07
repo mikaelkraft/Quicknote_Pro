@@ -14,7 +14,7 @@ void main() {
       expect(monetizationService.isPremium, false);
     });
 
-    test('should recognize premium status for premium and pro tiers', () {
+    test('should recognize premium status for premium and pro tiers', () async {
       monetizationService.setUserTier(UserTier.premium);
       expect(monetizationService.isPremium, true);
 

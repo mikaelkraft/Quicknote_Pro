@@ -235,6 +235,104 @@ class AnalyticsService extends ChangeNotifier {
     ));
   }
 
+  /// Track revenue-specific events for KPI monitoring
+  Future<void> trackRevenueEvent({
+    required String eventName,
+    required double revenue,
+    required String currency,
+    String? transactionId,
+    String? productId,
+    String? subscriptionTier,
+    Map<String, dynamic>? additionalProperties,
+  }) async {
+    final properties = {
+      'revenue': revenue,
+      'currency': currency,
+      'transaction_id': transactionId,
+      'product_id': productId,
+      'subscription_tier': subscriptionTier,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?additionalProperties,
+    };
+
+    await logEvent(eventName, properties);
+    
+    // Also track as purchase event for Firebase
+    if (_firebaseInitialized && _analytics != null) {
+      try {
+        await _analytics!.logPurchase(
+          currency: currency,
+          value: revenue,
+          transactionId: transactionId,
+          items: productId != null ? [
+            AnalyticsEventItem(
+              itemId: productId,
+              itemName: subscriptionTier ?? productId,
+              itemCategory: 'subscription',
+              price: revenue,
+            ),
+          ] : null,
+        );
+      } catch (e) {
+        if (kDebugMode) {
+          print('Analytics: Failed to log purchase event: $e');
+        }
+      }
+    }
+  }
+
+  /// Track conversion funnel events for KPI monitoring
+  Future<void> trackConversionFunnel({
+    required String stage,
+    required String context,
+    String? userId,
+    String? sessionId,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('conversion_funnel', {
+      'stage': stage,
+      'context': context,
+      'user_id': userId,
+      'session_id': sessionId,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
+  /// Track user engagement metrics for retention analysis
+  Future<void> trackEngagementMetric({
+    required String metricName,
+    required dynamic value,
+    String? context,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('engagement_metric', {
+      'metric_name': metricName,
+      'value': value,
+      'context': context,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
+  /// Track cohort-specific events for retention analysis
+  Future<void> trackCohortEvent({
+    required String cohortId,
+    required String eventName,
+    Map<String, dynamic>? properties,
+  }) async {
+    await logEvent('cohort_event', {
+      'cohort_id': cohortId,
+      'event_name': eventName,
+      'timestamp': DateTime.now().toIso8601String(),
+      'user_locale': _getUserLocale(),
+      ...?properties,
+    });
+  }
+
   /// Get event queue for processing
   List<AnalyticsEvent> getEventQueue() {
     return List.unmodifiable(_eventQueue);
@@ -426,6 +524,126 @@ class MonetizationEvent {
     MonetizationEvent('premium_feature_used', {
       'feature': feature,
       'user_tier': userTier,
+      'user_locale': _getUserLocale(),
+    });
+
+  // Trial-related events
+  static MonetizationEvent trialStarted({String? tier, String? trialType, int? durationDays, String? context, String? promoCode}) => 
+    MonetizationEvent('trial_started', {
+      'tier': tier,
+      'trial_type': trialType,
+      'duration_days': durationDays,
+      'context': context,
+      'promo_code': promoCode,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialExpired({String? tier, String? trialType, int? durationDays}) => 
+    MonetizationEvent('trial_expired', {
+      'tier': tier,
+      'trial_type': trialType,
+      'duration_days': durationDays,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialExtended({String? tier, int? additionalDays, String? reason}) => 
+    MonetizationEvent('trial_extended', {
+      'tier': tier,
+      'additional_days': additionalDays,
+      'reason': reason,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialConverted({String? trialTier, String? subscribedTier, int? trialDurationDays, int? conversionDay, String? paymentMethod, double? amount}) => 
+    MonetizationEvent('trial_converted', {
+      'trial_tier': trialTier,
+      'subscribed_tier': subscribedTier,
+      'trial_duration_days': trialDurationDays,
+      'conversion_day': conversionDay,
+      'payment_method': paymentMethod,
+      'amount': amount,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialCancelled({String? tier, String? reason, int? daysUsed}) => 
+    MonetizationEvent('trial_cancelled', {
+      'tier': tier,
+      'reason': reason,
+      'days_used': daysUsed,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent conversionAttempted({String? tier, String? context, int? attemptNumber, bool? hasActiveTrial}) => 
+    MonetizationEvent('conversion_attempted', {
+      'tier': tier,
+      'context': context,
+      'attempt_number': attemptNumber,
+      'has_active_trial': hasActiveTrial,
+      'user_locale': _getUserLocale(),
+    });
+
+  // Referral-related events
+  static MonetizationEvent referralCodeGenerated({String? userId, String? referralCode}) => 
+    MonetizationEvent('referral_code_generated', {
+      'user_id': userId,
+      'referral_code': referralCode,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralCodeShared({String? code, String? method}) => 
+    MonetizationEvent('referral_code_shared', {
+      'code': code,
+      'method': method,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralCodeUsed({String? code, String? newUserId}) => 
+    MonetizationEvent('referral_code_used', {
+      'code': code,
+      'new_user_id': newUserId,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralApplied({String? referrerCode, String? refereeId}) => 
+    MonetizationEvent('referral_applied', {
+      'referrer_code': referrerCode,
+      'referee_id': refereeId,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralConverted({String? referrerCode, String? refereeId, double? rewardAmount}) => 
+    MonetizationEvent('referral_converted', {
+      'referrer_code': referrerCode,
+      'referee_id': refereeId,
+      'reward_amount': rewardAmount,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralRewardClaimed({String? rewardType, double? amount, String? currency}) => 
+    MonetizationEvent('referral_reward_claimed', {
+      'reward_type': rewardType,
+      'amount': amount,
+      'currency': currency,
+      'user_locale': _getUserLocale(),
+    });
+
+  // Coupon-related events
+  static MonetizationEvent couponApplied({String? couponCode, String? discountType, double? discountAmount, double? originalPrice, String? tier, String? term}) => 
+    MonetizationEvent('coupon_applied', {
+      'coupon_code': couponCode,
+      'discount_type': discountType,
+      'discount_amount': discountAmount,
+      'original_price': originalPrice,
+      'tier': tier,
+      'term': term,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent couponValidated({String? couponCode, bool? isValid, String? errorReason}) => 
+    MonetizationEvent('coupon_validated', {
+      'coupon_code': couponCode,
+      'is_valid': isValid,
+      'error_reason': errorReason,
       'user_locale': _getUserLocale(),
     });
 }

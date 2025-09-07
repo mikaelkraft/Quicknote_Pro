@@ -33,11 +33,56 @@ class _SimpleBannerAdState extends State<SimpleBannerAd> {
 
   Future<void> _loadAd() async {
     final adsService = context.read<AdsService>();
+    
+    // Enhanced placement validation
+    if (!_validatePlacement()) {
+      return;
+    }
+    
     final result = await adsService.requestAd(widget.placement);
     
     if (mounted) {
       setState(() => _adResult = result);
+      
+      // Track ad load result for KPI monitoring
+      if (result.isSuccess) {
+        await _trackAdMetric('ad_load_success', {
+          'placement': widget.placement.name,
+          'load_time': DateTime.now().millisecondsSinceEpoch,
+        });
+      } else {
+        await _trackAdMetric('ad_load_failed', {
+          'placement': widget.placement.name,
+          'error': result.message,
+        });
+      }
     }
+  }
+
+  /// Validate placement according to documentation specs
+  bool _validatePlacement() {
+    final adsService = context.read<AdsService>();
+    
+    // Check if ads are enabled and user is not premium
+    if (!adsService.adsEnabled) {
+      return false;
+    }
+    
+    // Validate placement timing and frequency
+    if (!adsService.canShowAd(widget.placement)) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  /// Track ad-related metrics for analytics
+  Future<void> _trackAdMetric(String eventName, Map<String, dynamic> properties) async {
+    final analyticsService = AnalyticsService();
+    await analyticsService.logEvent(eventName, {
+      'timestamp': DateTime.now().toIso8601String(),
+      ...properties,
+    });
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../analytics/analytics_service.dart';
 
 /// Service for managing ad placements, formats, and frequency caps.
 /// 
@@ -94,6 +95,9 @@ class AdsService extends ChangeNotifier {
       return AdResult.blocked(placement, 'Frequency cap or interval restriction');
     }
 
+    // Track ad request for analytics
+    await _trackAdEvent('ad_requested', placement, null);
+
     // Simulate ad loading (replace with actual ad SDK integration)
     final config = AdConfig.forPlacement(placement);
     
@@ -101,11 +105,14 @@ class AdsService extends ChangeNotifier {
       // In real implementation, this would integrate with ad SDK
       await Future.delayed(const Duration(milliseconds: 500));
       
-      // Record the ad request
+      // Record the ad request and success
       await _recordAdShown(placement);
+      await _trackAdEvent('ad_loaded', placement, config.format);
+      await _trackAdEvent('ad_shown', placement, config.format);
       
       return AdResult.success(placement, config.format);
     } catch (e) {
+      await _trackAdEvent('ad_failed', placement, null, errorMessage: e.toString());
       return AdResult.error(placement, e.toString());
     }
   }
@@ -123,12 +130,73 @@ class AdsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Record ad interaction (click, dismiss, etc.)
-  void recordAdInteraction(AdPlacement placement, AdInteraction interaction) {
+  /// Record ad interaction events with comprehensive analytics
+  Future<void> recordAdInteraction(AdPlacement placement, AdInteraction interaction, {
+    Map<String, dynamic>? additionalData,
+  }) async {
     if (kDebugMode) {
       print('Ad interaction: ${placement.name} - ${interaction.name}');
     }
+    
+    // Track interaction with analytics
+    switch (interaction) {
+      case AdInteraction.clicked:
+        await _trackAdEvent('ad_clicked', placement, null, additionalData: additionalData);
+        break;
+      case AdInteraction.dismissed:
+        await _trackAdEvent('ad_dismissed', placement, null, additionalData: additionalData);
+        break;
+      case AdInteraction.closed:
+        await _trackAdEvent('ad_closed', placement, null, additionalData: additionalData);
+        break;
+      case AdInteraction.shown:
+        // Already tracked in requestAd
+        break;
+    }
+    
     notifyListeners();
+  }
+
+  /// Track ad revenue for analytics (when available from ad SDK)
+  Future<void> trackAdRevenue({
+    required AdPlacement placement,
+    required double revenue,
+    required String currency,
+    String? adNetwork,
+    String? adUnit,
+  }) async {
+    await _trackAdEvent('ad_revenue', placement, null, additionalData: {
+      'revenue': revenue,
+      'currency': currency,
+      'ad_network': adNetwork,
+      'ad_unit': adUnit,
+    });
+  }
+
+  /// Enhanced ad event tracking with analytics integration
+  Future<void> _trackAdEvent(
+    String eventName, 
+    AdPlacement placement, 
+    AdFormat? format, {
+    String? errorMessage,
+    Map<String, dynamic>? additionalData,
+  }) async {
+    // Use analytics service for comprehensive tracking
+    final analyticsService = AnalyticsService();
+    
+    final properties = <String, dynamic>{
+      'placement': placement.name,
+      'format': format?.name,
+      'error_message': errorMessage,
+      'timestamp': DateTime.now().toIso8601String(),
+      ...?additionalData,
+    };
+
+    await analyticsService.logEvent(eventName, properties);
+    
+    if (kDebugMode) {
+      print('Ad Event: $eventName - $properties');
+    }
   }
 
   /// Reset daily frequency counters (call at midnight or app start)

@@ -196,6 +196,8 @@ class FeatureGate extends StatelessWidget {
         return 'Note Creation';
       case FeatureType.voiceNoteRecording:
         return 'Voice Recordings';
+      case FeatureType.voiceTranscription:
+        return 'Voice Transcription';
       case FeatureType.advancedDrawing:
         return 'Advanced Drawing Tools';
       case FeatureType.cloudSync:
@@ -206,6 +208,8 @@ class FeatureGate extends StatelessWidget {
         return 'Folders';
       case FeatureType.attachments:
         return 'Attachments';
+      default:
+        return 'Premium Feature';
     }
   }
 
@@ -256,6 +260,8 @@ class FeatureGate extends StatelessWidget {
         return 'Create unlimited notes with Premium. Currently limited to 50 notes per month on the free plan.';
       case FeatureType.voiceNoteRecording:
         return 'Record unlimited voice notes with Premium. Get longer recording times and transcription features.';
+      case FeatureType.voiceTranscription:
+        return 'Automatically transcribe your voice notes to text with Premium. Save time and improve searchability.';
       case FeatureType.advancedDrawing:
         return 'Access professional drawing tools including brushes, shapes, layers, and advanced editing features.';
       case FeatureType.cloudSync:
@@ -266,6 +272,8 @@ class FeatureGate extends StatelessWidget {
         return 'Organize your notes with unlimited folders and advanced organization features.';
       case FeatureType.attachments:
         return 'Add unlimited images, files, and media to your notes with Premium.';
+      default:
+        return 'This premium feature is available with an upgraded plan.';
     }
   }
 
