@@ -164,6 +164,8 @@ class MonetizationHelper {
         return 'Unlimited Notes';
       case FeatureType.voiceNoteRecording:
         return 'Unlimited Voice Recordings';
+      case FeatureType.voiceTranscription:
+        return 'Voice Transcription';
       case FeatureType.advancedDrawing:
         return 'Advanced Drawing Tools';
       case FeatureType.cloudSync:
@@ -174,6 +176,8 @@ class MonetizationHelper {
         return 'Unlimited Folders';
       case FeatureType.attachments:
         return 'Unlimited Attachments';
+      default:
+        return 'Premium Feature';
     }
   }
 
@@ -184,6 +188,8 @@ class MonetizationHelper {
         return 'Create unlimited notes without monthly restrictions. Upgrade to Premium now.';
       case FeatureType.voiceNoteRecording:
         return 'Record unlimited voice notes with longer duration and transcription. Upgrade to Premium.';
+      case FeatureType.voiceTranscription:
+        return 'Automatically transcribe your voice notes to text. Available with Premium.';
       case FeatureType.advancedDrawing:
         return 'Access professional drawing tools, brushes, and layers. Available with Premium.';
       case FeatureType.cloudSync:
@@ -194,6 +200,8 @@ class MonetizationHelper {
         return 'Organize your notes with unlimited folders and advanced organization. Upgrade to Premium.';
       case FeatureType.attachments:
         return 'Add unlimited images, files, and media to your notes. Available with Premium.';
+      default:
+        return 'Unlock this premium feature and get access to all advanced capabilities.';
     }
   }
 
