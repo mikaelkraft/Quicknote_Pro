@@ -3,6 +3,7 @@
 /// Manages referral codes, rewards, and tracking for both referrers and referees.
 /// Provides incentives for users to invite friends and grow the user base.
 
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -464,12 +465,6 @@ class ReferralService extends ChangeNotifier {
     
     try {
       final rewardsJson = _pendingRewards.map((reward) {
-        return Uri.encodeComponent({
-          'type': reward.type.name,
-          'display_name': reward.displayName,
-          'description': reward.description,
-          'config': reward.config,
-          'expires_at': reward.expiresAt?.toIso8601String(),
         return Uri.encodeComponent(jsonEncode({
           'type': reward.type.name,
           'display_name': reward.displayName,

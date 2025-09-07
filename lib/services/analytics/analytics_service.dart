@@ -428,6 +428,83 @@ class MonetizationEvent {
       'user_tier': userTier,
       'user_locale': _getUserLocale(),
     });
+
+  // Trial-related events
+  static MonetizationEvent trialStarted({String? tier, String? trialType, int? durationDays, String? context, String? promoCode}) => 
+    MonetizationEvent('trial_started', {
+      'tier': tier,
+      'trial_type': trialType,
+      'duration_days': durationDays,
+      'context': context,
+      'promo_code': promoCode,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialExpired({String? tier, String? trialType, int? durationDays}) => 
+    MonetizationEvent('trial_expired', {
+      'tier': tier,
+      'trial_type': trialType,
+      'duration_days': durationDays,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialExtended({String? tier, int? additionalDays, String? reason}) => 
+    MonetizationEvent('trial_extended', {
+      'tier': tier,
+      'additional_days': additionalDays,
+      'reason': reason,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialConverted({String? trialTier, String? subscribedTier, int? trialDurationDays, int? conversionDay, String? paymentMethod, double? amount}) => 
+    MonetizationEvent('trial_converted', {
+      'trial_tier': trialTier,
+      'subscribed_tier': subscribedTier,
+      'trial_duration_days': trialDurationDays,
+      'conversion_day': conversionDay,
+      'payment_method': paymentMethod,
+      'amount': amount,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent trialCancelled({String? tier, String? reason, int? daysUsed}) => 
+    MonetizationEvent('trial_cancelled', {
+      'tier': tier,
+      'reason': reason,
+      'days_used': daysUsed,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent conversionAttempted({String? tier, String? context, int? attemptNumber, bool? hasActiveTrial}) => 
+    MonetizationEvent('conversion_attempted', {
+      'tier': tier,
+      'context': context,
+      'attempt_number': attemptNumber,
+      'has_active_trial': hasActiveTrial,
+      'user_locale': _getUserLocale(),
+    });
+
+  // Referral-related events
+  static MonetizationEvent referralCodeGenerated({String? userId, String? code}) => 
+    MonetizationEvent('referral_code_generated', {
+      'user_id': userId,
+      'code': code,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralCodeShared({String? code, String? method}) => 
+    MonetizationEvent('referral_code_shared', {
+      'code': code,
+      'method': method,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralCodeUsed({String? code, String? newUserId}) => 
+    MonetizationEvent('referral_code_used', {
+      'code': code,
+      'new_user_id': newUserId,
+      'user_locale': _getUserLocale(),
+    });
 }
 
 /// Engagement event types

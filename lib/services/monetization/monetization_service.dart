@@ -50,6 +50,12 @@ class MonetizationService extends ChangeNotifier {
   /// Access to trial service
   TrialService get trialService => _trialService;
 
+  /// Whether user has an active trial
+  bool get hasActiveTrial => _trialService.hasActiveTrial;
+
+  /// Whether user has premium access (including trial)
+  bool get hasPremiumAccess => isPremium || hasActiveTrial;
+
   /// Initialize the monetization service
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
@@ -352,7 +358,6 @@ enum UserTier {
   free,
   premium,
   pro,
-  enterprise,
   enterprise,
 }
 
@@ -727,7 +732,6 @@ class PricingInfo {
         tier: UserTier.premium,
         displayName: 'Premium',
         price: '\$0.99',
-        price: '\$0.99',
         billingPeriod: 'month',
         hasTrial: true,
         trialDays: 7,
@@ -746,7 +750,6 @@ class PricingInfo {
       PricingInfo(
         tier: UserTier.pro,
         displayName: 'Pro',
-        price: '\$1.99',
         price: '\$1.99',
         billingPeriod: 'month',
         hasTrial: true,

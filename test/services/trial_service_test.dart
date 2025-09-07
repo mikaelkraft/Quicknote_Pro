@@ -6,7 +6,7 @@ import '../../lib/services/monetization/monetization_service.dart';
 void main() {
   late TrialService trialService;
 
-  setUpEach(() async {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
     trialService = TrialService();
     await trialService.initialize();
