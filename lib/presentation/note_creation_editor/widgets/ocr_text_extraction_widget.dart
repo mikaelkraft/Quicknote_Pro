@@ -138,7 +138,7 @@ class _OcrTextExtractionWidgetState extends State<OcrTextExtractionWidget>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
                   decoration: BoxDecoration(
-                    color: _getConfidenceColor().withValues(alpha: 0.1),
+                    color: _getConfidenceColor().withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: _getConfidenceColor(), width: 1),
                   ),
@@ -285,7 +285,7 @@ class _OcrTextExtractionWidgetState extends State<OcrTextExtractionWidget>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
                   decoration: BoxDecoration(
-                    color: AppTheme.getWarningColor(true).withValues(alpha: 0.1),
+                    color: AppTheme.getWarningColor(true).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: AppTheme.getWarningColor(true)),
                   ),
@@ -391,7 +391,7 @@ class _OcrTextExtractionWidgetState extends State<OcrTextExtractionWidget>
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: widget.isPremiumUser 
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
                 : Theme.of(context).dividerColor,
             width: widget.isPremiumUser ? 2 : 1,
           ),

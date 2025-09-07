@@ -9,6 +9,8 @@ import 'package:quicknote_pro/repositories/notes_repository.dart';
 import '../mocks/mock_repositories.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   group('NoteController Tests', () {
     late NoteController noteController;
     late MockNotesRepository mockRepository;

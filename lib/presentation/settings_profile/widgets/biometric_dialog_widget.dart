@@ -97,7 +97,7 @@ class _BiometricDialogWidgetState extends State<BiometricDialogWidget>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -136,7 +136,7 @@ class _BiometricDialogWidgetState extends State<BiometricDialogWidget>
                                 (isDark
                                         ? AppTheme.errorDark
                                         : AppTheme.errorLight)
-                                    .withValues(alpha: 0.8),
+                                    .withOpacity(0.8),
                               ]
                             : [
                                 isDark
@@ -145,7 +145,7 @@ class _BiometricDialogWidgetState extends State<BiometricDialogWidget>
                                 (isDark
                                         ? AppTheme.primaryDark
                                         : AppTheme.primaryLight)
-                                    .withValues(alpha: 0.8),
+                                    .withOpacity(0.8),
                               ],
                       ),
                       shape: BoxShape.circle,
@@ -158,7 +158,7 @@ class _BiometricDialogWidgetState extends State<BiometricDialogWidget>
                                   : (isDark
                                       ? AppTheme.primaryDark
                                       : AppTheme.primaryLight))
-                              .withValues(alpha: 0.3),
+                              .withOpacity(0.3),
                           blurRadius: 15,
                           offset: const Offset(0, 5),
                         ),
