@@ -1,6 +1,9 @@
 /// Feature flags for controlling optional functionality
 /// These flags allow the app to build and run without external dependencies
 class FeatureFlags {
+  // Private constructor to prevent instantiation
+  const FeatureFlags._();
+  
   // IAP feature flag - disable for builds without store configuration
   static const bool enableIAP = false;
   

@@ -12,7 +12,7 @@ class Note {
   final bool hasReminder;
   final List<String> tags;
   
-  Note({
+  const Note({
     required this.id,
     required this.title,
     required this.content,

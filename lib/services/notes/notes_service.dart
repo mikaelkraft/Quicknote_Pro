@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import '../models/note.dart';
+import '../../models/note.dart';
 
 /// Service to manage notes with pin/sort/tag/share functionality
 class NotesService extends ChangeNotifier {
@@ -9,6 +10,10 @@ class NotesService extends ChangeNotifier {
   String _searchQuery = '';
   List<String> _availableTags = [];
   String? _selectedTag;
+  bool _isInitialized = false;
+
+  /// Whether the service is initialized
+  bool get isInitialized => _isInitialized;
   
   // Mock data - in a real app this would come from a database
   static final List<Map<String, dynamic>> _mockNotes = [
@@ -81,10 +86,18 @@ class NotesService extends ChangeNotifier {
 
   /// Initialize the service with mock data
   void initialize() {
-    _notes.clear();
-    _notes.addAll(_mockNotes.map((map) => Note.fromMap(map)));
-    _updateAvailableTags();
-    notifyListeners();
+    if (_isInitialized) return;
+    
+    try {
+      _notes.clear();
+      _notes.addAll(_mockNotes.map((map) => Note.fromMap(map)));
+      _updateAvailableTags();
+      _isInitialized = true;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Failed to initialize notes service: $e');
+      _isInitialized = true; // Still mark as initialized to prevent infinite retry
+    }
   }
 
   /// Get all notes
@@ -173,63 +186,86 @@ class NotesService extends ChangeNotifier {
 
   /// Toggle pin status of a note
   void togglePin(int noteId) {
-    final index = _notes.indexWhere((note) => note.id == noteId);
-    if (index != -1) {
-      _notes[index] = _notes[index].copyWith(
-        isPinned: !_notes[index].isPinned,
-        updatedAt: DateTime.now(),
-      );
-      notifyListeners();
+    try {
+      final index = _notes.indexWhere((note) => note.id == noteId);
+      if (index != -1) {
+        _notes[index] = _notes[index].copyWith(
+          isPinned: !_notes[index].isPinned,
+          updatedAt: DateTime.now(),
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to toggle pin for note $noteId: $e');
     }
   }
 
   /// Delete a note
   void deleteNote(int noteId) {
-    _notes.removeWhere((note) => note.id == noteId);
-    _updateAvailableTags();
-    notifyListeners();
+    try {
+      final removed = _notes.removeWhere((note) => note.id == noteId);
+      if (removed > 0) {
+        _updateAvailableTags();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to delete note $noteId: $e');
+    }
   }
 
   /// Duplicate a note
   void duplicateNote(int noteId) {
-    final index = _notes.indexWhere((note) => note.id == noteId);
-    if (index != -1) {
-      final original = _notes[index];
-      final duplicate = original.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch,
-        title: '${original.title} (Copy)',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        isPinned: false, // Duplicates are not pinned by default
-      );
-      _notes.insert(index + 1, duplicate);
-      notifyListeners();
+    try {
+      final index = _notes.indexWhere((note) => note.id == noteId);
+      if (index != -1) {
+        final original = _notes[index];
+        final duplicate = original.copyWith(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: '${original.title} (Copy)',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isPinned: false, // Duplicates are not pinned by default
+        );
+        _notes.insert(index + 1, duplicate);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to duplicate note $noteId: $e');
     }
   }
 
   /// Add or remove tag from note
   void updateNoteTags(int noteId, List<String> newTags) {
-    final index = _notes.indexWhere((note) => note.id == noteId);
-    if (index != -1) {
-      _notes[index] = _notes[index].copyWith(
-        tags: newTags,
-        updatedAt: DateTime.now(),
-      );
-      _updateAvailableTags();
-      notifyListeners();
+    try {
+      final index = _notes.indexWhere((note) => note.id == noteId);
+      if (index != -1) {
+        _notes[index] = _notes[index].copyWith(
+          tags: newTags,
+          updatedAt: DateTime.now(),
+        );
+        _updateAvailableTags();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Failed to update tags for note $noteId: $e');
     }
   }
 
   /// Share a note
   Future<void> shareNote(int noteId) async {
-    final note = _notes.firstWhere((n) => n.id == noteId);
     try {
+      final noteIndex = _notes.indexWhere((n) => n.id == noteId);
+      if (noteIndex == -1) {
+        throw ArgumentError('Note with id $noteId not found');
+      }
+      
+      final note = _notes[noteIndex];
       await Share.share(
         note.shareableContent,
         subject: note.title,
       );
     } catch (e) {
-      debugPrint('Share failed: $e');
+      debugPrint('Share failed for note $noteId: $e');
       rethrow;
     }
   }

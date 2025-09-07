@@ -84,10 +84,22 @@ class _SettingsProfileState extends State<SettingsProfile>
   }
 
   void _loadSettings() {
-    // Load settings from SharedPreferences or similar
-    setState(() {
-      _isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    });
+    // Load settings from theme service
+    try {
+      final themeService = context.read<ThemeService>();
+      setState(() {
+        _isDarkMode = themeService.themeMode == ThemeMode.dark ||
+                     (themeService.themeMode == ThemeMode.system &&
+                      Theme.of(context).brightness == Brightness.dark);
+        _themeMode = themeService.themeModeString;
+      });
+    } catch (e) {
+      debugPrint('Error loading settings: $e');
+      // Fallback to system theme detection
+      setState(() {
+        _isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      });
+    }
   }
 
   @override
@@ -355,13 +367,13 @@ class _SettingsProfileState extends State<SettingsProfile>
                 colors: isDark
                     ? [
                         AppTheme.backgroundDark,
-                        AppTheme.surfaceDark.withValues(alpha: 0.7),
-                        AppTheme.accentDark.withValues(alpha: 0.05),
+                        AppTheme.surfaceDark.withOpacity(0.7),
+                        AppTheme.accentDark.withOpacity(0.05),
                       ]
                     : [
                         AppTheme.backgroundLight,
-                        AppTheme.surfaceLight.withValues(alpha: 0.7),
-                        AppTheme.accentLight.withValues(alpha: 0.05),
+                        AppTheme.surfaceLight.withOpacity(0.7),
+                        AppTheme.accentLight.withOpacity(0.05),
                       ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -391,7 +403,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                           color: (isDark
                                   ? AppTheme.textSecondaryDark
                                   : AppTheme.textSecondaryLight)
-                              .withValues(alpha: 0.1),
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: CustomIconWidget(
@@ -583,7 +595,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                               ? Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withValues(alpha: 0.1)
+                                  .withOpacity(0.1)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
@@ -892,7 +904,7 @@ class _SettingsProfileState extends State<SettingsProfile>
                   color: (hasPremium
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).colorScheme.secondary)
-                      .withValues(alpha: 0.1),
+                      .withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: CustomIconWidget(

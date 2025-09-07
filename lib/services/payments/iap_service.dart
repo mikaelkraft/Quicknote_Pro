@@ -128,17 +128,22 @@ class IAPService extends ChangeNotifier {
   
   /// Handle purchase updates from real IAP
   void _handlePurchaseUpdate(List<dynamic> purchaseDetailsList) {
-    // This would handle real purchase updates
-    // For now, simulate success
-    for (final purchase in purchaseDetailsList) {
-      _hasRealEntitlement = true;
+    try {
+      // This would handle real purchase updates
+      // For now, simulate success
+      for (final purchase in purchaseDetailsList) {
+        _hasRealEntitlement = true;
+      }
       notifyListeners();
+    } catch (e) {
+      debugPrint('Error handling purchase update: $e');
     }
   }
-  
+
   /// Handle purchase errors
   void _handlePurchaseError(dynamic error) {
     debugPrint('Purchase error: $error');
+    // Could emit error events here for UI to handle
   }
   
   /// Purchase a product
@@ -265,7 +270,11 @@ class IAPService extends ChangeNotifier {
   
   @override
   void dispose() {
-    _purchaseSubscription?.cancel();
+    try {
+      _purchaseSubscription?.cancel();
+    } catch (e) {
+      debugPrint('Error disposing IAP service: $e');
+    }
     super.dispose();
   }
 }

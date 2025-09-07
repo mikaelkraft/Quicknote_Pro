@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -11,6 +12,7 @@ class ThemeService extends ChangeNotifier {
   late Box _box;
   ThemeMode _themeMode = ThemeMode.system;
   Color? _accentColor;
+  bool _isInitialized = false;
   
   // Available accent colors for customization
   static const List<Color> availableAccentColors = [
@@ -27,50 +29,79 @@ class ThemeService extends ChangeNotifier {
   
   /// Initialize the theme service and load saved settings
   Future<void> init() async {
-    await Hive.initFlutter();
-    _box = await Hive.openBox(_boxName);
-    await _loadSettings();
+    if (_isInitialized) return;
+    
+    try {
+      await Hive.initFlutter();
+      _box = await Hive.openBox(_boxName);
+      await _loadSettings();
+      _isInitialized = true;
+    } catch (e) {
+      debugPrint('Failed to initialize theme service: $e');
+      // Ensure we still mark as initialized to prevent infinite retry
+      _isInitialized = true;
+    }
   }
   
   /// Load theme settings from storage
   Future<void> _loadSettings() async {
+    if (!_isInitialized) return;
+    
     try {
       // Load theme mode
       final themeModeIndex = _box.get(_themeModeKey, defaultValue: ThemeMode.system.index);
-      _themeMode = ThemeMode.values[themeModeIndex];
+      if (themeModeIndex >= 0 && themeModeIndex < ThemeMode.values.length) {
+        _themeMode = ThemeMode.values[themeModeIndex];
+      }
       
       // Load accent color
       final accentColorValue = _box.get(_accentColorKey);
-      if (accentColorValue != null) {
+      if (accentColorValue != null && accentColorValue is int) {
         _accentColor = Color(accentColorValue);
       }
       
       notifyListeners();
     } catch (e) {
+      debugPrint('Failed to load theme settings: $e');
       // If loading fails, use defaults
       _themeMode = ThemeMode.system;
       _accentColor = null;
+      notifyListeners();
     }
   }
   
   /// Set the theme mode and persist it
   Future<void> setThemeMode(ThemeMode mode) async {
-    if (_themeMode != mode) {
+    if (!_isInitialized || _themeMode == mode) return;
+    
+    try {
       _themeMode = mode;
       await _box.put(_themeModeKey, mode.index);
       notifyListeners();
+    } catch (e) {
+      debugPrint('Failed to save theme mode: $e');
+      // Revert on failure
+      _themeMode = ThemeMode.system;
+      notifyListeners();
     }
   }
-  
+
   /// Set the accent color and persist it
   Future<void> setAccentColor(Color? color) async {
-    if (_accentColor != color) {
+    if (!_isInitialized || _accentColor == color) return;
+    
+    try {
       _accentColor = color;
       if (color != null) {
         await _box.put(_accentColorKey, color.value);
       } else {
         await _box.delete(_accentColorKey);
       }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Failed to save accent color: $e');
+      // Revert on failure
+      _accentColor = null;
       notifyListeners();
     }
   }
@@ -108,7 +139,13 @@ class ThemeService extends ChangeNotifier {
   /// Dispose of resources
   @override
   void dispose() {
-    _box.close();
+    try {
+      if (_isInitialized) {
+        _box.close();
+      }
+    } catch (e) {
+      debugPrint('Error closing theme service box: $e');
+    }
     super.dispose();
   }
 }

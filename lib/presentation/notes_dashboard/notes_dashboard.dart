@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:provider/provider.dart';
@@ -47,13 +48,21 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   void _onFilterSelected(String filter) {
-    final notesService = context.read<NotesService>();
-    notesService.setFilter(filter);
+    try {
+      final notesService = context.read<NotesService>();
+      notesService.setFilter(filter);
+    } catch (e) {
+      debugPrint('Error setting filter: $e');
+    }
   }
 
   void _onSearchChanged(String query) {
-    final notesService = context.read<NotesService>();
-    notesService.setSearchQuery(query);
+    try {
+      final notesService = context.read<NotesService>();
+      notesService.setSearchQuery(query);
+    } catch (e) {
+      debugPrint('Error setting search query: $e');
+    }
   }
 
   void _showNoteTypeSelector() {
@@ -88,21 +97,27 @@ class _NotesDashboardState extends State<NotesDashboard>
   }
 
   void _onNoteAction(int noteId, String action) {
-    final notesService = context.read<NotesService>();
-    
-    switch (action) {
-      case 'pin':
-        notesService.togglePin(noteId);
-        break;
-      case 'delete':
-        notesService.deleteNote(noteId);
-        break;
-      case 'duplicate':
-        notesService.duplicateNote(noteId);
-        break;
-      case 'share':
-        _shareNote(noteId);
-        break;
+    try {
+      final notesService = context.read<NotesService>();
+      
+      switch (action) {
+        case 'pin':
+          notesService.togglePin(noteId);
+          break;
+        case 'delete':
+          notesService.deleteNote(noteId);
+          break;
+        case 'duplicate':
+          notesService.duplicateNote(noteId);
+          break;
+        case 'share':
+          _shareNote(noteId);
+          break;
+        default:
+          debugPrint('Unknown note action: $action');
+      }
+    } catch (e) {
+      debugPrint('Error performing note action $action: $e');
     }
   }
   
@@ -190,7 +205,7 @@ class _NotesDashboardState extends State<NotesDashboard>
                             color: (isDark
                                     ? AppTheme.primaryDark
                                     : AppTheme.primaryLight)
-                                .withValues(alpha: 0.1),
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: CustomIconWidget(
@@ -476,7 +491,7 @@ class _NotesDashboardState extends State<NotesDashboard>
               colors: [
                 isDark ? AppTheme.warningDark : AppTheme.warningLight,
                 (isDark ? AppTheme.warningDark : AppTheme.warningLight)
-                    .withValues(alpha: 0.8),
+                    .withOpacity(0.8),
               ],
             ),
             borderRadius: BorderRadius.circular(12),
@@ -500,7 +515,7 @@ class _NotesDashboardState extends State<NotesDashboard>
               Text(
                 'Unlock unlimited features',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: Colors.white.withOpacity(0.9),
                     ),
               ),
               SizedBox(height: 2.h),

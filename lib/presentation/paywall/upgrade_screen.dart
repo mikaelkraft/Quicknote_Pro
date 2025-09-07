@@ -208,13 +208,13 @@ class _UpgradeScreenState extends State<UpgradeScreen>
                 colors: isDark
                     ? [
                         AppTheme.backgroundDark,
-                        AppTheme.primaryDark.withValues(alpha: 0.1),
-                        AppTheme.accentDark.withValues(alpha: 0.05),
+                        AppTheme.primaryDark.withOpacity(0.1),
+                        AppTheme.accentDark.withOpacity(0.05),
                       ]
                     : [
                         AppTheme.backgroundLight,
-                        AppTheme.primaryLight.withValues(alpha: 0.1),
-                        AppTheme.accentLight.withValues(alpha: 0.05),
+                        AppTheme.primaryLight.withOpacity(0.1),
+                        AppTheme.accentLight.withOpacity(0.05),
                       ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -287,7 +287,7 @@ class _UpgradeScreenState extends State<UpgradeScreen>
               padding: EdgeInsets.all(2.w),
               decoration: BoxDecoration(
                 color: (isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight)
-                    .withValues(alpha: 0.1),
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: CustomIconWidget(
@@ -323,7 +323,7 @@ class _UpgradeScreenState extends State<UpgradeScreen>
               colors: [
                 isDark ? AppTheme.accentDark : AppTheme.accentLight,
                 (isDark ? AppTheme.accentDark : AppTheme.accentLight)
-                    .withValues(alpha: 0.8),
+                    .withOpacity(0.8),
               ],
             ),
             shape: BoxShape.circle,
@@ -373,7 +373,7 @@ class _UpgradeScreenState extends State<UpgradeScreen>
               Container(
                 padding: EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: CustomIconWidget(
@@ -562,7 +562,7 @@ class _UpgradeScreenState extends State<UpgradeScreen>
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).dividerColor,

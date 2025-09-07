@@ -505,7 +505,7 @@ class _NoteCreationEditorState extends State<NoteCreationEditor>
   Widget _buildImageInsertion() {
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
             margin: EdgeInsets.all(4.w),

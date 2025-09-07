@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'cloud_sync_service.dart';
 import 'providers/icloud_drive_sync_provider.dart';
 
@@ -12,14 +13,18 @@ class ProviderRegistry {
   
   /// Initialize all available providers
   void initialize() {
-    _providers.clear();
-    
-    // Add iCloud Drive provider
-    _providers.add(iCloudDriveSyncProvider());
-    
-    // TODO: Add other providers (Google Drive, Dropbox, etc.)
-    // _providers.add(GoogleDriveSyncProvider());
-    // _providers.add(DropboxSyncProvider());
+    try {
+      _providers.clear();
+      
+      // Add iCloud Drive provider
+      _providers.add(iCloudDriveSyncProvider());
+      
+      // TODO: Add other providers (Google Drive, Dropbox, etc.)
+      // _providers.add(GoogleDriveSyncProvider());
+      // _providers.add(DropboxSyncProvider());
+    } catch (e) {
+      debugPrint('Error initializing sync providers: $e');
+    }
   }
   
   /// Get all available providers
@@ -58,11 +63,20 @@ class ProviderRegistry {
   Future<Map<String, bool>> syncAll() async {
     final results = <String, bool>{};
     
-    for (final provider in configuredProviders) {
-      if (provider.isSignedIn) {
-        final success = await provider.syncNotes();
-        results[provider.displayName] = success;
+    try {
+      for (final provider in configuredProviders) {
+        if (provider.isSignedIn) {
+          try {
+            final success = await provider.syncNotes();
+            results[provider.displayName] = success;
+          } catch (e) {
+            debugPrint('Sync failed for ${provider.displayName}: $e');
+            results[provider.displayName] = false;
+          }
+        }
       }
+    } catch (e) {
+      debugPrint('Error during sync all operation: $e');
     }
     
     return results;
