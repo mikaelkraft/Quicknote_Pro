@@ -96,9 +96,10 @@ void main() {
       expect(testNote.id, 'test_note_id');
       expect(testNote.title, 'Test Note');
       expect(testNote.content, 'This is test content for the note');
-      expect(testNote.attachments.length, 2);
+      expect(testNote.attachments.length, 3);
       expect(testNote.attachments[0], testImageAttachment);
       expect(testNote.attachments[1], testFileAttachment);
+      expect(testNote.attachments[2], testAudioAttachment);
       expect(testNote.createdAt, testCreatedAt);
       expect(testNote.updatedAt, testUpdatedAt);
     });
@@ -207,7 +208,7 @@ void main() {
     });
 
     test('should count words', () {
-      expect(testNote.wordCount, 8); // "This is test content for the note"
+      expect(testNote.wordCount, 7); // "This is test content for the note"
 
       final emptyNote = testNote.copyWith(content: '');
       expect(emptyNote.wordCount, 0);
@@ -245,7 +246,15 @@ void main() {
       final totalSize = testNote.totalAttachmentSize;
       expect(totalSize, 3584000); // 1024000 + 2048000 + 512000
 
-      final noSizeAttachment = testImageAttachment.copyWith(sizeBytes: null);
+      // Create new attachment without size to test null handling
+      final noSizeAttachment = Attachment(
+        id: testImageAttachment.id,
+        name: testImageAttachment.name,
+        relativePath: testImageAttachment.relativePath,
+        type: testImageAttachment.type,
+        createdAt: testImageAttachment.createdAt,
+        // No sizeBytes field - should be null
+      );
       final noteWithNullSize = testNote.copyWith(attachments: [noSizeAttachment, testFileAttachment, testAudioAttachment]);
       expect(noteWithNullSize.totalAttachmentSize, 2560000); // Only counts non-null sizes (2048000 + 512000)
     });
@@ -331,7 +340,7 @@ void main() {
       final str = testNote.toString();
       expect(str, contains('test_note_id'));
       expect(str, contains('Test Note'));
-      expect(str, contains('34 chars')); // content length
+      expect(str, contains('33 chars')); // content length
       expect(str, contains('attachments: 3'));
     });
   });

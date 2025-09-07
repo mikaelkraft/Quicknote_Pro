@@ -133,6 +133,9 @@ void main() {
     });
 
     test('should format file size correctly', () {
+      // Test the original attachment (1024000 bytes = 1000 KB)
+      expect(testAttachment.fileSizeFormatted, '1000.0 KB');
+
       final bytesAttachment = testAttachment.copyWith(sizeBytes: 500);
       expect(bytesAttachment.fileSizeFormatted, '500 B');
 
@@ -145,7 +148,15 @@ void main() {
       final gbAttachment = testAttachment.copyWith(sizeBytes: 1610612736); // 1.5 GB
       expect(gbAttachment.fileSizeFormatted, '1.5 GB');
 
-      final noSizeAttachment = testAttachment.copyWith(sizeBytes: null);
+      // Test null size by creating new attachment without size
+      final noSizeAttachment = Attachment(
+        id: 'no_size_test',
+        name: 'no_size.txt',
+        relativePath: 'test/no_size.txt',
+        type: AttachmentType.file,
+        createdAt: DateTime.now(),
+        // No sizeBytes field - should be null
+      );
       expect(noSizeAttachment.fileSizeFormatted, 'Unknown size');
     });
 
@@ -247,7 +258,15 @@ void main() {
     });
 
     test('should handle null duration gracefully', () {
-      final attachment = audioAttachment.copyWith(durationSeconds: null);
+      final attachment = Attachment(
+        id: 'audio_test_null',
+        name: 'voice_note_no_duration.m4a',
+        relativePath: 'audio/voice_note_no_duration.m4a',
+        mimeType: 'audio/aac',
+        type: AttachmentType.audio,
+        createdAt: DateTime.now(),
+        // No durationSeconds field - should be null
+      );
       expect(attachment.formattedDuration, '');
     });
 

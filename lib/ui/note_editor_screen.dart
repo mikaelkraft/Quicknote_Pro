@@ -10,6 +10,8 @@ import '../../models/attachment.dart';
 import '../../controllers/note_controller.dart';
 import '../../services/media_picker.dart';
 import '../presentation/note_creation_editor/widgets/save_status_indicator_widget.dart';
+import '../presentation/note_creation_editor/widgets/voice_note_widget.dart';
+import '../presentation/note_creation_editor/widgets/audio_player_widget.dart';
 
 class NoteEditorScreen extends StatefulWidget {
   final String? noteId;
@@ -188,8 +190,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   Widget _buildAttachmentsSection(NoteController controller) {
+    final audioAttachments = controller.audioAttachments;
+    final otherAttachments = controller.attachments
+        .where((attachment) => !attachment.isAudio)
+        .toList();
+
     return Container(
-      height: 20.h,
+      height: audioAttachments.isNotEmpty ? 35.h : 20.h,
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -210,17 +217,55 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 ),
           ),
           SizedBox(height: 2.h),
-          Expanded(
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: controller.attachments.length,
-              separatorBuilder: (context, index) => SizedBox(width: 3.w),
-              itemBuilder: (context, index) {
-                final attachment = controller.attachments[index];
-                return _buildAttachmentTile(controller, attachment);
-              },
+          
+          // Audio attachments - shown prominently
+          if (audioAttachments.isNotEmpty) ...[
+            Text(
+              'Voice Notes',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
-          ),
+            SizedBox(height: 1.h),
+            SizedBox(
+              height: 15.h,
+              child: ListView.separated(
+                itemCount: audioAttachments.length,
+                separatorBuilder: (context, index) => SizedBox(height: 1.h),
+                itemBuilder: (context, index) {
+                  final audioAttachment = audioAttachments[index];
+                  return AudioPlayerWidget(
+                    audioAttachment: audioAttachment,
+                    onDelete: () => _removeAttachment(_noteController, audioAttachment),
+                  );
+                },
+              ),
+            ),
+            if (otherAttachments.isNotEmpty) SizedBox(height: 2.h),
+          ],
+          
+          // Other attachments - shown as thumbnails
+          if (otherAttachments.isNotEmpty) ...[
+            if (audioAttachments.isNotEmpty)
+              Text(
+                'Other Attachments',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            SizedBox(height: 1.h),
+            Expanded(
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: otherAttachments.length,
+                separatorBuilder: (context, index) => SizedBox(width: 3.w),
+                itemBuilder: (context, index) {
+                  final attachment = otherAttachments[index];
+                  return _buildAttachmentTile(controller, attachment);
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -369,6 +414,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         FloatingActionButton(
+          heroTag: 'voice_note',
+          onPressed: () => _showVoiceNoteDialog(),
+          backgroundColor: const Color(0xFFFF6B6B),
+          child: CustomIconWidget(
+            iconName: 'mic',
+            size: 6.w,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        FloatingActionButton(
           heroTag: 'camera',
           onPressed: () => _pickImageFromCamera(),
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -503,6 +559,67 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       ),
     );
   }
+
+  void _showVoiceNoteDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 90.w,
+            maxHeight: 70.h,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(4.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Record Voice Note',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: CustomIconWidget(
+                        iconName: 'close',
+                        size: 6.w,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              VoiceNoteWidget(
+                onAudioRecorded: _handleVoiceNoteRecorded,
+                isPremiumUser: _isPremiumUser, // TODO: Get from user service
+              ),
+              SizedBox(height: 2.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleVoiceNoteRecorded(String audioPath, int durationSeconds) async {
+    try {
+      await _noteController.addAudioRecording(audioPath, durationSeconds);
+      _showSuccessMessage('Voice note added successfully');
+    } catch (e) {
+      _showErrorMessage('Failed to add voice note: $e');
+    }
+  }
+
+  // TODO: Get from user service or provider
+  bool get _isPremiumUser => false; // Mock for now
 
   void _showSuccessMessage(String message) {
     if (mounted) {
