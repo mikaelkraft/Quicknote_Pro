@@ -485,10 +485,10 @@ class MonetizationEvent {
     });
 
   // Referral-related events
-  static MonetizationEvent referralCodeGenerated({String? userId, String? code}) => 
+  static MonetizationEvent referralCodeGenerated({String? userId, String? referralCode}) => 
     MonetizationEvent('referral_code_generated', {
       'user_id': userId,
-      'code': code,
+      'referral_code': referralCode,
       'user_locale': _getUserLocale(),
     });
 
@@ -503,6 +503,49 @@ class MonetizationEvent {
     MonetizationEvent('referral_code_used', {
       'code': code,
       'new_user_id': newUserId,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralApplied({String? referrerCode, String? refereeId}) => 
+    MonetizationEvent('referral_applied', {
+      'referrer_code': referrerCode,
+      'referee_id': refereeId,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralConverted({String? referrerCode, String? refereeId, double? rewardAmount}) => 
+    MonetizationEvent('referral_converted', {
+      'referrer_code': referrerCode,
+      'referee_id': refereeId,
+      'reward_amount': rewardAmount,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent referralRewardClaimed({String? rewardType, double? amount, String? currency}) => 
+    MonetizationEvent('referral_reward_claimed', {
+      'reward_type': rewardType,
+      'amount': amount,
+      'currency': currency,
+      'user_locale': _getUserLocale(),
+    });
+
+  // Coupon-related events
+  static MonetizationEvent couponApplied({String? couponCode, String? discountType, double? discountAmount, double? originalPrice, String? tier, String? term}) => 
+    MonetizationEvent('coupon_applied', {
+      'coupon_code': couponCode,
+      'discount_type': discountType,
+      'discount_amount': discountAmount,
+      'original_price': originalPrice,
+      'tier': tier,
+      'term': term,
+      'user_locale': _getUserLocale(),
+    });
+
+  static MonetizationEvent couponValidated({String? couponCode, bool? isValid, String? errorReason}) => 
+    MonetizationEvent('coupon_validated', {
+      'coupon_code': couponCode,
+      'is_valid': isValid,
+      'error_reason': errorReason,
       'user_locale': _getUserLocale(),
     });
 }

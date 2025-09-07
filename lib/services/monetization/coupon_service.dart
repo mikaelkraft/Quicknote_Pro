@@ -3,6 +3,7 @@
 /// Manages discount codes, validation, and application to subscription pricing.
 /// Supports various discount types and usage restrictions for marketing campaigns.
 
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../analytics/analytics_service.dart';
@@ -740,57 +741,3 @@ class CouponService extends ChangeNotifier {
 }
 
 /// Extension for MonetizationEvent to add coupon events
-extension CouponMonetizationEvents on MonetizationEvent {
-  /// Coupon applied to purchase
-  static MonetizationEvent couponApplied({
-    required String couponCode,
-    required double discountAmount,
-    required double originalPrice,
-    required String tier,
-    required String term,
-  }) {
-    return MonetizationEvent(
-      eventName: 'coupon_applied',
-      parameters: {
-        'coupon_code': couponCode,
-        'discount_amount': discountAmount,
-        'original_price': originalPrice,
-        'final_price': originalPrice - discountAmount,
-        'tier': tier,
-        'term': term,
-        'discount_percentage': ((discountAmount / originalPrice) * 100).round(),
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Coupon validation failed
-  static MonetizationEvent couponValidationFailed({
-    required String couponCode,
-    required String reason,
-  }) {
-    return MonetizationEvent(
-      eventName: 'coupon_validation_failed',
-      parameters: {
-        'coupon_code': couponCode,
-        'failure_reason': reason,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-
-  /// Coupon viewed by user
-  static MonetizationEvent couponViewed({
-    required String couponCode,
-    required String context,
-  }) {
-    return MonetizationEvent(
-      eventName: 'coupon_viewed',
-      parameters: {
-        'coupon_code': couponCode,
-        'context': context,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-  }
-}
