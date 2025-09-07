@@ -207,6 +207,44 @@ class NoteController extends ChangeNotifier {
     }
   }
 
+  /// Add an audio recording to the current note
+  Future<void> addAudioRecording(String audioPath, int durationSeconds) async {
+    if (_currentNote == null) {
+      throw StateError('No current note to add audio to');
+    }
+
+    _setSaving(true);
+    _setError(null);
+
+    try {
+      // Get file size
+      final file = File(audioPath);
+      final fileSizeBytes = await file.exists() ? await file.length() : null;
+
+      // Use the persistence service to add audio attachment
+      final updatedNote = await _persistenceService.addAudioAttachment(
+        _currentNote!,
+        audioPath,
+        durationSeconds,
+        fileSizeBytes: fileSizeBytes,
+      );
+      
+      _currentNote = updatedNote;
+      _noteStreamController.add(updatedNote);
+      
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to add audio recording: $e');
+      rethrow;
+    } finally {
+      _setSaving(false);
+    }
+  }
+
+  /// Get all audio attachments for the current note
+  List<Attachment> get audioAttachments => 
+      _currentNote?.audioAttachments ?? [];
+
   /// Flush any pending save operations
   Future<void> flushPendingSave() async {
     _autosaveTimer?.cancel();

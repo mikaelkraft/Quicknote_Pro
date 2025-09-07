@@ -6,6 +6,7 @@ enum AttachmentType {
   image,
   file,
   doodle,
+  audio,
 }
 
 /// Extension for AttachmentType to provide string conversion
@@ -18,6 +19,8 @@ extension AttachmentTypeExtension on AttachmentType {
         return 'file';
       case AttachmentType.doodle:
         return 'doodle';
+      case AttachmentType.audio:
+        return 'audio';
     }
   }
 
@@ -29,6 +32,8 @@ extension AttachmentTypeExtension on AttachmentType {
         return AttachmentType.file;
       case 'doodle':
         return AttachmentType.doodle;
+      case 'audio':
+        return AttachmentType.audio;
       default:
         throw ArgumentError('Unknown AttachmentType: $value');
     }
@@ -49,6 +54,9 @@ class Attachment {
   final String? vectorData; // JSON string containing drawing strokes
   final String? thumbnailPath; // Path to PNG thumbnail for doodles
   final Map<String, dynamic>? metadata; // Additional metadata (canvas size, etc.)
+  
+  // Audio-specific fields
+  final int? durationSeconds; // Duration for audio files
 
   const Attachment({
     required this.id,
@@ -61,6 +69,7 @@ class Attachment {
     this.vectorData,
     this.thumbnailPath,
     this.metadata,
+    this.durationSeconds,
   });
 
   /// Create a copy of the attachment with updated fields
@@ -75,6 +84,7 @@ class Attachment {
     String? vectorData,
     String? thumbnailPath,
     Map<String, dynamic>? metadata,
+    int? durationSeconds,
   }) {
     return Attachment(
       id: id ?? this.id,
@@ -87,6 +97,7 @@ class Attachment {
       vectorData: vectorData ?? this.vectorData,
       thumbnailPath: thumbnailPath ?? this.thumbnailPath,
       metadata: metadata ?? this.metadata,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
     );
   }
 
@@ -103,6 +114,7 @@ class Attachment {
       'vectorData': vectorData,
       'thumbnailPath': thumbnailPath,
       'metadata': metadata,
+      'durationSeconds': durationSeconds,
     };
   }
 
@@ -119,6 +131,7 @@ class Attachment {
       vectorData: json['vectorData'] as String?,
       thumbnailPath: json['thumbnailPath'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,
+      durationSeconds: json['durationSeconds'] as int?,
     );
   }
 
@@ -148,7 +161,7 @@ class Attachment {
     return 'Attachment{id: $id, name: $name, relativePath: $relativePath, '
            'mimeType: $mimeType, sizeBytes: $sizeBytes, type: $type, '
            'createdAt: $createdAt, hasVectorData: ${vectorData != null}, '
-           'hasThumbnail: ${thumbnailPath != null}}';
+           'hasThumbnail: ${thumbnailPath != null}, durationSeconds: $durationSeconds}';
   }
 
   /// Get a human-readable file size string
@@ -171,6 +184,9 @@ class Attachment {
   /// Check if this is a doodle attachment
   bool get isDoodle => type == AttachmentType.doodle;
 
+  /// Check if this is an audio attachment
+  bool get isAudio => type == AttachmentType.audio;
+
   /// Get file extension from name
   String? get fileExtension {
     final lastDot = name.lastIndexOf('.');
@@ -191,5 +207,14 @@ class Attachment {
     final height = metadata!['canvasHeight'] as double?;
     if (width == null || height == null) return null;
     return Size(width, height);
+  }
+
+  /// Get formatted duration for audio files
+  String get formattedDuration {
+    if (!isAudio || durationSeconds == null) return '';
+    final duration = Duration(seconds: durationSeconds!);
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 }
