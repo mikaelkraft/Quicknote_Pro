@@ -8,6 +8,7 @@ import '../../constants/feature_flags.dart';
 import 'referral_service.dart';
 import 'coupon_service.dart';
 import 'trial_service.dart';
+import 'revenuecat_service.dart';
 
 /// Service for managing pricing tiers, feature limits, and upgrade flows.
 ///
@@ -31,6 +32,7 @@ class MonetizationService extends ChangeNotifier {
   final ReferralService _referralService = ReferralService();
   final CouponService _couponService = CouponService();
   final TrialService _trialService = TrialService();
+  final RevenueCatService _revenueCatService = RevenueCatService();
 
   /// Current user tier
   UserTier get currentTier => _currentTier;
@@ -59,6 +61,9 @@ class MonetizationService extends ChangeNotifier {
   /// Access to trial service
   TrialService get trialService => _trialService;
 
+  /// Access to RevenueCat service
+  RevenueCatService get revenueCatService => _revenueCatService;
+
   /// Access to A/B testing service
   ABTestingService get abTestingService => _abTestingService;
 
@@ -86,6 +91,10 @@ class MonetizationService extends ChangeNotifier {
     await _referralService.initialize();
     await _couponService.initialize();
     await _trialService.initialize();
+    await _revenueCatService.initialize();
+
+    // Update current tier based on RevenueCat entitlements
+    await _updateTierFromRevenueCat();
   }
 
   /// Load user tier from storage
@@ -869,5 +878,35 @@ class PricingInfo {
   String get trialText {
     if (!hasTrial || trialDays == null) return '';
     return '$trialDays-day free trial';
+  }
+
+  /// Update user tier based on RevenueCat entitlements
+  Future<void> _updateTierFromRevenueCat() async {
+    if (!_revenueCatService.isInitialized) return;
+
+    final tier = _revenueCatService.getCurrentTier();
+    if (tier != _currentTier) {
+      await setUserTier(tier);
+    }
+  }
+
+  /// Purchase product through RevenueCat
+  Future<bool> purchaseProduct(String productId) async {
+    return await _revenueCatService.purchaseProduct(productId);
+  }
+
+  /// Restore purchases through RevenueCat
+  Future<bool> restorePurchases() async {
+    return await _revenueCatService.restorePurchases();
+  }
+
+  /// Check if user has feature access via RevenueCat
+  bool hasRevenueCatFeatureAccess(String feature) {
+    return _revenueCatService.hasFeatureAccess(feature);
+  }
+
+  /// Get available products for purchase
+  List<ProductInfo> getAvailableProducts() {
+    return _revenueCatService.getAvailableProducts();
   }
 }

@@ -1,0 +1,33 @@
+name = "quicknote-paystack-webhook"
+main = "paystack-webhook.js"
+compatibility_date = "2023-10-30"
+
+# Worker routing
+routes = [
+  { pattern = "*.quicknote.app/webhooks/*", zone_name = "quicknote.app" }
+]
+
+# Environment variables (to be set in Cloudflare dashboard)
+[env.production]
+name = "quicknote-paystack-webhook"
+
+[env.production.vars]
+# These should be set in the Cloudflare dashboard for security
+# PAYSTACK_SECRET_KEY = "sk_live_..."
+# REVENUECAT_API_KEY = "revenuecat_api_key..."
+# WEBHOOK_SECRET = "webhook_secret..."
+
+[env.staging]
+name = "quicknote-paystack-webhook-staging"
+
+[env.staging.vars]
+# Staging environment variables
+# PAYSTACK_SECRET_KEY = "sk_test_..."
+# REVENUECAT_API_KEY = "revenuecat_test_api_key..."
+# WEBHOOK_SECRET = "webhook_secret_staging..."
+
+# KV namespaces for webhook logging (optional)
+[[kv_namespaces]]
+binding = "WEBHOOK_LOGS"
+id = "webhook-logs-namespace-id"
+preview_id = "webhook-logs-preview-namespace-id"
