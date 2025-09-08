@@ -31,6 +31,12 @@ This document provides a comprehensive guide to the consolidated Monetization v1
    - Monetization Service: Feature flags and A/B testing integration
    - Ads Service: Smart timing with frequency caps
    - Trial Service: Enhanced trial management
+   - RevenueCat Service: Subscription management and entitlements
+
+5. **Payment Integration**
+   - RevenueCat SDK for cross-platform subscription management
+   - Paystack integration for African markets via Cloudflare Workers
+   - Comprehensive webhook handling for payment events
 
 ## Implementation Details
 
@@ -43,6 +49,11 @@ All monetization features are now controlled by environment variables:
 FEATURE_FLAG_MONETIZATION_ENABLED=true
 FEATURE_FLAG_IAP_ENABLED=true
 FEATURE_FLAG_SUBSCRIPTIONS_ENABLED=true
+FEATURE_FLAG_REVENUECAT_ENABLED=true
+
+// Payment providers
+FEATURE_FLAG_PAYSTACK_ENABLED=true
+FEATURE_FLAG_PAYSTACK_WEBHOOKS_ENABLED=true
 
 // Ad system control  
 FEATURE_FLAG_ADS_ENABLED=true
@@ -114,6 +125,43 @@ if (adsService.canShowAd(AdPlacement.noteListBanner)) {
 ```
 
 ## Usage Guide
+
+### Product Configuration
+
+The application supports the following subscription products:
+
+#### Premium Tier
+- **Monthly**: `quicknote_premium_monthly` - $1.99/month
+- **Annual**: `quicknote_premium_annual` - $19.99/year (17% savings)
+- **Lifetime**: `quicknote_premium_lifetime` - $74.99 one-time
+
+#### Pro Tier
+- **Monthly**: `quicknote_pro_monthly` - $2.99/month
+- **Annual**: `quicknote_pro_annual` - $29.99/year (17% savings)
+- **Lifetime**: `quicknote_pro_lifetime` - $114.99 one-time
+
+#### Enterprise Tier
+- **Monthly**: `quicknote_enterprise_monthly` - $2.00/user/month
+- **Annual**: `quicknote_enterprise_annual` - $20.00/user/year (17% savings)
+
+Product IDs and pricing are centralized in `lib/constants/product_ids.dart` and must match platform configurations (App Store, Google Play, Paystack).
+
+### RevenueCat Integration
+
+```dart
+// Initialize RevenueCat service
+final revenueCatService = context.read<MonetizationService>().revenueCatService;
+
+// Check subscription status
+final tier = revenueCatService.getCurrentTier();
+final hasFeature = revenueCatService.hasFeatureAccess('premium_features');
+
+// Purchase a product
+final success = await revenueCatService.purchaseProduct('quicknote_premium_annual');
+
+// Restore purchases
+await revenueCatService.restorePurchases();
+```
 
 ### Initialization
 
