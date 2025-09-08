@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../core/app_export.dart';
+import '../../../services/billing/unified_billing_service.dart';
+import '../../../constants/product_ids.dart';
 
 class PurchaseButtonWidget extends StatefulWidget {
   final bool isLoading;
   final String selectedPlan;
   final VoidCallback onStartTrial;
   final VoidCallback onRestore;
+  final String? userId;
+  final String? userEmail;
 
   const PurchaseButtonWidget({
     Key? key,
@@ -15,6 +19,8 @@ class PurchaseButtonWidget extends StatefulWidget {
     required this.selectedPlan,
     required this.onStartTrial,
     required this.onRestore,
+    this.userId,
+    this.userEmail,
   }) : super(key: key);
 
   @override
@@ -25,6 +31,8 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmerController;
   late Animation<double> _shimmerAnimation;
+  final UnifiedBillingService _billingService = UnifiedBillingService.instance;
+  bool _isPurchasing = false;
 
   @override
   void initState() {
@@ -57,7 +65,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
       children: [
         // Primary button
         GestureDetector(
-          onTap: widget.isLoading ? null : widget.onStartTrial,
+          onTap: widget.isLoading || _isPurchasing ? null : _handlePurchase,
           child: Container(
             width: double.infinity,
             height: 7.h,
@@ -87,7 +95,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
               child: Stack(
                 children: [
                   // Shimmer effect
-                  if (!widget.isLoading)
+                  if (!(widget.isLoading || _isPurchasing))
                     AnimatedBuilder(
                       animation: _shimmerAnimation,
                       builder: (context, child) {
@@ -114,7 +122,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
 
                   // Button content
                   Center(
-                    child: widget.isLoading
+                    child: (widget.isLoading || _isPurchasing)
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -130,7 +138,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
                               ),
                               SizedBox(width: 3.w),
                               Text(
-                                'Processing...',
+                                _isPurchasing ? 'Purchasing...' : 'Processing...',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -175,7 +183,7 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
 
         // Secondary button
         GestureDetector(
-          onTap: widget.isLoading ? null : widget.onRestore,
+          onTap: widget.isLoading || _isPurchasing ? null : _handleRestore,
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 1.5.h),
             child: Row(
@@ -218,5 +226,108 @@ class _PurchaseButtonWidgetState extends State<PurchaseButtonWidget>
         ),
       ],
     );
+  }
+
+  /// Handle purchase button tap
+  Future<void> _handlePurchase() async {
+    if (_isPurchasing) return;
+
+    setState(() {
+      _isPurchasing = true;
+    });
+
+    try {
+      // Map selected plan to product ID
+      String productId;
+      switch (widget.selectedPlan.toLowerCase()) {
+        case 'premium':
+          productId = ProductIds.premiumMonthly;
+          break;
+        case 'pro':
+          productId = ProductIds.proMonthly;
+          break;
+        case 'lifetime':
+          productId = ProductIds.premiumLifetime;
+          break;
+        default:
+          productId = ProductIds.premiumMonthly;
+      }
+
+      // Perform purchase using unified billing service
+      final result = await _billingService.purchaseProduct(
+        productId: productId,
+        userEmail: widget.userEmail,
+      );
+
+      if (result.success) {
+        // Handle successful purchase
+        if (result.provider == BillingProvider.paystack) {
+          // For Paystack, open checkout URL
+          final checkoutUrl = result.metadata?['checkout_url'] as String?;
+          if (checkoutUrl != null) {
+            _openCheckoutUrl(checkoutUrl);
+          }
+        } else {
+          // For RevenueCat, call the original success callback
+          widget.onStartTrial();
+        }
+      } else {
+        // Show error message
+        _showErrorMessage(result.error ?? 'Purchase failed');
+      }
+    } catch (e) {
+      _showErrorMessage('Purchase failed: $e');
+    } finally {
+      setState(() {
+        _isPurchasing = false;
+      });
+    }
+  }
+
+  /// Handle restore purchases button tap
+  Future<void> _handleRestore() async {
+    if (_isPurchasing) return;
+
+    setState(() {
+      _isPurchasing = true;
+    });
+
+    try {
+      final result = await _billingService.restorePurchases();
+      
+      if (result.success) {
+        widget.onRestore();
+      } else {
+        _showErrorMessage(result.error ?? 'Restore failed');
+      }
+    } catch (e) {
+      _showErrorMessage('Restore failed: $e');
+    } finally {
+      setState(() {
+        _isPurchasing = false;
+      });
+    }
+  }
+
+  /// Open checkout URL for web payments
+  void _openCheckoutUrl(String url) {
+    // This would need to be implemented based on the platform
+    // For web: window.open(url)
+    // For mobile: url_launcher package
+    if (kDebugMode) {
+      print('Opening checkout URL: $url');
+    }
+  }
+
+  /// Show error message to user
+  void _showErrorMessage(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
