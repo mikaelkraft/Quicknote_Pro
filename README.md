@@ -221,6 +221,18 @@ See docs/monetization for plans, tracking, and outlines:
 - docs/monetization/metrics.md
 - docs/monetization/release-plan.md
 
+## 💳 Payment Setup & Integration
+Comprehensive payment processing with RevenueCat and Paystack:
+- [Payment Setup Guide](docs/payment-setup-guide.md) - Complete setup instructions
+- [Cloudflare Worker](cloudflare-worker/README.md) - Webhook processing deployment
+- Product IDs: `lib/constants/product_ids.dart` - Annual & lifetime SKUs
+- RevenueCat Service: `lib/services/monetization/revenuecat_service.dart`
+
+**Supported Payment Methods:**
+- RevenueCat (iOS/Android subscriptions)
+- Paystack (African markets + international)
+- Cloudflare Workers (webhook processing)
+
 ## 🙏 Acknowledgments
 - Powered by [Flutter](https://flutter.dev) & [Dart](https://dart.dev)
 - Styled with Material Design
