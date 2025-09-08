@@ -55,6 +55,9 @@ dependencies:
   # Firebase Analytics
   firebase_core: ^3.6.0
   firebase_analytics: ^11.3.3
+  
+  # In-App Purchases & Billing
+  purchases_flutter: ^6.30.0
 
 dev_dependencies:
   flutter_test:    # 🚨 CRITICAL: Required for Flutter project testing - DO NOT REMOVE

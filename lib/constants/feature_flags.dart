@@ -24,6 +24,21 @@ class FeatureFlags {
     defaultValue: true,
   );
 
+  static const bool revenueCatEnabled = bool.fromEnvironment(
+    '${_envPrefix}REVENUECAT_ENABLED',
+    defaultValue: true,
+  );
+
+  static const bool paystackEnabled = bool.fromEnvironment(
+    '${_envPrefix}PAYSTACK_ENABLED',
+    defaultValue: true,
+  );
+
+  static const bool webCheckoutEnabled = bool.fromEnvironment(
+    '${_envPrefix}WEB_CHECKOUT_ENABLED',
+    defaultValue: true,
+  );
+
   // Analytics flags
   static const bool analyticsEnabled = bool.fromEnvironment(
     '${_envPrefix}ANALYTICS_ENABLED',
@@ -236,6 +251,9 @@ class FeatureFlags {
       'monetization_enabled': monetizationEnabled,
       'iap_enabled': iapEnabled,
       'subscriptions_enabled': subscriptionsEnabled,
+      'revenuecat_enabled': revenueCatEnabled,
+      'paystack_enabled': paystackEnabled,
+      'web_checkout_enabled': webCheckoutEnabled,
       
       // Analytics
       'analytics_enabled': analyticsEnabled,
